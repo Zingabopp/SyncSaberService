@@ -35,6 +35,8 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.IO.Compression" />
+    <Reference Include="System.IO.Compression.FileSystem" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -43,11 +45,28 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Config.cs" />
+    <Compile Include="DownloadBatch.cs" />
+    <Compile Include="DownloadJob.cs" />
+    <Compile Include="Logger.cs" />
+    <Compile Include="Playlist.cs" />
+    <Compile Include="PlaylistIO.cs" />
+    <Compile Include="PlaylistSong.cs" />
+    <Compile Include="SimpleJSON.cs" />
+    <Compile Include="SongInfo.cs" />
+    <Compile Include="SongListUtils.cs" />
+    <Compile Include="SyncSaber.cs" />
+    <Compile Include="Utilities.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config" />
+    <PackageReference Include="ini-parser">
+      <Version>2.5.2</Version>
+    </PackageReference>
+    <PackageReference Include="Microsoft.Tpl.Dataflow">
+      <Version>4.5.24</Version>
+    </PackageReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
