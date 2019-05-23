@@ -106,6 +106,7 @@ namespace SyncSaberService
             return ProcessFeedPage(pageText, info);
             
         }
+
         public static SyncSaber Instance;
         private Dictionary<string, string> _beastSaberFeeds;
         public Dictionary<string, string> BeastSaberFeeds

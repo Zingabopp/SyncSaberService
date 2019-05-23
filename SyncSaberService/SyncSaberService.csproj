@@ -47,7 +47,9 @@
   <ItemGroup>
     <Compile Include="Config.cs" />
     <Compile Include="DownloadBatch.cs" />
+    <Compile Include="Downloaders\BeastSaverDownloader.cs" />
     <Compile Include="DownloadJob.cs" />
+    <Compile Include="Downloaders\IFeedDownloader.cs" />
     <Compile Include="Logger.cs" />
     <Compile Include="Playlist.cs" />
     <Compile Include="PlaylistIO.cs" />

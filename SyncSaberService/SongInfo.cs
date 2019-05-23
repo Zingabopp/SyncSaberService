@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text.RegularExpressions;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -20,7 +21,16 @@ namespace SyncSaberService
         public string Index
         {
             get { return _songIndex; }
-            set { _songIndex = value; }
+            set
+            {
+                _songIndex = value;
+                if (_beatSaverRegex.IsMatch(_songIndex))
+                {
+                    int dashIndex = _songIndex.IndexOf('-');
+                    _songID = int.Parse(_songIndex.Substring(0, dashIndex));
+                    _songVersion = int.Parse(_songIndex.Substring(dashIndex + 1));
+                }
+            }
         }
         public string Name
         {
@@ -42,6 +52,29 @@ namespace SyncSaberService
             get { return _feedName; }
             set { _feedName = value; }
         }
+
+        private int _songID = 0;
+        public int SongID
+        {
+            get
+            {
+
+                return _songID;
+            }
+        }
+
+        private int _songVersion = 0;
+        public int SongVersion
+        {
+            get
+            {
+                return _songVersion;
+            }
+        }
+
+        private readonly Regex _digitRegex = new Regex("^[0-9]+$", RegexOptions.Compiled);
+
+        private readonly Regex _beatSaverRegex = new Regex("^[0-9]+-[0-9]+$", RegexOptions.Compiled);
 
         private string _songUrl, _songIndex, _songName, _authorName, _feedName;
     }
