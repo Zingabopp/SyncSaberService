@@ -25,7 +25,7 @@ namespace SyncSaberService
         private static readonly ConsoleColor DefaultFgColor = ConsoleColor.Gray;
         public static bool ShortenSourceName = false;
         public static bool ShowTime = true;
-        private static StreamWriter fileWriter = new StreamWriter("log.txt", false);
+        public static StreamWriter fileWriter = new StreamWriter("log.txt", false);
 
         private static void ResetForegroundColor()
         {
@@ -79,6 +79,7 @@ namespace SyncSaberService
             string logText = $"{sourcePart}{timePart} - Debug] {text}";
             Console.WriteLine(logText);
             fileWriter.Write(logText + "\n");
+            
             //Console.ForegroundColor = ConsoleColor.Green;
             //Console.WriteLine("[" + LoggerName + " @ " + DateTime.Now.ToString("HH:mm") + " - Debug] " + String.Format(format, args));
             ResetForegroundColor();

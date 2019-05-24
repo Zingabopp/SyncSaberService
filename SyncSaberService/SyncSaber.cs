@@ -32,8 +32,7 @@ namespace SyncSaberService
             catch (Exception ex)
             {
                 Logger.Exception($"Exception loading XML from {info.feedUrl}: ", ex);
-                this._downloaderRunning = false;
-                //yield break;
+                _downloaderRunning = false;
                 return downloadCountForPage;
             }
             XmlNodeList xmlNodeList = xmlDocument.DocumentElement.SelectNodes("/rss/channel/item");
@@ -485,85 +484,21 @@ namespace SyncSaberService
         }
         private static IntegerWrapper EarliestEmptyPage = new IntegerWrapper(9999);
 
-        public void DownloadBeastSaberFeeds(int feedToDownload)
+        public void DownloadBeastSaberFeed(int feedToDownload, int maxPages)
         {
             DownloadBatch jobs = new DownloadBatch();
             jobs.JobCompleted += OnJobFinished;
             ClearResultQueues();
-            this._downloaderRunning = true;
+            _downloaderRunning = true;
             DateTime startTime = DateTime.Now;
             int downloadCount = 0;
             int totalSongs = 0;
             int pageIndex = 0;
-            int concurrentPageChecks = 5;
             var cook = Cookies;
+            IFeedReader bReader = new BeastSaverReader(Config.BeastSaberUsername, Config.BeastSaberPassword, Config.MaxConcurrentDownloads);
+            var queuedSongs = bReader.GetSongsFromFeed(feedToDownload, maxPages);
             
-            //ConcurrentQueue<string> pagesToProcess = new ConcurrentQueue<string>();
-            //WebClient client = new WebClient();
-            //client.Headers.Add(HttpRequestHeader.Cookie, cook.GetCookieHeader(new Uri(info.feedUrl)));
-            Queue<FeedPageInfo> pageQueue = new Queue<FeedPageInfo>();
-
-            // TODO: Split off the download of page text into it's own class.
-            var actionBlock = new ActionBlock<FeedPageInfo>(info => {
-                HttpClient hClient = new HttpClient();
-                hClient.DefaultRequestHeaders.Add(HttpRequestHeader.Cookie.ToString(), CookieHeader);
-                //bool cancelJob = false;
-                lock(EarliestEmptyPage)
-                {
-                    if((EarliestEmptyPage.number) < info.pageIndex)
-                    {
-                        //Logger.Debug($"Skipping page {info.pageIndex}: {info.pageIndex} > {EarliestEmptyPage.number} ");
-                        return;
-                        //cancelJob = true;
-                    }
-                }
-                    
-                var pageText = hClient.GetStringAsync(info.feedUrl); //jobClient.DownloadString(info.feedUrl);
-                pageText.Wait();
-                //Logger.Debug(pageText.Result);
-                int numSongs = ProcessFeedPage(pageText.Result, info);
-                if(numSongs == 0)
-                {
-                    Logger.Debug($"No songs found on page {info.pageIndex}");
-                    lock(EarliestEmptyPage)
-                    {
-                        EarliestEmptyPage.number = info.pageIndex;
-                    }
-                }
-                hClient.Dispose();
-            }, new ExecutionDataflowBlockOptions {
-                BoundedCapacity = 500,
-                MaxDegreeOfParallelism = concurrentPageChecks
-            });
-            lock (EarliestEmptyPage)
-            {
-                EarliestEmptyPage.number = 9999;
-            }
-            do
-            {
-                pageIndex++; // Increment page index because it starts with 1.
-                             //int totalSongsForPage = 0;
-                             //int downloadCountForPage = 0;
-
-                string feedUrl = _beastSaberFeeds.ElementAt(feedToDownload).Value + "/feed/?acpage=" + pageIndex.ToString();
-                FeedPageInfo pageInfo = new FeedPageInfo();
-                pageInfo.feedToDownload = feedToDownload;
-                pageInfo.feedUrl = feedUrl;
-                pageInfo.pageIndex = pageIndex;
-                pageQueue.Enqueue(pageInfo);
-            }
-            while (pageIndex < this.GetMaxBeastSaberPages(feedToDownload) || this.GetMaxBeastSaberPages(feedToDownload) == 0);
-
-            while (pageQueue.Count > 0)
-            {
-                var page = pageQueue.Dequeue();
-                
-                //actionBlock.SendAsync(job).Wait();
-                actionBlock.SendAsync(page).Wait();
-            }
-            actionBlock.Complete();
-            actionBlock.Completion.Wait();
-            Logger.Debug($"Finished checking pages, queueing {_songDownloadQueue.Count} songs");
+            Logger.Debug($"Finished checking pages, queueing {queuedSongs.Count} songs");
             while (!_songDownloadQueue.IsEmpty)
             {
                 DownloadJob job;

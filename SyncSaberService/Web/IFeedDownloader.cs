@@ -23,6 +23,7 @@ namespace SyncSaberService.Web
         string GetPageText(string url);
         SongInfo[] GetSongsFromPage(string pageText);
         Dictionary<int, FeedInfo> Feeds { get; }
+        Dictionary<int, SongInfo> GetSongsFromFeed(int feedIndex, int maxPages);
     }
 
     public struct FeedInfo

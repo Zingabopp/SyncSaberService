@@ -20,6 +20,7 @@ namespace SyncSaberService.Web
     public class BeastSaverReader : IFeedReader
     {
         private string _username, _password, _loginUri;
+        private int _maxConcurrency;
         private const string DefaultLoginUri = "https://bsaber.com/wp-login.php?jetpack-sso-show-default-form=1";
         private static readonly string USERNAMEKEY = "{USERNAME}";
         private static readonly string PAGENUMKEY = "{PAGENUM}";
@@ -60,11 +61,15 @@ namespace SyncSaberService.Web
             }
         }
 
-        public BeastSaverReader(string username, string password, string loginUri = DefaultLoginUri)
+        public BeastSaverReader(string username, string password, int maxConcurrency, string loginUri = DefaultLoginUri)
         {
             _username = username;
             _password = password;
             _loginUri = loginUri;
+            if (maxConcurrency > 0)
+                _maxConcurrency = maxConcurrency;
+            else
+                _maxConcurrency = 3;
             _earliestEmptyPage = new Dictionary<int, int>() {
                 {0, 9999 },
                 {1, 9999 },
@@ -219,28 +224,15 @@ namespace SyncSaberService.Web
                 return "";
         }
 
-        public List<SongInfo> GetSongsFromFeed(int feedIndex, int maxPages, int maxConcurrency, bool ignoreDuplicateIDs = true)
+        public Dictionary<int, SongInfo> GetSongsFromFeed(int feedIndex, int maxPages)
         {
             int pageIndex = 0;
-            if (maxConcurrency < 1)
-                maxConcurrency = 1;
             ConcurrentQueue<SongInfo> songList = new ConcurrentQueue<SongInfo>();
+            //ConcurrentDictionary<int, SongInfo> songDict = new ConcurrentDictionary<int, SongInfo>();
             Queue<FeedPageInfo> pageQueue = new Queue<FeedPageInfo>();
             var actionBlock = new ActionBlock<FeedPageInfo>(info => {
                 //bool cancelJob = false;
-                lock (_earliestEmptyPage)
-                {
-                    if (EarliestEmptyPageForFeed(feedIndex) < info.pageIndex)
-                    {
-                        //Logger.Debug($"Skipping page {info.pageIndex}: {info.pageIndex} > {EarliestEmptyPage.number} ");
-                        return;
-                        //cancelJob = true;
-                    }
-                }
-
-                var pageText = GetPageText(info.feedUrl);//hClient.GetStringAsync(info.feedUrl); //jobClient.DownloadString(info.feedUrl);
-                //pageText.Wait();
-                //Logger.Debug(pageText.Result);
+                var pageText = GetPageText(info.feedUrl);
                 var songsFound = GetSongsFromPage(pageText);
                 if (songsFound.Count() == 0)
                 {
@@ -256,10 +248,11 @@ namespace SyncSaberService.Web
                     {
                         songList.Enqueue(song);
                     }
+                    
                 }
             }, new ExecutionDataflowBlockOptions {
-                BoundedCapacity = maxConcurrency + 2,
-                MaxDegreeOfParallelism = maxConcurrency
+                BoundedCapacity = _maxConcurrency, // So pages don't get overqueued when a page with no songs is found
+                MaxDegreeOfParallelism = _maxConcurrency
             });
             lock (_earliestEmptyPage)
             {
@@ -269,9 +262,7 @@ namespace SyncSaberService.Web
             // Keep queueing pages to check until max pages is reached, or pageIndex is greater than earliestEmptyPage
             do
             {
-                pageIndex++; // Increment page index because it starts with 1.
-                             //int totalSongsForPage = 0;
-                             //int downloadCountForPage = 0;
+                pageIndex++; // Increment page index first because it starts with 1.
 
                 lock (_earliestEmptyPage)
                 {
@@ -287,7 +278,7 @@ namespace SyncSaberService.Web
                 Logger.Debug($"Queued page {pageIndex} for reading. EarliestEmptyPage is {earliestEmptyPage}");
                 //Logger.Debug($"FeedURL is {feedUrl}");
             }
-            while ((pageIndex < maxPages || maxPages == 0) && pageIndex < earliestEmptyPage);
+            while ((pageIndex < maxPages || maxPages == 0) && pageIndex <= earliestEmptyPage);
 
             while (pageQueue.Count > 0)
             {
@@ -299,7 +290,27 @@ namespace SyncSaberService.Web
             actionBlock.Completion.Wait();
 
             Logger.Debug($"Finished checking pages, found {songList.Count} songs");
-            return songList.ToList();
+            Dictionary<int, SongInfo> retDict = new Dictionary<int, SongInfo>();
+            foreach (var song in songList)
+            {
+                if (retDict.ContainsKey(song.SongID))
+                {
+                    if (retDict[song.SongID].SongVersion < song.SongVersion)
+                    {
+                        Logger.Debug($"Song with ID {song.SongID} already exists, updating");
+                        retDict[song.SongID] = song;
+                    }
+                    else
+                    {
+                        Logger.Debug($"Song with ID {song.SongID} is already the newest version");
+                    }
+                }
+                else
+                {
+                    retDict.Add(song.SongID, song);
+                }
+            }
+            return retDict;
         }
 
         public struct FeedPageInfo

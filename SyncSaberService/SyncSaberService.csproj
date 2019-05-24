@@ -48,7 +48,7 @@
     <Compile Include="Config.cs" />
     <Compile Include="Web\DownloadBatch.cs" />
     <Compile Include="Web\AsyncCookieCache.cs" />
-    <Compile Include="Web\BeastSaverDownloader.cs" />
+    <Compile Include="Web\BeastSaberReader.cs" />
     <Compile Include="Web\DownloadJob.cs" />
     <Compile Include="Web\IFeedDownloader.cs" />
     <Compile Include="Logger.cs" />

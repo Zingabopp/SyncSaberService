@@ -15,12 +15,13 @@ namespace SyncSaberService
         static void Main(string[] args)
         {
             Logger.LogLevel = LogLevel.Debug;
+            Logger.fileWriter.AutoFlush = true;
             Logger.ShortenSourceName = true;
             
             Config.Initialize();
 
-            //var testReader = new Web.BeastSaverReader(Config.BeastSaberUsername, Config.BeastSaberPassword);
-            //var testList = testReader.GetSongsFromFeed(0, 0, 3);
+            var testReader = new Web.BeastSaverReader(Config.BeastSaberUsername, Config.BeastSaberPassword, 3);
+            var testList = testReader.GetSongsFromFeed(2, 0);
 
             if (!Config.CriticalError)
             {
@@ -36,11 +37,11 @@ namespace SyncSaberService
                 //int count = ss.CheckFeed(testPage);
                 var test = HttpRequestHeader.Cookie.ToString();
                 Logger.Info($"Downloading songs from {ss.BeastSaberFeeds.ElementAt(0).Value} feed...");
-                ss.DownloadBeastSaberFeeds(0);
+                ss.DownloadBeastSaberFeed(0, 50);
                 Logger.Info($"Downloading songs from {ss.BeastSaberFeeds.ElementAt(1).Value} feed...");
-                ss.DownloadBeastSaberFeeds(1);
+                ss.DownloadBeastSaberFeed(1, 50);
                 Logger.Info($"Downloading songs from {ss.BeastSaberFeeds.ElementAt(2).Value} feed...");
-                ss.DownloadBeastSaberFeeds(2);
+                ss.DownloadBeastSaberFeed(2, 50);
                 foreach(string mapper in Config.FavoriteMappers)
                 {
                     //ss.DownloadAllSongsByAuthor(mapper);
