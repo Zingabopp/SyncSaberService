@@ -11,7 +11,7 @@ using System.Net;
 using System.Diagnostics;
 using static SyncSaberService.Utilities;
 
-namespace SyncSaberService
+namespace SyncSaberService.Web
 {
     public class DownloadJob
     {
@@ -137,6 +137,7 @@ namespace SyncSaberService
             catch (Exception ex)
             {
                 // Used to catch the cancellation exception.
+                // TODO: Catch specific exceptions.
             }
             finally
             {

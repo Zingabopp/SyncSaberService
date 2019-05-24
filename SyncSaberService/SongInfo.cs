@@ -72,9 +72,9 @@ namespace SyncSaberService
             }
         }
 
-        private readonly Regex _digitRegex = new Regex("^[0-9]+$", RegexOptions.Compiled);
+        private static readonly Regex _digitRegex = new Regex("^[0-9]+$", RegexOptions.Compiled);
 
-        private readonly Regex _beatSaverRegex = new Regex("^[0-9]+-[0-9]+$", RegexOptions.Compiled);
+        private static readonly Regex _beatSaverRegex = new Regex("^[0-9]+-[0-9]+$", RegexOptions.Compiled);
 
         private string _songUrl, _songIndex, _songName, _authorName, _feedName;
     }

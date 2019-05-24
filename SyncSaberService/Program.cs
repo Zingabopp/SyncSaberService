@@ -12,9 +12,6 @@ namespace SyncSaberService
 {
     class Program
     {
-
-
-
         static void Main(string[] args)
         {
             Logger.LogLevel = LogLevel.Debug;
@@ -22,8 +19,8 @@ namespace SyncSaberService
             
             Config.Initialize();
 
-
-            
+            //var testReader = new Web.BeastSaverReader(Config.BeastSaberUsername, Config.BeastSaberPassword);
+            //var testList = testReader.GetSongsFromFeed(0, 0, 3);
 
             if (!Config.CriticalError)
             {

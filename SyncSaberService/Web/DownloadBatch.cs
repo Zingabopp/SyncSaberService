@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Threading.Tasks.Dataflow;
 using static SyncSaberService.Utilities;
-namespace SyncSaberService
+namespace SyncSaberService.Web
 {
     class DownloadBatch
     {

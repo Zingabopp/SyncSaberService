@@ -15,13 +15,24 @@ using System.Threading.Tasks.Dataflow;
 using System.Net.Http;
 using static SyncSaberService.Utilities;
 
-namespace SyncSaberService.Downloaders
+namespace SyncSaberService.Web
 {
     public interface IFeedReader
     {
         string GetPageUrl(int feedIndex, int page);
         string GetPageText(string url);
         SongInfo[] GetSongsFromPage(string pageText);
-        Dictionary<int, string> FeedUrls { get; }
+        Dictionary<int, FeedInfo> Feeds { get; }
+    }
+
+    public struct FeedInfo
+    {
+        public FeedInfo(string _name, string _baseUrl)
+        {
+            Name = _name;
+            BaseUrl = _baseUrl;
+        }
+        public string BaseUrl;
+        public string Name;
     }
 }
