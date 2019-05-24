@@ -21,28 +21,52 @@ namespace SyncSaberService.Downloaders
     {
         private string _username, _password, _loginUri;
         private const string DefaultLoginUri = "https://bsaber.com/wp-login.php?jetpack-sso-show-default-form=1";
+        private static readonly string USERNAMEKEY = "{USERNAME}";
+        private static readonly string PAGENUMKEY = "{PAGENUM}";
+        private static readonly Uri FeedRootUri = new Uri("https://bsaber.com");
 
-        private CookieContainer _cookies;
-        private CookieContainer Cookies
+        private static CookieContainer _cookies;
+        private static CookieContainer Cookies
         {
             get
             {
-                if (_cookies == null)
-                    _cookies = GetBSaberCookies(_username, _password);
                 return _cookies;
             }
+            set
+            {
+                _cookies = value;
+            }
         }
-        private string _cookieHeader = "";
-        private string CookieHeader
+        private Dictionary<int, string> _feeds;
+        public Dictionary<int, string> FeedUrls
         {
             get
             {
-                if (_cookieHeader == "")
-                    _cookieHeader = Cookies.GetCookieHeader(new Uri("https://bsaber.com"));
-                return _cookieHeader;
+                if(_feeds == null)
+                {
+                    _feeds = new Dictionary<int, string> ()
+                    {
+                        { 0, "https://bsaber.com/members/" + USERNAMEKEY + "/wall/followings/feed/?acpage=" + PAGENUMKEY },
+                        { 1, "https://bsaber.com/members/" + USERNAMEKEY + "/bookmarks/feed/?acpage=" + PAGENUMKEY },
+                        { 2, "https://bsaber.com/members/curatorrecommended/bookmarks/feed/?acpage=" + PAGENUMKEY }
+                    };
+                }
+                return _feeds;
             }
         }
 
+        /*
+private static string _cookieHeader = "";
+private static string CookieHeader
+{
+get
+{
+if (_cookieHeader == "" && !(Cookies == null))
+_cookieHeader = Cookies.GetCookieHeader(new Uri("https://bsaber.com"));
+return _cookieHeader;
+}
+}
+*/
         public BeastSaverDownloader(string username, string password, string loginUri = DefaultLoginUri)
         {
             _username = username;
@@ -52,9 +76,25 @@ namespace SyncSaberService.Downloaders
 
         public static CookieContainer GetBSaberCookies(string username, string password)
         {
+            CookieContainer tempContainer = null;
+            lock(_cookies)
+            {
+                if (_cookies != null)
+                {
+                    tempContainer = new CookieContainer();
+                    tempContainer.Add(_cookies.GetCookies(FeedRootUri));
+                }
+            }
+            if (tempContainer != null)
+                return tempContainer;
             string loginUri = "https://bsaber.com/wp-login.php?jetpack-sso-show-default-form=1";
             string reqString = $"log={username}&pwd={password}&rememberme=forever";
-            return GetCookies(loginUri, reqString);
+            var tempCookies = GetCookies(loginUri, reqString);
+            lock(_cookies)
+            {
+                _cookies = tempCookies;
+            }
+            return Cookies;
         }
 
         public static CookieContainer GetCookies(string loginUri, string requestString)
@@ -82,7 +122,7 @@ namespace SyncSaberService.Downloaders
         public string GetPageText(string url)
         {
             HttpClient hClient = new HttpClient();
-            hClient.DefaultRequestHeaders.Add(HttpRequestHeader.Cookie.ToString(), CookieHeader);
+            hClient.DefaultRequestHeaders.Add(HttpRequestHeader.Cookie.ToString(), GetBSaberCookies(_username, _password).GetCookieHeader(FeedRootUri));
             //bool cancelJob = false;
             //lock (EarliestEmptyPage)
             //{
@@ -102,9 +142,20 @@ namespace SyncSaberService.Downloaders
             return pageText;
         }
 
-        public string GetPageUrl(int page)
+        public async Task<string> GetPageTextAsync(string url)
         {
-            throw new NotImplementedException();
+            return await new Task<string>(() => GetPageText(url));
+        }
+
+        public string GetPageUrl(string feedUrlBase, int page)
+        {
+            string feedUrl = feedUrlBase.Replace(USERNAMEKEY, _username).Replace(PAGENUMKEY, page.ToString());
+            return feedUrl;
+        }
+
+        public string GetPageUrl(int feedIndex, int page)
+        {
+            return GetPageUrl(FeedUrls[feedIndex], page);
         }
     }
 }
