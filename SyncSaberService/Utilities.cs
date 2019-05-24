@@ -16,8 +16,8 @@ namespace SyncSaberService
 {
     public static class Utilities
     {
-        
-        
+
+
         /// <summary>
         /// Creates a new KeyData object with the provided keyName and keyValue;
         /// </summary>
@@ -63,7 +63,7 @@ namespace SyncSaberService
             return successful;
         }
 
-        
+
 
         public static void EmptyDirectory(string directory, bool delete = true)
         {
@@ -128,7 +128,7 @@ namespace SyncSaberService
             File.WriteAllLines(path, data);
             File.Delete(path + ".bak");
         }
-
+        
         public static CookieContainer LoginBSaber(string username, string password)
         {
             string loginUri = "https://bsaber.com/wp-login.php?jetpack-sso-show-default-form=1";
@@ -144,17 +144,17 @@ namespace SyncSaberService
             request.ContentLength = requestData.Length;
             using (Stream s = request.GetRequestStream())
                 s.Write(requestData, 0, requestData.Length);
-            /*
-            using (HttpWebResponse response = (HttpWebResponse) request.GetResponse())
-            {
-                foreach (Cookie c in response.Cookies)
-                    Console.WriteLine(c.Name + " = " + c.Value);
-            }
-            */
+            
+            //using (HttpWebResponse response = (HttpWebResponse) request.GetResponse())
+            //{
+            //    foreach (Cookie c in response.Cookies)
+            //        Console.WriteLine(c.Name + " = " + c.Value);
+            //}
+           
             HttpWebResponse response = (HttpWebResponse) request.GetResponse(); // Needs this to populate cookies
             return cc;
         }
-
+       
         public static string FormatTimeSpan(TimeSpan timeElapsed)
         {
             string timeElapsedStr = "";
@@ -165,7 +165,7 @@ namespace SyncSaberService
             timeElapsedStr = $"{timeElapsedStr}{timeElapsed.Seconds}s";
             return timeElapsedStr;
         }
-        
+
 
     }
 
