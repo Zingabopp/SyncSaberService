@@ -510,11 +510,15 @@ namespace SyncSaberService
             */
             string customSongsPath = Path.Combine(Config.BeatSaberPath, "CustomSongs");
             var existingSongs = Directory.GetDirectories(customSongsPath);
+            string tempPath = "";
+            string outputPath = "";
             foreach (var song in queuedSongs.Values)
             {
-                if (existingSongs.Contains(song.Index) || _songDownloadHistory.Contains(song.Index))
+                tempPath = Path.Combine(Path.GetTempPath(), song.Index + ".zip");
+                outputPath = Path.Combine(Config.BeatSaberPath, "CustomSongs", song.Index);
+                if (existingSongs.Contains(song.Index) || _songDownloadHistory.Contains(song.Index) || Directory.Exists(outputPath))
                     continue; // We already have the song or don't want it, skip
-                DownloadJob job = new DownloadJob(song, song.URL, Path.Combine(Config.BeatSaberPath, "CustomSongs\""));
+                DownloadJob job = new DownloadJob(song, tempPath, outputPath);
                 jobs.AddJob(job);
             }
             jobs.RunJobs().Wait();

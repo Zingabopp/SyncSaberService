@@ -20,8 +20,8 @@ namespace SyncSaberService
             
             Config.Initialize();
 
-            var testReader = new Web.BeastSaverReader(Config.BeastSaberUsername, Config.BeastSaberPassword, 3);
-            var testList = testReader.GetSongsFromFeed(2, 0);
+            //var testReader = new Web.BeastSaverReader(Config.BeastSaberUsername, Config.BeastSaberPassword, 3);
+            //var testList = testReader.GetSongsFromFeed(2, 0);
 
             if (!Config.CriticalError)
             {

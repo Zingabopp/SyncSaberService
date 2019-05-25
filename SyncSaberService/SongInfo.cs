@@ -30,6 +30,10 @@ namespace SyncSaberService
                     _songID = int.Parse(_songIndex.Substring(0, dashIndex));
                     _songVersion = int.Parse(_songIndex.Substring(dashIndex + 1));
                 }
+                else
+                {
+                    Logger.Warning($"Invalid song index: {value}");
+                }
             }
         }
         public string Name
