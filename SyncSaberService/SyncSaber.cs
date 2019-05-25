@@ -19,6 +19,7 @@ namespace SyncSaberService
 {
     public class SyncSaber
     {
+        public static readonly string DownloadURLPrefix = "https://beatsaver.com/download/";
 
         public int ProcessFeedPage(string pageText, FeedPageInfo info)
         {
@@ -73,12 +74,12 @@ namespace SyncSaberService
                     }
                 }
             }
-            if(totalSongsForPage == 0)
+            if (totalSongsForPage == 0)
             {
                 Logger.Debug($"Page {info.pageIndex} has no songs");
-                lock(EarliestEmptyPage)
+                lock (EarliestEmptyPage)
                 {
-                    if (( EarliestEmptyPage.number) > info.pageIndex)
+                    if ((EarliestEmptyPage.number) > info.pageIndex)
                     {
                         Logger.Debug($"Page {info.pageIndex} is less than the EarlistEmptyPage {EarliestEmptyPage.number}");
                         EarliestEmptyPage.number = info.pageIndex;
@@ -91,7 +92,7 @@ namespace SyncSaberService
 
         public int CheckFeed(SyncSaber.FeedPageInfo info)
         {
-            
+
             Logger.Info($"Checking page {info.pageIndex.ToString()} of {_beastSaberFeeds.ElementAt(info.feedToDownload).Key} feed from BeastSaber!");
             Uri feedUri = new Uri(info.feedUrl);
             HttpWebRequest newrequest = (HttpWebRequest) WebRequest.Create(feedUri);
@@ -104,7 +105,7 @@ namespace SyncSaberService
             string pageText = client.DownloadString(info.feedUrl);
 
             return ProcessFeedPage(pageText, info);
-            
+
         }
 
         public static SyncSaber Instance;
@@ -424,7 +425,7 @@ namespace SyncSaberService
         }
 
         private CookieContainer _cookies;
-        
+
         private CookieContainer Cookies
         {
             get
@@ -446,7 +447,7 @@ namespace SyncSaberService
             }
         }
 
-        
+
 
         private static string GetMapperFromBsaber(string innerText)
         {
@@ -497,13 +498,24 @@ namespace SyncSaberService
             var cook = Cookies;
             IFeedReader bReader = new BeastSaverReader(Config.BeastSaberUsername, Config.BeastSaberPassword, Config.MaxConcurrentDownloads);
             var queuedSongs = bReader.GetSongsFromFeed(feedToDownload, maxPages);
-            
-            Logger.Debug($"Finished checking pages, queueing {queuedSongs.Count} songs");
+
+            Logger.Debug($"Finished checking pages, found {queuedSongs.Count} songs");
+            /*
             while (!_songDownloadQueue.IsEmpty)
             {
                 DownloadJob job;
                 if (_songDownloadQueue.TryDequeue(out job))
                     jobs.AddJob(job);
+            }
+            */
+            string customSongsPath = Path.Combine(Config.BeatSaberPath, "CustomSongs");
+            var existingSongs = Directory.GetDirectories(customSongsPath);
+            foreach (var song in queuedSongs.Values)
+            {
+                if (existingSongs.Contains(song.Index) || _songDownloadHistory.Contains(song.Index))
+                    continue; // We already have the song or don't want it, skip
+                DownloadJob job = new DownloadJob(song, song.URL, Path.Combine(Config.BeatSaberPath, "CustomSongs\""));
+                jobs.AddJob(job);
             }
             jobs.RunJobs().Wait();
             Logger.Debug("Jobs finished, Processing downloads...");
