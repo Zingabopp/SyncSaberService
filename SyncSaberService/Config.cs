@@ -618,7 +618,7 @@ namespace SyncSaberService
                 if (_favoriteMappers == null)
                     _favoriteMappers = new List<string>();
                 FileInfo mapperFile = new FileInfo(Path.Combine(BeatSaberPath, "UserData\\FavoriteMappers.ini"));
-                Logger.Debug($"MapperFile: {mapperFile.FullName}");
+                //Logger.Debug($"MapperFile: {mapperFile.FullName}");
 
                 if (mapperFile.Exists)
                 {
@@ -626,7 +626,7 @@ namespace SyncSaberService
                     {
                         if (string.IsNullOrWhiteSpace(mapper))
                             continue;
-                        Logger.Debug($"Mapper: {mapper} read from FavoriteMappers.ini");
+                        //Logger.Debug($"Mapper: {mapper} read from FavoriteMappers.ini");
                         if (!_favoriteMappers.Contains(mapper))
                             _favoriteMappers.Add(mapper);
                     }

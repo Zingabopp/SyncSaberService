@@ -54,13 +54,19 @@ namespace SyncSaberService.Web
                 string searchURL = Feeds[99].BaseUrl.Replace(AUTHORKEY, a);
                 string pageText = GetPageText(searchURL);
                 JSONNode result = JSON.Parse(pageText);
-                Logger.Info($"Getting mapper ID, a = {a}");
                 if (result["total"].AsInt == 0)
                 {
-                    return searchURL;
+                    Logger.Warning($"No songs by {a} found, is the name spelled correctly?");
+                    return "0";
                 }
                 var songJSONAry = result["songs"].AsArray;
-                return songJSONAry.Children.First(c => c["uploader"].Value.ToLower() == a.ToLower())["uploaderId"].Value;
+                var matchingSong = songJSONAry.Children.FirstOrDefault(c => c["uploader"].Value.ToLower() == a.ToLower());
+                if (matchingSong == null)
+                {
+                    Logger.Warning($"No songs by {a} found, is the name spelled correctly?");
+                    return "0";
+                }
+                return matchingSong["uploaderId"].Value;
             });
 
             return Feeds[feedIndex].BaseUrl.Replace(AUTHORKEY, mapperId).Replace(PAGEKEY, (pageIndex * SONGSPERUSERPAGE).ToString());

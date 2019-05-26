@@ -14,14 +14,11 @@ namespace SyncSaberService
     {
         static void Main(string[] args)
         {
-            Logger.LogLevel = LogLevel.Debug;
+            Logger.LogLevel = LogLevel.Info;
             Logger.fileWriter.AutoFlush = true;
             Logger.ShortenSourceName = true;
-            
-            Config.Initialize();
 
-            //var testReader = new Web.BeastSaberReader(Config.BeastSaberUsername, Config.BeastSaberPassword, 3);
-            //var testList = testReader.GetSongsFromFeed(2, 0);
+            Config.Initialize();
 
             if (!Config.CriticalError)
             {
@@ -30,15 +27,42 @@ namespace SyncSaberService
                 sw.Start();
                 SyncSaber ss = new SyncSaber();
 
-                var test = HttpRequestHeader.Cookie.ToString();
                 Logger.Info($"Downloading songs from {ss.BeastSaberFeeds.ElementAt(0).Value} feed...");
-                ss.DownloadBeastSaberFeed(0, 50);
+                try
+                {
+                    ss.DownloadBeastSaberFeed(0, 50);
+                }
+                catch (Exception ex)
+                {
+                    Logger.Exception($"Exception downloading BeastSaberFeed (0)", ex);
+                }
                 Logger.Info($"Downloading songs from {ss.BeastSaberFeeds.ElementAt(1).Value} feed...");
-                ss.DownloadBeastSaberFeed(1, 50);
+                try
+                {
+                    ss.DownloadBeastSaberFeed(1, 50);
+                }
+                catch (Exception ex)
+                {
+                    Logger.Exception($"Exception downloading BeastSaberFeed (1)", ex);
+                }
                 Logger.Info($"Downloading songs from {ss.BeastSaberFeeds.ElementAt(2).Value} feed...");
-                ss.DownloadBeastSaberFeed(2, 50);
+                try
+                {
+                    ss.DownloadBeastSaberFeed(2, 50);
+                }
+                catch (Exception ex)
+                {
+                    Logger.Exception($"Exception downloading BeastSaberFeed (2)", ex);
+                }
 
-                ss.DownloadAllSongsByAuthors(Config.FavoriteMappers);
+                try
+                {
+                    ss.DownloadAllSongsByAuthors(Config.FavoriteMappers);
+                }
+                catch (Exception ex)
+                {
+                    Logger.Exception("Exception downloading BeatSaver authors feed.", ex);
+                }
                 sw.Stop();
                 var processingTime = new TimeSpan(sw.ElapsedTicks);
                 Console.WriteLine($"\nFinished downloading songs in {(int) processingTime.TotalMinutes} min {processingTime.Seconds} sec");
@@ -53,6 +77,6 @@ namespace SyncSaberService
             Console.ReadKey();
         }
 
-        
+
     }
 }

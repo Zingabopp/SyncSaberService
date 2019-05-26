@@ -117,6 +117,7 @@ namespace SyncSaberService.Web
         {
             byte[] requestData = Encoding.UTF8.GetBytes(requestString);
             CookieContainer cc = new CookieContainer();
+            Logger.Debug("Requesting cookies");
             var request = (HttpWebRequest) WebRequest.Create(loginUri);
             request.Proxy = null;
             request.AllowAutoRedirect = false;
