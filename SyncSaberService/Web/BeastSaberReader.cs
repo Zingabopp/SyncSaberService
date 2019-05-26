@@ -34,7 +34,7 @@ namespace SyncSaberService.Web
         {
             return _earliestEmptyPage[feedIndex];
         }
-        private static object _cookieLock;
+        private static object _cookieLock = new object();
         private static CookieContainer _cookies;
         private static CookieContainer Cookies
         {
@@ -70,10 +70,12 @@ namespace SyncSaberService.Web
             _username = username;
             _password = password;
             _loginUri = loginUri;
+            Cookies = GetBSaberCookies(username, password);
+            AddCookies(Cookies, FeedRootUri);
             if (maxConcurrency > 0)
                 _maxConcurrency = maxConcurrency;
             else
-                _maxConcurrency = 3;
+                _maxConcurrency = 5;
             _earliestEmptyPage = new Dictionary<int, int>() {
                 {0, 9999 },
                 {1, 9999 },
@@ -174,11 +176,6 @@ namespace SyncSaberService.Web
                 }
             }
             return songsOnPage;
-        }
-
-        public async Task<string> GetPageTextAsync(string url)
-        {
-            return await new Task<string>(() => GetPageText(url));
         }
 
         public string GetPageUrl(string feedUrlBase, int page)

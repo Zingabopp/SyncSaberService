@@ -237,6 +237,54 @@ namespace SyncSaberService
             _downloaderRunning = false;
         }
 
+        public void DownloadBeastSaberFeed(int feedToDownload, int maxPages)
+        {
+            DownloadBatch jobs = new DownloadBatch();
+            jobs.JobCompleted += OnJobFinished;
+            ClearResultQueues();
+            _downloaderRunning = true;
+            DateTime startTime = DateTime.Now;
+            int downloadCount = 0;
+            int totalSongs = 0;
+            int pageIndex = 0;
+            var bReader = new BeastSaberReader(Config.BeastSaberUsername, Config.BeastSaberPassword, Config.MaxConcurrentPageChecks);
+            var queuedSongs = bReader.GetSongsFromFeed(new BeastSaberFeedSettings(feedToDownload, maxPages));
+
+            Logger.Debug($"Finished checking pages, found {queuedSongs.Count} songs");
+
+            string customSongsPath = Path.Combine(Config.BeatSaberPath, "CustomSongs");
+            var existingSongs = Directory.GetDirectories(customSongsPath);
+            string tempPath = "";
+            string outputPath = "";
+            foreach (var song in queuedSongs.Values)
+            {
+                tempPath = Path.Combine(Path.GetTempPath(), song.Index + ".zip");
+                outputPath = Path.Combine(Config.BeatSaberPath, "CustomSongs", song.Index);
+                if (existingSongs.Contains(song.Index) || _songDownloadHistory.Contains(song.Index) || Directory.Exists(outputPath))
+                    continue; // We already have the song or don't want it, skip
+                DownloadJob job = new DownloadJob(song, tempPath, outputPath);
+                jobs.AddJob(job);
+            }
+            jobs.RunJobs().Wait();
+            Logger.Debug("Jobs finished, Processing downloads...");
+            downloadCount = SuccessfulDownloads.Count;
+            int failedCount = FailedDownloads.Count;
+            totalSongs = SuccessfulDownloads.Count + FailedDownloads.Count;
+
+            ProcessDownloads();
+            var timeElapsed = (DateTime.Now - startTime);
+            Logger.Info(string.Format("Downloaded {0} songs from BeastSaber {1} feed in {2}. Checked {3} page{4}, skipped {5} songs.", new object[]
+            {
+                downloadCount,
+                this._beastSaberFeeds.ElementAt(feedToDownload).Key,
+                FormatTimeSpan(timeElapsed),
+                pageIndex,
+                (pageIndex != 1) ? "s" : "",
+                totalSongs - downloadCount
+            }));
+            _downloaderRunning = false;
+        }
+
         private void ProcessDownloads(List<Playlist> playlists = null)
         {
             if (playlists == null)

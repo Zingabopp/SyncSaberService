@@ -112,6 +112,13 @@ namespace SyncSaberService
                     return CreateKeyData("MaxConcurrentDownloads", "2");
                 }
             }
+            public static KeyData MaxConcurrentPageChecks
+            {
+                get
+                {
+                    return CreateKeyData("MaxConcurrentPageChecks", "10");
+                }
+            }
         }
 
         public static void Write()
@@ -148,6 +155,7 @@ namespace SyncSaberService
                         { SettingKeys.BeatSaberPath.KeyName, false },
                         { SettingKeys.BeastSaberPassword.KeyName, false },
                         { SettingKeys.MaxConcurrentDownloads.KeyName, false },
+                        { SettingKeys.MaxConcurrentPageChecks.KeyName, false },
                         { SettingKeys.DownloadTimeout.KeyName, false },
                     };
                 }
@@ -190,6 +198,7 @@ namespace SyncSaberService
             setting = BeatSaberPath;
             setting = DownloadTimeout;
             setting = MaxConcurrentDownloads;
+            setting = MaxConcurrentPageChecks;
         }
 
         public static bool Initialize()
@@ -571,6 +580,32 @@ namespace SyncSaberService
             set
             {
                 Settings[SettingKeys.MaxConcurrentDownloads.KeyName] = value.ToString();
+                Write();
+            }
+        }
+
+        public static int MaxConcurrentPageChecks
+        {
+            get
+            {
+                KeyData setting = SettingKeys.MaxConcurrentPageChecks;
+                int val = Settings.GetInt(setting);
+                if (val < 0)
+                {
+                    int defaultVal = int.Parse(setting.Value);
+                    if (!SettingError[setting.KeyName]) // don't repeat error message over and over
+                    {
+                        Logger.Warning($"Value of {val} is invalid for setting {setting.KeyName}, using {defaultVal} instead.");
+                        SettingError[setting.KeyName] = true;
+                    }
+                    val = defaultVal; ;
+                }
+                else { SettingError[setting.KeyName] = false; }
+                return val;
+            }
+            set
+            {
+                Settings[SettingKeys.MaxConcurrentPageChecks.KeyName] = value.ToString();
                 Write();
             }
         }

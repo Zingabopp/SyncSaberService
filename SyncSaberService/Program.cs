@@ -25,23 +25,18 @@ namespace SyncSaberService
 
             if (!Config.CriticalError)
             {
+                Web.HttpClientWrapper.Initialize(Config.MaxConcurrentPageChecks);
                 Stopwatch sw = new Stopwatch();
                 sw.Start();
                 SyncSaber ss = new SyncSaber();
 
-                SyncSaber.FeedPageInfo testPage = new SyncSaber.FeedPageInfo {
-                    feedToDownload = 2,
-                    feedUrl = "https://bsaber.com/members/zingabopp/wall/followings/feed/?acpage=3",
-                    pageIndex = 3
-                };
-                //int count = ss.CheckFeed(testPage);
                 var test = HttpRequestHeader.Cookie.ToString();
                 Logger.Info($"Downloading songs from {ss.BeastSaberFeeds.ElementAt(0).Value} feed...");
-                //ss.DownloadBeastSaberFeed(0, 50);
+                ss.DownloadBeastSaberFeed(0, 50);
                 Logger.Info($"Downloading songs from {ss.BeastSaberFeeds.ElementAt(1).Value} feed...");
-                //ss.DownloadBeastSaberFeed(1, 50);
+                ss.DownloadBeastSaberFeed(1, 50);
                 Logger.Info($"Downloading songs from {ss.BeastSaberFeeds.ElementAt(2).Value} feed...");
-                //ss.DownloadBeastSaberFeed(2, 50);
+                ss.DownloadBeastSaberFeed(2, 50);
 
                 ss.DownloadAllSongsByAuthors(Config.FavoriteMappers);
                 sw.Stop();
