@@ -14,11 +14,15 @@ using System.Threading.Tasks;
 using System.Threading.Tasks.Dataflow;
 using System.Net.Http;
 using static SyncSaberService.Utilities;
+using static SyncSaberService.Web.HttpClientWrapper;
 
 namespace SyncSaberService.Web
 {
-    public class BeastSaverReader : IFeedReader
+    public class BeastSaberReader : IFeedReader
     {
+        public static readonly string NameKey = "BeastSaberReader";
+        public string Name { get { return NameKey; } }
+
         private string _username, _password, _loginUri;
         private int _maxConcurrency;
         private const string DefaultLoginUri = "https://bsaber.com/wp-login.php?jetpack-sso-show-default-form=1";
@@ -61,7 +65,7 @@ namespace SyncSaberService.Web
             }
         }
 
-        public BeastSaverReader(string username, string password, int maxConcurrency, string loginUri = DefaultLoginUri)
+        public BeastSaberReader(string username, string password, int maxConcurrency, string loginUri = DefaultLoginUri)
         {
             _username = username;
             _password = password;
@@ -131,7 +135,7 @@ namespace SyncSaberService.Web
         /// <param name="pageText"></param>
         /// <exception cref="XmlException">Invalid XML in pageText</exception>
         /// <returns></returns>
-        public SongInfo[] GetSongsFromPage(string pageText)
+        public List<SongInfo> GetSongsFromPage(string pageText)
         {
             List<SongInfo> songsOnPage = new List<SongInfo>();
 
@@ -169,25 +173,7 @@ namespace SyncSaberService.Web
                     }
                 }
             }
-            return songsOnPage.ToArray();
-        }
-
-        /// <summary>
-        /// Downloads the page and returns it as a string.
-        /// </summary>
-        /// <param name="url"></param>
-        /// <exception cref="HttpRequestException"></exception>
-        /// <returns></returns>
-        public string GetPageText(string url)
-        {
-            HttpClient hClient = new HttpClient();
-            hClient.DefaultRequestHeaders.Add(HttpRequestHeader.Cookie.ToString(), GetBSaberCookies(_username, _password).GetCookieHeader(FeedRootUri));
-            var pageReadTask = hClient.GetStringAsync(url); //jobClient.DownloadString(info.feedUrl);
-            pageReadTask.Wait();
-            string pageText = pageReadTask.Result;
-            //Logger.Debug(pageText.Result);
-            hClient.Dispose();
-            return pageText;
+            return songsOnPage;
         }
 
         public async Task<string> GetPageTextAsync(string url)
@@ -232,7 +218,7 @@ namespace SyncSaberService.Web
         /// <returns></returns>
         public Dictionary<int, SongInfo> GetSongsFromFeed(IFeedSettings settings)
         {
-            var _settings = settings as BeastSaverFeedSettings;
+            var _settings = settings as BeastSaberFeedSettings;
             if (_settings == null)
                 throw new InvalidCastException(INVALIDFEEDSETTINGSMESSAGE);
             int pageIndex = 0;
@@ -257,7 +243,7 @@ namespace SyncSaberService.Web
                     {
                         songList.Enqueue(song);
                     }
-                    
+
                 }
             }, new ExecutionDataflowBlockOptions {
                 BoundedCapacity = _maxConcurrency, // So pages don't get overqueued when a page with no songs is found
@@ -329,17 +315,15 @@ namespace SyncSaberService.Web
             public int FeedIndex;
             public int pageIndex;
         }
+    }
 
-        public class BeastSaverFeedSettings : IFeedSettings
+    public class BeastSaberFeedSettings : IFeedSettings
+    {
+        public int MaxPages;
+        public int FeedIndex;
+        public BeastSaberFeedSettings(int _feedIndex, int _maxPages = 0)
         {
-            public int MaxPages;
-            public int FeedIndex;
-            public BeastSaverFeedSettings(int _feedIndex, int _maxPages = 0)
-            {
-                FeedIndex = _feedIndex;
-            }
+            FeedIndex = _feedIndex;
         }
-
-
     }
 }

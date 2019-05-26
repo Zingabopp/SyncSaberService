@@ -19,8 +19,8 @@ namespace SyncSaberService.Web
 {
     public interface IFeedReader
     {
-        string GetPageText(string url);
-        SongInfo[] GetSongsFromPage(string pageText);
+        string Name { get; }
+        List<SongInfo> GetSongsFromPage(string pageText);
         Dictionary<int, FeedInfo> Feeds { get; }
         Dictionary<int, SongInfo> GetSongsFromFeed(IFeedSettings settings);
     }

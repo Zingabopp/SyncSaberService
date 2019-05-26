@@ -134,7 +134,7 @@ namespace SyncSaberService.Web
                 await downloadAsync;
                 webTimer.Stop();
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 // Used to catch the cancellation exception.
                 // TODO: Catch specific exceptions.
@@ -198,7 +198,7 @@ namespace SyncSaberService.Web
                     { }
                     File.Delete(zipFile.FullName);
                 }
-                catch (System.IO.IOException ex)
+                catch (System.IO.IOException)
                 {
                     Logger.Warning("File is in use and can't be deleted");
                 }
@@ -244,7 +244,7 @@ namespace SyncSaberService.Web
                     { }
                     File.Delete(zipPath);
                 }
-                catch (System.IO.IOException ex)
+                catch (System.IO.IOException)
                 {
                     Logger.Warning("File is in use and can't be deleted");
                 }

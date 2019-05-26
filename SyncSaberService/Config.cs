@@ -285,7 +285,7 @@ namespace SyncSaberService
             {
                 _parser.WriteFile(_iniFile.FullName, _data);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 Logger.Error("Unable to write to Config file because it's in use.");
             }

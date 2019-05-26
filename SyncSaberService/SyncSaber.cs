@@ -19,95 +19,6 @@ namespace SyncSaberService
 {
     public class SyncSaber
     {
-        public static readonly string DownloadURLPrefix = "https://beatsaver.com/download/";
-
-        public int ProcessFeedPage(string pageText, FeedPageInfo info)
-        {
-            int downloadCountForPage = 0;
-            int totalSongsForPage = 0;
-            XmlDocument xmlDocument = new XmlDocument();
-            try
-            {
-                xmlDocument.LoadXml(pageText);
-            }
-            catch (Exception ex)
-            {
-                Logger.Exception($"Exception loading XML from {info.feedUrl}: ", ex);
-                _downloaderRunning = false;
-                return downloadCountForPage;
-            }
-            XmlNodeList xmlNodeList = xmlDocument.DocumentElement.SelectNodes("/rss/channel/item");
-            foreach (object obj in xmlNodeList)
-            {
-                XmlNode node = (XmlNode) obj;
-                if (node["DownloadURL"] == null || node["SongTitle"] == null)
-                {
-                    Logger.Debug("Not a song! Skipping!");
-                }
-                else
-                {
-                    string songName = node["SongTitle"].InnerText;
-                    string innerText = node["DownloadURL"].InnerText;
-                    if (innerText.Contains("dl.php"))
-                    {
-                        Logger.Warning("Skipping BeastSaber download with old url format!");
-                        totalSongsForPage++;
-                    }
-                    else
-                    {
-                        string songIndex = innerText.Substring(innerText.LastIndexOf('/') + 1);
-                        string mapper = GetMapperFromBsaber(node.InnerText);
-                        string songUrl = "https://beatsaver.com/download/" + songIndex;
-                        SongInfo currentSong = new SongInfo(songIndex, songName, songUrl, mapper, _beastSaberFeeds.ElementAt(info.feedToDownload).Key);
-                        string currentSongDirectory = Path.Combine(Config.BeatSaberPath, "CustomSongs", songIndex);
-                        //bool downloadFailed = false;
-                        if (Config.AutoDownloadSongs && !(this._songDownloadHistory.Contains(songIndex) || Directory.Exists(currentSongDirectory)))
-                        {
-                            Logger.Info($"Queued {songIndex} - {songName} for download");
-                            string localPath = Path.Combine(Path.GetTempPath(), songIndex + ".zip");
-                            DownloadJob job = new DownloadJob(currentSong, localPath, currentSongDirectory);
-                            _songDownloadQueue.Enqueue(job);
-                            //jobs.AddJob(job);
-                            downloadCountForPage++;
-                        }
-                        totalSongsForPage++;
-                    }
-                }
-            }
-            if (totalSongsForPage == 0)
-            {
-                Logger.Debug($"Page {info.pageIndex} has no songs");
-                lock (EarliestEmptyPage)
-                {
-                    if ((EarliestEmptyPage.number) > info.pageIndex)
-                    {
-                        Logger.Debug($"Page {info.pageIndex} is less than the EarlistEmptyPage {EarliestEmptyPage.number}");
-                        EarliestEmptyPage.number = info.pageIndex;
-                    }
-                }
-            }
-            Logger.Info($"Finished page {info.pageIndex}, queued {downloadCountForPage} songs out of {totalSongsForPage}");
-            return totalSongsForPage;
-        }
-
-        public int CheckFeed(SyncSaber.FeedPageInfo info)
-        {
-
-            Logger.Info($"Checking page {info.pageIndex.ToString()} of {_beastSaberFeeds.ElementAt(info.feedToDownload).Key} feed from BeastSaber!");
-            Uri feedUri = new Uri(info.feedUrl);
-            HttpWebRequest newrequest = (HttpWebRequest) WebRequest.Create(feedUri);
-            newrequest.Proxy = null;
-            //newrequest.CookieContainer = Cookies;
-            newrequest.Headers.Add(HttpRequestHeader.Cookie, Cookies.GetCookieHeader(feedUri));
-            WebClient client = new WebClient();
-            var header = Cookies.GetCookieHeader(new Uri(info.feedUrl));
-            client.Headers.Add(HttpRequestHeader.Cookie, CookieHeader);
-            string pageText = client.DownloadString(info.feedUrl);
-
-            return ProcessFeedPage(pageText, info);
-
-        }
-
         public static SyncSaber Instance;
         private Dictionary<string, string> _beastSaberFeeds;
         public Dictionary<string, string> BeastSaberFeeds
@@ -154,7 +65,6 @@ namespace SyncSaberService
             {
                 Directory.CreateDirectory(Config.BeatSaberPath + "\\CustomSongs");
             }
-            var cookieInit = Cookies;
         }
 
         private Playlist GetPlaylistForFeed(string feedName)
@@ -287,97 +197,43 @@ namespace SyncSaberService
             // TODO: Add fail reason to FailedDownloads items
         }
 
-        public void DownloadAllSongsByAuthor(string author)
+        public void DownloadAllSongsByAuthors(List<string> mappers)
         {
-            DownloadBatch jobs = new DownloadBatch();
-            jobs.JobCompleted += OnJobFinished;
-            ClearResultQueues();
-            Logger.Info("Downloading all songs from " + author);
-            this._downloaderRunning = true;
+            var feedReader = new BeatSaverReader();
+            foreach (string mapper in mappers)
+            {
+                DownloadAllSongsByAuthor(mapper, feedReader);
+            }
+        }
+
+        public void DownloadAllSongsByAuthor(string mapper, IFeedReader feedReader = null)
+        {
+            _downloaderRunning = true;
             DateTime startTime = DateTime.Now;
-            TimeSpan idleTime = default(TimeSpan);
-            string mapperId = string.Empty;
-            //using (UnityWebRequest www = UnityWebRequest.Get("https://beatsaver.com/api/songs/search/user/" + author))
-            WebClient client = new WebClient();
-            var cookInit = Cookies;
-
-            string resp = "";
-            using (StreamReader reader = new StreamReader(client.OpenRead("https://beatsaver.com/api/songs/search/user/" + author)))
+            Dictionary<int, SongInfo> songs;
+            List<Playlist> playlists = new List<Playlist>();
+            switch (feedReader.Name)
             {
-                resp = reader.ReadToEnd();
+                case "BeatSaverReader":
+                    songs = feedReader.GetSongsFromFeed(new BeatSaverFeedSettings(0, mapper));
+                    playlists.Add(GetPlaylistForFeed("followings"));
+                    break;
+                default:
+                    songs = new Dictionary<int, SongInfo>();
+                    break;
             }
-            JSONNode result = JSON.Parse(resp);
-
-            if (result["total"].AsInt == 0)
-            {
-                this._downloaderRunning = false;
-                return;
-            }
-            foreach (JSONObject song in result["songs"].AsArray)
-            {
-                mapperId = song["uploaderId"].Value;
-                break; // TODO: Getting the mapper ID like this is dumb...
-            }
-            if (mapperId == string.Empty)
-            {
-                Logger.Error("Failed to find mapper \"" + author);
-                this._downloaderRunning = false;
-                return;
-            }
-
-            int downloadCount = 0;
-            int currentSongIndex = 0;
-            int totalSongs = 1;
-            Logger.Info("Checking for new songs from \"" + author + "\"");
-            while (currentSongIndex < totalSongs)
-            {
-                using (StreamReader reader = new StreamReader(client.OpenRead("https://beatsaver.com/api/songs/search/user/" + author)))
-                {
-                    resp = reader.ReadToEnd();
-                }
-                result = JSON.Parse(resp);
-                if (result["total"].AsInt == 0)
-                {
-                    this._downloaderRunning = false;
-                    Logger.Debug($"No songs found for {author}");
-                    return;
-                }
-
-                totalSongs = result["total"].AsInt;
-
-                foreach (JSONObject song in result["songs"].AsArray)
-                {
-                    //JSONObject song = (JSONObject) aKeyValue;
-                    string songIndex = song["version"].Value;
-                    string songName = song["songName"].Value;
-                    string songUrl = "https://beatsaver.com/download/" + songIndex;
-                    SongInfo currentSong = new SongInfo(songIndex, songName, songUrl, author, "followings");
-                    string currentSongDirectory = Path.Combine(Config.BeatSaberPath, "CustomSongs", songIndex);
-                    //bool downloadFailed = false;
-                    if (Config.AutoDownloadSongs && !this._songDownloadHistory.Contains(songIndex) && !Directory.Exists(currentSongDirectory))
-                    {
-
-                        Logger.Info($"Queued {songIndex} - {songName} for download");
-                        string localPath = Path.Combine(Path.GetTempPath(), songIndex + ".zip");
-                        DownloadJob job = new DownloadJob(currentSong, localPath, currentSongDirectory);
-                        jobs.AddJob(job);
-                    }
-                    currentSongIndex++;
-                }
-
-            }
-
-            jobs.RunJobs().Wait();
+            Logger.Debug($"Finished checking pages, found {songs.Count} songs");
+            int totalSongs = songs.Count;
+            DownloadSongs(songs);
             Logger.Debug("Jobs finished, Processing downloads...");
-            downloadCount = SuccessfulDownloads.Count;
+            int downloadCount = SuccessfulDownloads.Count;
             int failedCount = FailedDownloads.Count;
-            totalSongs = SuccessfulDownloads.Count + FailedDownloads.Count;
+            
 
-            ProcessDownloads();
-
-            TimeSpan timeElapsed = (DateTime.Now - startTime);
-
-            Logger.Info($"Downloaded {downloadCount} from mapper {author} in {FormatTimeSpan(timeElapsed)}. Failed to download {failedCount} songs.");
+            ProcessDownloads(playlists);
+            var timeElapsed = (DateTime.Now - startTime);
+            Logger.Info($"Downloaded {downloadCount} songs from mapper {mapper} in {FormatTimeSpan(timeElapsed)}. " +
+                $"Skipped {totalSongs - downloadCount} songs.");
             _downloaderRunning = false;
         }
 
@@ -413,42 +269,6 @@ namespace SyncSaberService
                 playlist.WritePlaylist();
         }
 
-        private WebClient _client;
-        private WebClient Client
-        {
-            get
-            {
-                if (_client == null)
-                    _client = new WebClient();
-                return _client;
-            }
-        }
-
-        private CookieContainer _cookies;
-
-        private CookieContainer Cookies
-        {
-            get
-            {
-                if (_cookies == null)
-                    _cookies = Utilities.LoginBSaber(Config.BeastSaberUsername, Config.BeastSaberPassword);
-                return _cookies;
-            }
-        }
-
-        private string _cookieHeader = "";
-        private string CookieHeader
-        {
-            get
-            {
-                if (_cookieHeader == "")
-                    _cookieHeader = Cookies.GetCookieHeader(new Uri("https://bsaber.com"));
-                return _cookieHeader;
-            }
-        }
-
-
-
         private static string GetMapperFromBsaber(string innerText)
         {
             string prefix = "Mapper: ";
@@ -461,57 +281,22 @@ namespace SyncSaberService
                 return "";
         }
 
-        public async Task<int> CheckFeedPage(FeedPageInfo info, CookieContainer cook)
-        {
-            int downloadCountForPage = 0;
-            int totalSongsForPage = 0;
-            Logger.Info($"Checking page {info.pageIndex.ToString()} of {_beastSaberFeeds.ElementAt(info.feedToDownload).Key} feed from BeastSaber!");
-            HttpWebRequest newrequest = (HttpWebRequest) WebRequest.Create(info.feedUrl);
-            newrequest.Proxy = null;
-            newrequest.CookieContainer = cook;
-            WebClient client = new WebClient();
-            client.Headers.Add(HttpRequestHeader.Cookie, cook.GetCookieHeader(new Uri(info.feedUrl)));
-            Logger.Debug($"Page {info.pageIndex}: Got Cookies, starting web request");
-            downloadCountForPage = ProcessFeedPage(client.DownloadString(info.feedUrl), info);
-            Logger.Info($"Finished page {info.pageIndex}, queued {downloadCountForPage}");// songs out of {totalSongsForPage}");
-            return downloadCountForPage;
-        }
-
         public struct FeedPageInfo
         {
             public int feedToDownload;
             public string feedUrl;
             public int pageIndex;
         }
-        private static IntegerWrapper EarliestEmptyPage = new IntegerWrapper(9999);
 
-        public void DownloadBeastSaberFeed(int feedToDownload, int maxPages)
+        public void DownloadSongs(Dictionary<int, SongInfo> queuedSongs)
         {
-            DownloadBatch jobs = new DownloadBatch();
-            jobs.JobCompleted += OnJobFinished;
-            ClearResultQueues();
-            _downloaderRunning = true;
-            DateTime startTime = DateTime.Now;
-            int downloadCount = 0;
-            int totalSongs = 0;
-            int pageIndex = 0;
-            var cook = Cookies;
-            IFeedReader bReader = new BeastSaverReader(Config.BeastSaberUsername, Config.BeastSaberPassword, Config.MaxConcurrentDownloads);
-            var queuedSongs = bReader.GetSongsFromFeed(feedToDownload, maxPages);
-
-            Logger.Debug($"Finished checking pages, found {queuedSongs.Count} songs");
-            /*
-            while (!_songDownloadQueue.IsEmpty)
-            {
-                DownloadJob job;
-                if (_songDownloadQueue.TryDequeue(out job))
-                    jobs.AddJob(job);
-            }
-            */
             string customSongsPath = Path.Combine(Config.BeatSaberPath, "CustomSongs");
             var existingSongs = Directory.GetDirectories(customSongsPath);
             string tempPath = "";
             string outputPath = "";
+
+            DownloadBatch jobs = new DownloadBatch();
+            jobs.JobCompleted += OnJobFinished;
             foreach (var song in queuedSongs.Values)
             {
                 tempPath = Path.Combine(Path.GetTempPath(), song.Index + ".zip");
@@ -522,23 +307,7 @@ namespace SyncSaberService
                 jobs.AddJob(job);
             }
             jobs.RunJobs().Wait();
-            Logger.Debug("Jobs finished, Processing downloads...");
-            downloadCount = SuccessfulDownloads.Count;
-            int failedCount = FailedDownloads.Count;
-            totalSongs = SuccessfulDownloads.Count + FailedDownloads.Count;
-
-            ProcessDownloads();
-            var timeElapsed = (DateTime.Now - startTime);
-            Logger.Info(string.Format("Downloaded {0} songs from BeastSaber {1} feed in {2}. Checked {3} page{4}, skipped {5} songs.", new object[]
-            {
-                downloadCount,
-                this._beastSaberFeeds.ElementAt(feedToDownload).Key,
-                FormatTimeSpan(timeElapsed),
-                pageIndex,
-                (pageIndex != 1) ? "s" : "",
-                totalSongs - downloadCount
-            }));
-            this._downloaderRunning = false;
+            
         }
 
         private int GetMaxBeastSaberPages(int feedToDownload)
@@ -558,45 +327,13 @@ namespace SyncSaberService
             }
             return Config.MaxCuratorRecommendedPages;
         }
-        /*
-        public async void WorkDownloadQueue(int taskLimit)
-        {
 
-            var actionBlock = new ActionBlock<DownloadJob>(job => {
-                Logger.Debug($"Running job {job.Song.Index} in ActionBlock");
-                Task<JobResult> newTask = job.RunJob();
-                newTask.Wait();
-                TaskComplete(job.Song.Index);
-            }, new ExecutionDataflowBlockOptions {
-                BoundedCapacity = 500,
-                MaxDegreeOfParallelism = taskLimit
-            });
-            while(_songDownloadQueue.Count > 0)
-            {
-                var job = _songDownloadQueue.Pop();
-                Logger.Debug($"Adding job for {job.Song.Index}");
-                await actionBlock.SendAsync(job);
-            }
-            
-            actionBlock.Complete();
-            await actionBlock.Completion;
-            Logger.Debug($"Actionblock complete");
-            
-        }
-
-        public void TaskComplete(string songIndex)
-        {
-            Logger.Info($"Completed processing {songIndex}");
-        }
-        */
         private readonly Regex _digitRegex = new Regex("^[0-9]+$", RegexOptions.Compiled);
 
         private readonly Regex _beatSaverRegex = new Regex("^[0-9]+-[0-9]+$", RegexOptions.Compiled);
 
         private bool _downloaderRunning;
         private string _historyPath;
-
-        private readonly Stack<string> _authorDownloadQueue = new Stack<string>();
 
         private readonly ConcurrentQueue<DownloadJob> _songDownloadQueue = new ConcurrentQueue<DownloadJob>();
 

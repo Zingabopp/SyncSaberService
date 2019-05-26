@@ -16,6 +16,7 @@ namespace SyncSaberService
             Author = authorName;
             URL = songUrl;
             Feed = feedName;
+            //Logger.Debug(this.ToString());
         }
 
         public string Index
@@ -74,6 +75,18 @@ namespace SyncSaberService
             {
                 return _songVersion;
             }
+        }
+
+        public override string ToString()
+        {
+            StringBuilder retStr = new StringBuilder();
+            retStr.Append("SongInfo:");
+            retStr.AppendLine("   Index: " + Index);
+            retStr.AppendLine("   Name: " + Name);
+            retStr.AppendLine("   Author: " + Author);
+            retStr.AppendLine("   URL: " + URL);
+            retStr.AppendLine("   Feed: " + Feed);
+            return retStr.ToString();
         }
 
         private static readonly Regex _digitRegex = new Regex("^[0-9]+$", RegexOptions.Compiled);
