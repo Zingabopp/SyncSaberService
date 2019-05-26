@@ -191,7 +191,11 @@ namespace SyncSaberService
             setting = BeatSaberPath;
         }
 
-        public static bool Initialize(string newBeatSaberPath = "")
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public static bool Initialize()
         {
             bool successful = true;
             bool changed = false;
@@ -213,13 +217,11 @@ namespace SyncSaberService
 
             if (changed)
                 _parser.WriteFile(_iniFile.Name, _data);
-            if (newBeatSaberPath != string.Empty)
-            {
-                BeatSaberPath = newBeatSaberPath;
-            }
+
             ReadAllSettings();
-            Setting = new Dictionary<string, Func<string>>();
-            Setting.Add(SettingKeys.BeatSaberPath.KeyName, () => { return BeatSaberPath; });
+            Setting = new Dictionary<string, Func<string>> {
+                { SettingKeys.BeatSaberPath.KeyName, () => { return BeatSaberPath; } }
+            };
             Console.WriteLine($"Path: {Setting[SettingKeys.BeatSaberPath.KeyName]()}");
             return successful;
         }
@@ -229,10 +231,9 @@ namespace SyncSaberService
             if (!settings.ContainsKey(keyName))
             {
                 settings.AddKey(CreateKeyData(keyName, defaultVal.ToString()));
-                UpdateFile();
+                Write();
             }
-            bool result;
-            bool successful = StrToBool(settings[keyName], out result, defaultVal);
+            bool successful = StrToBool(settings[keyName], out bool result, defaultVal);
             if (!successful)
                 Logger.Warning($"Unable to parse {keyName} with value {settings[keyName]} as a boolean, using default value of {defaultVal} instead.");
             return result;
@@ -240,8 +241,7 @@ namespace SyncSaberService
 
         public static bool GetBool(this KeyDataCollection settings, KeyData data)
         {
-            bool defaultVal;
-            StrToBool(data.Value, out defaultVal);
+            StrToBool(data.Value, out bool defaultVal);
             return settings.GetBool(data.KeyName, defaultVal);
         }
 
@@ -250,7 +250,7 @@ namespace SyncSaberService
             if (!settings.ContainsKey(keyName))
             {
                 settings.AddKey(CreateKeyData(keyName, defaultVal.ToString()));
-                UpdateFile();
+                Write();
             }
             int val = defaultVal;
             bool successful = int.TryParse(settings[keyName], out val);
@@ -272,7 +272,7 @@ namespace SyncSaberService
             if (!settings.ContainsKey(keyName))
             {
                 settings.AddKey(CreateKeyData(keyName, defaultVal));
-                UpdateFile();
+                Write();
             }
             return settings[keyName];
         }
@@ -286,26 +286,13 @@ namespace SyncSaberService
         {
             try
             {
-                Logger.Warning($"Writing to config at {_iniFile.FullName}");
-                _parser.WriteFile(_iniFile.FullName, _data);
-            }
-            catch (Exception ex)
-            {
-                Logger.Exception("Unable to write Config file:", ex);
-            }
-
-        }
-
-        public static void UpdateFile()
-        {
-            try
-            {
                 _parser.WriteFile(_iniFile.FullName, _data);
             }
             catch (Exception)
             {
                 Logger.Error("Unable to write to Config file because it's in use.");
             }
+
         }
 
         private static FileIniDataParser _parser = new FileIniDataParser();
@@ -503,32 +490,20 @@ namespace SyncSaberService
             }
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <exception cref="FileNotFoundException">Thrown when 'Beat Saber.exe' is not found at the specified path.</exception>
         public static string BeatSaberPath
         {
             get
             {
                 KeyData setting = SettingKeys.BeatSaberPath;
                 string path = Settings.GetString(setting);
-                DirectoryInfo bsDir = new DirectoryInfo(path);
-                bool valid = bsDir.Exists;
-                if (valid)
-                {
-                    var files = bsDir.GetFiles();
-                    valid = files.Count() > 0;
-                    if (valid)
-                        valid = bsDir.GetFiles()?.First(f => f.Name.ToLower() == "beat saber.exe") != null;
-                }
-                if (!valid)
+                
+                if (!IsBeatSaberDirectory(path))
                 {
                     if (!SettingError[setting.KeyName]) // don't repeat error message over and over
                     {
-                        //Logger.Error($"Beat Saber path {path} is invalid. Couldn't find 'Beat Saber.exe'");
+                        Logger.Error($"Beat Saber path {path} is invalid. Couldn't find 'Beat Saber.exe'");
                         SettingError[setting.KeyName] = true;
-                        throw new FileNotFoundException($"Unable to locate 'Beat Saber.exe' inside the specified BeatSaberPath folder {path}.");
+                        //throw new FileNotFoundException($"Unable to locate 'Beat Saber.exe' inside the specified BeatSaberPath folder {path}.");
                     }
                 }
                 else { SettingError[setting.KeyName] = false; }
@@ -543,6 +518,18 @@ namespace SyncSaberService
                 Settings[SettingKeys.BeatSaberPath.KeyName] = value.ToString();
                 Write();
             }
+        }
+
+        public static bool IsBeatSaberDirectory(string path)
+        {
+            DirectoryInfo bsDir = new DirectoryInfo(path);
+            bool valid = bsDir.Exists;
+            if (bsDir.Exists)
+            {
+                var files = bsDir.GetFiles("Beat Saber.exe");
+                return files.Count() > 0;
+            }
+            return false;
         }
 
         /// <summary>

@@ -21,6 +21,7 @@ namespace SyncSaberService.Web
     class BeatSaverReader : IFeedReader
     {
         private static readonly string AUTHORKEY = "{AUTHOR}";
+        private static readonly string AUTHORIDKEY = "{AUTHORID}";
         private static readonly string PAGEKEY = "{PAGE}";
         private const int SONGSPERUSERPAGE = 20;
         public static string NameKey => "BeatSaverReader";
@@ -35,7 +36,7 @@ namespace SyncSaberService.Web
                 {
                     _feeds = new Dictionary<int, FeedInfo>()
                     {
-                        { 0, new FeedInfo("author", "https://beatsaver.com/api/songs/byuser/" +  AUTHORKEY + "/" + PAGEKEY) },
+                        { 0, new FeedInfo("author", "https://beatsaver.com/api/songs/byuser/" +  AUTHORIDKEY + "/" + PAGEKEY) },
                         { 1, new FeedInfo("newest", "https://beatsaver.com/api/songs/new/" + PAGEKEY) },
                         { 2, new FeedInfo("top", "https://beatsaver.com/api/songs/top/" + PAGEKEY) },
                         {99, new FeedInfo("search-by-author", "https://beatsaver.com/api/songs/search/user/" + AUTHORKEY) }
@@ -47,7 +48,6 @@ namespace SyncSaberService.Web
 
         public string GetPageUrl(int feedIndex, string author = "", int pageIndex = 0)
         {
-            
             string mapperId = string.Empty;
 
             mapperId = _authors.GetOrAdd(author, (a) => {
@@ -69,15 +69,20 @@ namespace SyncSaberService.Web
                 return matchingSong["uploaderId"].Value;
             });
 
-            return Feeds[feedIndex].BaseUrl.Replace(AUTHORKEY, mapperId).Replace(PAGEKEY, (pageIndex * SONGSPERUSERPAGE).ToString());
+            return Feeds[feedIndex].BaseUrl.Replace(AUTHORIDKEY, mapperId).Replace(PAGEKEY, (pageIndex * SONGSPERUSERPAGE).ToString());
         }
 
-        private static readonly string INVALIDFEEDSETTINGSMESSAGE = "The IFeedSettings passed is not a BeatSaverFeedSettings.";
+        private const string INVALIDFEEDSETTINGSMESSAGE = "The IFeedSettings passed is not a BeatSaverFeedSettings.";
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="_settings"></param>
+        /// <exception cref="InvalidCastException">Thrown when the passed IFeedSettings isn't a BeatSaverFeedSettings</exception>
+        /// <returns></returns>
         public Dictionary<int, SongInfo> GetSongsFromFeed(IFeedSettings _settings)
         {
-            var settings = _settings as BeatSaverFeedSettings;
-            if (settings == null)
+            if (!(_settings is BeatSaverFeedSettings settings))
                 throw new InvalidCastException(INVALIDFEEDSETTINGSMESSAGE);
             List<SongInfo> songs = new List<SongInfo>();
             string pageText = GetPageText(GetPageUrl(settings.FeedIndex, settings.Author));

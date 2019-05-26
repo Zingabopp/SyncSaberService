@@ -26,8 +26,9 @@ namespace SyncSaberService
         /// <returns></returns>
         public static KeyData CreateKeyData(string keyName, string keyValue)
         {
-            var data = new KeyData(keyName);
-            data.Value = keyValue;
+            var data = new KeyData(keyName) {
+                Value = keyValue
+            };
             return data;
         }
 
@@ -128,33 +129,7 @@ namespace SyncSaberService
             File.WriteAllLines(path, data);
             File.Delete(path + ".bak");
         }
-        
-        public static CookieContainer LoginBSaber(string username, string password)
-        {
-            string loginUri = "https://bsaber.com/wp-login.php?jetpack-sso-show-default-form=1";
-            string reqString = $"log={username}&pwd={password}&rememberme=forever";
-            byte[] requestData = Encoding.UTF8.GetBytes(reqString);
-            CookieContainer cc = new CookieContainer();
-            var request = (HttpWebRequest) WebRequest.Create(loginUri);
-            request.Proxy = null;
-            request.AllowAutoRedirect = false;
-            request.CookieContainer = cc;
-            request.Method = "post";
-            request.ContentType = "application/x-www-form-urlencoded";
-            request.ContentLength = requestData.Length;
-            using (Stream s = request.GetRequestStream())
-                s.Write(requestData, 0, requestData.Length);
-            
-            //using (HttpWebResponse response = (HttpWebResponse) request.GetResponse())
-            //{
-            //    foreach (Cookie c in response.Cookies)
-            //        Console.WriteLine(c.Name + " = " + c.Value);
-            //}
-           
-            HttpWebResponse response = (HttpWebResponse) request.GetResponse(); // Needs this to populate cookies
-            return cc;
-        }
-       
+
         public static string FormatTimeSpan(TimeSpan timeElapsed)
         {
             string timeElapsedStr = "";
@@ -165,16 +140,13 @@ namespace SyncSaberService
             timeElapsedStr = $"{timeElapsedStr}{timeElapsed.Seconds}s";
             return timeElapsedStr;
         }
-
-
     }
 
     internal static class ConcurrentQueueExtensions
     {
         public static void Clear<T>(this ConcurrentQueue<T> queue)
         {
-            T item;
-            while (queue.TryDequeue(out item))
+            while (queue.TryDequeue(out T item))
             {
                 // do nothing
             }

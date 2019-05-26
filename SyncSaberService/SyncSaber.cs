@@ -48,18 +48,18 @@ namespace SyncSaberService
                 BeastSaberFeeds.Add("curator recommended", "https://bsaber.com/members/curatorrecommended/bookmarks");
             }
 
-            this._historyPath = Path.Combine(Config.BeatSaberPath, "UserData", "SyncSaberHistory.txt");
-            if (File.Exists(this._historyPath + ".bak"))
+            _historyPath = Path.Combine(Config.BeatSaberPath, "UserData", "SyncSaberHistory.txt");
+            if (File.Exists(_historyPath + ".bak"))
             {
-                if (File.Exists(this._historyPath))
+                if (File.Exists(_historyPath))
                 {
-                    File.Delete(this._historyPath);
+                    File.Delete(_historyPath);
                 }
-                File.Move(this._historyPath + ".bak", this._historyPath);
+                File.Move(_historyPath + ".bak", ._historyPath);
             }
-            if (File.Exists(this._historyPath))
+            if (File.Exists(_historyPath))
             {
-                this._songDownloadHistory = File.ReadAllLines(this._historyPath).ToList<string>();
+                ._songDownloadHistory = File.ReadAllLines(_historyPath).ToList<string>();
             }
             if (!Directory.Exists(Config.BeatSaberPath + "\\CustomSongs"))
             {
@@ -183,11 +183,6 @@ namespace SyncSaberService
             FailedDownloads.Clear();
         }
 
-        public void ClearDownloadQueue()
-        {
-            _songDownloadQueue.Clear();
-        }
-
         public void OnJobFinished(DownloadJob job)
         {
             if (job.Result == DownloadJob.JobResult.SUCCESS)
@@ -208,7 +203,6 @@ namespace SyncSaberService
 
         public void DownloadAllSongsByAuthor(string mapper, IFeedReader feedReader = null)
         {
-            _downloaderRunning = true;
             DateTime startTime = DateTime.Now;
             Dictionary<int, SongInfo> songs;
             List<Playlist> playlists = new List<Playlist>();
@@ -234,7 +228,6 @@ namespace SyncSaberService
             var timeElapsed = (DateTime.Now - startTime);
             Logger.Info($"Downloaded {downloadCount} songs from mapper {mapper} in {FormatTimeSpan(timeElapsed)}. " +
                 $"Skipped {totalSongs - downloadCount} songs.");
-            _downloaderRunning = false;
         }
 
         public void DownloadBeastSaberFeed(int feedToDownload, int maxPages)
@@ -242,11 +235,10 @@ namespace SyncSaberService
             DownloadBatch jobs = new DownloadBatch();
             jobs.JobCompleted += OnJobFinished;
             ClearResultQueues();
-            _downloaderRunning = true;
             DateTime startTime = DateTime.Now;
             int downloadCount = 0;
             int totalSongs = 0;
-            int pageIndex = 0;
+
             var bReader = new BeastSaberReader(Config.BeastSaberUsername, Config.BeastSaberPassword, Config.MaxConcurrentPageChecks);
             var queuedSongs = bReader.GetSongsFromFeed(new BeastSaberFeedSettings(feedToDownload, maxPages));
             totalSongs = queuedSongs.Count;
@@ -272,16 +264,7 @@ namespace SyncSaberService
 
             ProcessDownloads();
             var timeElapsed = (DateTime.Now - startTime);
-            Logger.Info(string.Format("Downloaded {0} songs from BeastSaber {1} feed in {2}. Checked {3} page{4}, skipped {5} songs.", new object[]
-            {
-                downloadCount,
-                this._beastSaberFeeds.ElementAt(feedToDownload).Key,
-                FormatTimeSpan(timeElapsed),
-                pageIndex,
-                (pageIndex != 1) ? "s" : "",
-                totalSongs - downloadCount - failedCount
-            }));
-            _downloaderRunning = false;
+            Logger.Info($"Downloaded {downloadCount} songs from BeastSaber {_beastSaberFeeds.ElementAt(feedToDownload).Key} feed in {FormatTimeSpan(timeElapsed)}. Skipped {totalSongs - downloadCount - failedCount} songs.");
         }
 
         private void ProcessDownloads(List<Playlist> playlists = null)
@@ -303,7 +286,6 @@ namespace SyncSaberService
             }
             while (FailedDownloads.TryDequeue(out job))
             {
-                //failedCount++;
                 if (!_songDownloadHistory.Contains(job.Song.Index) && job.Result != DownloadJob.JobResult.TIMEOUT)
                 {
                     _songDownloadHistory.Add(job.Song.Index);
@@ -314,25 +296,6 @@ namespace SyncSaberService
             Utilities.WriteStringListSafe(_historyPath, _songDownloadHistory.Distinct<string>().ToList<string>(), true);
             foreach (Playlist playlist in playlists)
                 playlist.WritePlaylist();
-        }
-
-        private static string GetMapperFromBsaber(string innerText)
-        {
-            string prefix = "Mapper: ";
-            string suffix = "</p>";
-            int startIndex = innerText.IndexOf(prefix) + prefix.Length;
-            int endIndex = innerText.IndexOf(suffix, startIndex);
-            if (endIndex > startIndex && startIndex >= 0)
-                return innerText.Substring(startIndex, endIndex - startIndex);
-            else
-                return "";
-        }
-
-        public struct FeedPageInfo
-        {
-            public int feedToDownload;
-            public string feedUrl;
-            public int pageIndex;
         }
 
         public void DownloadSongs(Dictionary<int, SongInfo> queuedSongs)
@@ -354,35 +317,13 @@ namespace SyncSaberService
                 jobs.AddJob(job);
             }
             jobs.RunJobs().Wait();
-            
-        }
-
-        private int GetMaxBeastSaberPages(int feedToDownload)
-        {
-            string key = this._beastSaberFeeds.ElementAt(feedToDownload).Key;
-            if (key == "followings")
-            {
-                return Config.MaxFollowingsPages;
-            }
-            if (key == "bookmarks")
-            {
-                return Config.MaxBookmarksPages;
-            }
-            if (!(key == "curator recommended"))
-            {
-                return 0;
-            }
-            return Config.MaxCuratorRecommendedPages;
         }
 
         private readonly Regex _digitRegex = new Regex("^[0-9]+$", RegexOptions.Compiled);
 
         private readonly Regex _beatSaverRegex = new Regex("^[0-9]+-[0-9]+$", RegexOptions.Compiled);
 
-        private bool _downloaderRunning;
-        private string _historyPath;
-
-        private readonly ConcurrentQueue<DownloadJob> _songDownloadQueue = new ConcurrentQueue<DownloadJob>();
+        private readonly string _historyPath;
 
         private ConcurrentQueue<DownloadJob> _successfulDownloads;
         private ConcurrentQueue<DownloadJob> SuccessfulDownloads
@@ -405,6 +346,7 @@ namespace SyncSaberService
                 return _failedDownloads;
             }
         }
+
         private readonly List<Task<bool>> _runningJobs = new List<Task<bool>>();
 
         private List<string> _songDownloadHistory = new List<string>();
@@ -420,21 +362,4 @@ namespace SyncSaberService
 
     }
 
-    public class IntegerWrapper
-    {
-        private int _number;
-        public int number
-        {
-            get { return _number; }
-            set
-            {
-                Logger.Debug($"Settings current number {_number} to {value}");
-                _number = value;
-            }
-        }
-        public IntegerWrapper(int initial)
-        {
-            number = initial;
-        }
-    }
 }

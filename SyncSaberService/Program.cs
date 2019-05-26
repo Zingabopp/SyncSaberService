@@ -33,7 +33,7 @@ namespace SyncSaberService
                     {
                         Logger.Info("Found Beat Saber.exe");
                         Config.BeatSaberPath = bsDir.FullName;
-                        Console.WriteLine($"Updated Beat Saber directory path to {Config.BeatSaberPath}");
+                        Logger.Info($"Updated Beat Saber directory path to {Config.BeatSaberPath}");
                         Console.WriteLine("Press any key to continue...");
                         Console.ReadKey();
                     }
@@ -49,35 +49,38 @@ namespace SyncSaberService
                 Stopwatch sw = new Stopwatch();
                 sw.Start();
                 SyncSaber ss = new SyncSaber();
-
+                Console.WriteLine();
                 Logger.Info($"Downloading songs from {ss.BeastSaberFeeds.ElementAt(0).Value} feed...");
                 try
                 {
-                    ss.DownloadBeastSaberFeed(0, 50);
+                    ss.DownloadBeastSaberFeed(0, Web.BeastSaberReader.GetMaxBeastSaberPages(0));
                 }
                 catch (Exception ex)
                 {
                     Logger.Exception($"Exception downloading BeastSaberFeed (0)", ex);
                 }
+                Console.WriteLine();
                 Logger.Info($"Downloading songs from {ss.BeastSaberFeeds.ElementAt(1).Value} feed...");
                 try
                 {
-                    ss.DownloadBeastSaberFeed(1, 50);
+                    ss.DownloadBeastSaberFeed(1, Web.BeastSaberReader.GetMaxBeastSaberPages(1));
                 }
                 catch (Exception ex)
                 {
                     Logger.Exception($"Exception downloading BeastSaberFeed (1)", ex);
                 }
+                Console.WriteLine();
                 Logger.Info($"Downloading songs from {ss.BeastSaberFeeds.ElementAt(2).Value} feed...");
                 try
                 {
-                    ss.DownloadBeastSaberFeed(2, 50);
+                    ss.DownloadBeastSaberFeed(2, Web.BeastSaberReader.GetMaxBeastSaberPages(2));
                 }
                 catch (Exception ex)
                 {
                     Logger.Exception($"Exception downloading BeastSaberFeed (2)", ex);
                 }
-
+                Console.WriteLine();
+                Logger.Info($"Downloading songs from FavoriteMappers.ini...");
                 try
                 {
                     ss.DownloadAllSongsByAuthors(Config.FavoriteMappers);
@@ -88,7 +91,8 @@ namespace SyncSaberService
                 }
                 sw.Stop();
                 var processingTime = new TimeSpan(sw.ElapsedTicks);
-                Console.WriteLine($"\nFinished downloading songs in {(int) processingTime.TotalMinutes} min {processingTime.Seconds} sec");
+                Console.WriteLine();
+                Logger.Info($"Finished downloading songs in {(int) processingTime.TotalMinutes} min {processingTime.Seconds} sec");
             }
             else
             {

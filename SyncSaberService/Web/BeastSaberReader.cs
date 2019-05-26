@@ -207,17 +207,16 @@ namespace SyncSaberService.Web
             else
                 return "";
         }
-        private static readonly string INVALIDFEEDSETTINGSMESSAGE = "The IFeedSettings passed is not a BeastSaberFeedSettings.";
+        private const string INVALIDFEEDSETTINGSMESSAGE = "The IFeedSettings passed is not a BeastSaberFeedSettings.";
         /// <summary>
         /// Gets all songs from the feed defined by the provided settings.
         /// </summary>
         /// <param name="settings"></param>
-        /// <exception cref="InvalidCastException">Thrown when the provided settings don't match the correct IFeedSettings class</exception>
+        /// <exception cref="InvalidCastException">Thrown when the passed IFeedSettings isn't a BeastSaberFeedSettings</exception>
         /// <returns></returns>
         public Dictionary<int, SongInfo> GetSongsFromFeed(IFeedSettings settings)
         {
-            var _settings = settings as BeastSaberFeedSettings;
-            if (_settings == null)
+            if (!(settings is BeastSaberFeedSettings _settings))
                 throw new InvalidCastException(INVALIDFEEDSETTINGSMESSAGE);
             if (_settings.FeedIndex != 2 && _username == string.Empty)
             {
@@ -268,10 +267,11 @@ namespace SyncSaberService.Web
                 }
                 string feedUrl = GetPageUrl(Feeds[_settings.FeedIndex].BaseUrl, pageIndex);
 
-                FeedPageInfo pageInfo = new FeedPageInfo();
-                pageInfo.feedToDownload = _settings.FeedIndex;
-                pageInfo.feedUrl = feedUrl;
-                pageInfo.pageIndex = pageIndex;
+                FeedPageInfo pageInfo = new FeedPageInfo {
+                    feedToDownload = _settings.FeedIndex,
+                    feedUrl = feedUrl,
+                    pageIndex = pageIndex
+                };
                 actionBlock.SendAsync(pageInfo).Wait();
                 Logger.Debug($"Queued page {pageIndex} for reading. EarliestEmptyPage is {earliestEmptyPage}");
                 //Logger.Debug($"FeedURL is {feedUrl}");
@@ -309,6 +309,21 @@ namespace SyncSaberService.Web
                 }
             }
             return retDict;
+        }
+
+        public static int GetMaxBeastSaberPages(int feedToDownload)
+        {
+            switch (feedToDownload)
+            {
+                case 0:
+                    return Config.MaxFollowingsPages;
+                case 1:
+                    return Config.MaxBookmarksPages;
+                case 2:
+                    return Config.MaxCuratorRecommendedPages;
+                default:
+                    return 0;
+            }           
         }
 
         public struct FeedPageInfo
