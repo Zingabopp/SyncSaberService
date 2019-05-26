@@ -18,7 +18,30 @@ namespace SyncSaberService
             Logger.fileWriter.AutoFlush = true;
             Logger.ShortenSourceName = true;
 
-            Config.Initialize();
+            try
+            {
+                Config.Initialize();
+            }
+            catch (FileNotFoundException)
+            { }
+            if (args.Length > 0)
+            {
+                var bsDir = new DirectoryInfo(args[0]);
+                if (bsDir.Exists)
+                {
+                    if (bsDir.GetFiles("Beat Saber.exe").Length > 0)
+                    {
+                        Logger.Info("Found Beat Saber.exe");
+                        Config.BeatSaberPath = bsDir.FullName;
+                        Console.WriteLine($"Updated Beat Saber directory path to {Config.BeatSaberPath}");
+                        Console.WriteLine("Press any key to continue...");
+                        Console.ReadKey();
+                    }
+                    else
+                        Logger.Warning($"Provided directory does not appear to be Beat Saber's root folder, ignoring it");
+                }
+            }
+            
 
             if (!Config.CriticalError)
             {

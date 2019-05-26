@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.IO;
 using IniParser;
 using IniParser.Model;
+using System.Reflection;
 using static SyncSaberService.Utilities;
 
 namespace SyncSaberService
@@ -121,18 +122,7 @@ namespace SyncSaberService
             }
         }
 
-        public static void Write()
-        {
-            try
-            {
-                _parser.WriteFile(_iniFile.FullName, _data);
-            }
-            catch (Exception ex)
-            {
-                Logger.Exception("Unable to write Config file:", ex);
-            }
-
-        }
+        
 
         private static Dictionary<string, bool> _errorStatus;
         private static Dictionary<string, bool> SettingError
@@ -195,13 +185,13 @@ namespace SyncSaberService
             setting = MaxBookmarksPages;
             setting = MaxCuratorRecommendedPages;
             setting = MaxFollowingsPages;
-            setting = BeatSaberPath;
             setting = DownloadTimeout;
             setting = MaxConcurrentDownloads;
             setting = MaxConcurrentPageChecks;
+            setting = BeatSaberPath;
         }
 
-        public static bool Initialize()
+        public static bool Initialize(string newBeatSaberPath = "")
         {
             bool successful = true;
             bool changed = false;
@@ -223,6 +213,10 @@ namespace SyncSaberService
 
             if (changed)
                 _parser.WriteFile(_iniFile.Name, _data);
+            if (newBeatSaberPath != string.Empty)
+            {
+                BeatSaberPath = newBeatSaberPath;
+            }
             ReadAllSettings();
             Setting = new Dictionary<string, Func<string>>();
             Setting.Add(SettingKeys.BeatSaberPath.KeyName, () => { return BeatSaberPath; });
@@ -288,6 +282,20 @@ namespace SyncSaberService
             return settings.GetString(data.KeyName, data.Value);
         }
 
+        public static void Write()
+        {
+            try
+            {
+                Logger.Warning($"Writing to config at {_iniFile.FullName}");
+                _parser.WriteFile(_iniFile.FullName, _data);
+            }
+            catch (Exception ex)
+            {
+                Logger.Exception("Unable to write Config file:", ex);
+            }
+
+        }
+
         public static void UpdateFile()
         {
             try
@@ -304,7 +312,7 @@ namespace SyncSaberService
 
         private static IniData _data;
 
-        private static FileInfo _iniFile = new FileInfo("SyncSaberService.ini");
+        private static FileInfo _iniFile = new FileInfo(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "SyncSaberService.ini"));
 
         public const string SectionName = "SyncSaberService";
 
@@ -495,6 +503,10 @@ namespace SyncSaberService
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <exception cref="FileNotFoundException">Thrown when 'Beat Saber.exe' is not found at the specified path.</exception>
         public static string BeatSaberPath
         {
             get
@@ -514,8 +526,9 @@ namespace SyncSaberService
                 {
                     if (!SettingError[setting.KeyName]) // don't repeat error message over and over
                     {
-                        Logger.Error($"Beat Saber path {path} is invalid. Couldn't find 'Beat Saber.exe'");
+                        //Logger.Error($"Beat Saber path {path} is invalid. Couldn't find 'Beat Saber.exe'");
                         SettingError[setting.KeyName] = true;
+                        throw new FileNotFoundException($"Unable to locate 'Beat Saber.exe' inside the specified BeatSaberPath folder {path}.");
                     }
                 }
                 else { SettingError[setting.KeyName] = false; }
@@ -524,6 +537,9 @@ namespace SyncSaberService
             }
             set
             {
+                var bsDir = new DirectoryInfo(value);
+                if(bsDir.GetFiles("Beat Saber.exe").Length > 0)
+                    SettingError[SettingKeys.BeatSaberPath.KeyName] = false;
                 Settings[SettingKeys.BeatSaberPath.KeyName] = value.ToString();
                 Write();
             }
