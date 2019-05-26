@@ -55,11 +55,11 @@ namespace SyncSaberService
                 {
                     File.Delete(_historyPath);
                 }
-                File.Move(_historyPath + ".bak", ._historyPath);
+                File.Move(_historyPath + ".bak", _historyPath);
             }
             if (File.Exists(_historyPath))
             {
-                ._songDownloadHistory = File.ReadAllLines(_historyPath).ToList<string>();
+                _songDownloadHistory = File.ReadAllLines(_historyPath).ToList<string>();
             }
             if (!Directory.Exists(Config.BeatSaberPath + "\\CustomSongs"))
             {
