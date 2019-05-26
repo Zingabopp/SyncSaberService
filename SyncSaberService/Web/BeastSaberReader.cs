@@ -219,6 +219,11 @@ namespace SyncSaberService.Web
             var _settings = settings as BeastSaberFeedSettings;
             if (_settings == null)
                 throw new InvalidCastException(INVALIDFEEDSETTINGSMESSAGE);
+            if (_settings.FeedIndex != 2 && _username == string.Empty)
+            {
+                Logger.Error($"Can't access feed without a valid username and password in the config file");
+                return new Dictionary<int, SongInfo>();
+            }
             int pageIndex = 0;
             ConcurrentQueue<SongInfo> songList = new ConcurrentQueue<SongInfo>();
             //ConcurrentDictionary<int, SongInfo> songDict = new ConcurrentDictionary<int, SongInfo>();
@@ -282,7 +287,7 @@ namespace SyncSaberService.Web
             actionBlock.Complete();
             actionBlock.Completion.Wait();
 
-            Logger.Debug($"Finished checking pages, found {songList.Count} songs");
+            Logger.Info($"Finished checking pages, found {songList.Count} songs");
             Dictionary<int, SongInfo> retDict = new Dictionary<int, SongInfo>();
             foreach (var song in songList)
             {

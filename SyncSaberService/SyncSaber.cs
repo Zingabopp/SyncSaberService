@@ -249,7 +249,7 @@ namespace SyncSaberService
             int pageIndex = 0;
             var bReader = new BeastSaberReader(Config.BeastSaberUsername, Config.BeastSaberPassword, Config.MaxConcurrentPageChecks);
             var queuedSongs = bReader.GetSongsFromFeed(new BeastSaberFeedSettings(feedToDownload, maxPages));
-
+            totalSongs = queuedSongs.Count;
             Logger.Debug($"Finished checking pages, found {queuedSongs.Count} songs");
 
             string customSongsPath = Path.Combine(Config.BeatSaberPath, "CustomSongs");
@@ -269,7 +269,6 @@ namespace SyncSaberService
             Logger.Debug("Jobs finished, Processing downloads...");
             downloadCount = SuccessfulDownloads.Count;
             int failedCount = FailedDownloads.Count;
-            totalSongs = SuccessfulDownloads.Count + FailedDownloads.Count;
 
             ProcessDownloads();
             var timeElapsed = (DateTime.Now - startTime);
@@ -280,7 +279,7 @@ namespace SyncSaberService
                 FormatTimeSpan(timeElapsed),
                 pageIndex,
                 (pageIndex != 1) ? "s" : "",
-                totalSongs - downloadCount
+                totalSongs - downloadCount - failedCount
             }));
             _downloaderRunning = false;
         }
