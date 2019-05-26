@@ -223,9 +223,18 @@ namespace SyncSaberService.Web
             else
                 return "";
         }
-
-        public Dictionary<int, SongInfo> GetSongsFromFeed(int feedIndex, int maxPages)
+        private static readonly string INVALIDFEEDSETTINGSMESSAGE = "The IFeedSettings passed is not a BeastSaberFeedSettings.";
+        /// <summary>
+        /// Gets all songs from the feed defined by the provided settings.
+        /// </summary>
+        /// <param name="settings"></param>
+        /// <exception cref="InvalidCastException">Thrown when the provided settings don't match the correct IFeedSettings class</exception>
+        /// <returns></returns>
+        public Dictionary<int, SongInfo> GetSongsFromFeed(IFeedSettings settings)
         {
+            var _settings = settings as BeastSaverFeedSettings;
+            if (_settings == null)
+                throw new InvalidCastException(INVALIDFEEDSETTINGSMESSAGE);
             int pageIndex = 0;
             ConcurrentQueue<SongInfo> songList = new ConcurrentQueue<SongInfo>();
             //ConcurrentDictionary<int, SongInfo> songDict = new ConcurrentDictionary<int, SongInfo>();
@@ -239,7 +248,7 @@ namespace SyncSaberService.Web
                     Logger.Debug($"No songs found on page {info.pageIndex}");
                     lock (_earliestEmptyPage)
                     {
-                        _earliestEmptyPage[feedIndex] = info.pageIndex;
+                        _earliestEmptyPage[_settings.FeedIndex] = info.pageIndex;
                     }
                 }
                 else
@@ -256,7 +265,7 @@ namespace SyncSaberService.Web
             });
             lock (_earliestEmptyPage)
             {
-                _earliestEmptyPage[feedIndex] = 9999;
+                _earliestEmptyPage[_settings.FeedIndex] = 9999;
             }
             int earliestEmptyPage = 9999;
             // Keep queueing pages to check until max pages is reached, or pageIndex is greater than earliestEmptyPage
@@ -266,19 +275,19 @@ namespace SyncSaberService.Web
 
                 lock (_earliestEmptyPage)
                 {
-                    earliestEmptyPage = _earliestEmptyPage[feedIndex];
+                    earliestEmptyPage = _earliestEmptyPage[_settings.FeedIndex];
                 }
-                string feedUrl = GetPageUrl(Feeds[feedIndex].BaseUrl, pageIndex);
+                string feedUrl = GetPageUrl(Feeds[_settings.FeedIndex].BaseUrl, pageIndex);
 
                 FeedPageInfo pageInfo = new FeedPageInfo();
-                pageInfo.feedToDownload = feedIndex;
+                pageInfo.feedToDownload = _settings.FeedIndex;
                 pageInfo.feedUrl = feedUrl;
                 pageInfo.pageIndex = pageIndex;
                 actionBlock.SendAsync(pageInfo).Wait();
                 Logger.Debug($"Queued page {pageIndex} for reading. EarliestEmptyPage is {earliestEmptyPage}");
                 //Logger.Debug($"FeedURL is {feedUrl}");
             }
-            while ((pageIndex < maxPages || maxPages == 0) && pageIndex <= earliestEmptyPage);
+            while ((pageIndex < _settings.MaxPages || _settings.MaxPages == 0) && pageIndex <= earliestEmptyPage);
 
             while (pageQueue.Count > 0)
             {
@@ -319,6 +328,16 @@ namespace SyncSaberService.Web
             public string feedUrl;
             public int FeedIndex;
             public int pageIndex;
+        }
+
+        public class BeastSaverFeedSettings : IFeedSettings
+        {
+            public int MaxPages;
+            public int FeedIndex;
+            public BeastSaverFeedSettings(int _feedIndex, int _maxPages = 0)
+            {
+                FeedIndex = _feedIndex;
+            }
         }
 
 

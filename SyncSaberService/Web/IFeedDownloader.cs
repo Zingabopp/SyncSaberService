@@ -19,13 +19,16 @@ namespace SyncSaberService.Web
 {
     public interface IFeedReader
     {
-        string GetPageUrl(int feedIndex, int page);
         string GetPageText(string url);
         SongInfo[] GetSongsFromPage(string pageText);
         Dictionary<int, FeedInfo> Feeds { get; }
-        Dictionary<int, SongInfo> GetSongsFromFeed(int feedIndex, int maxPages);
+        Dictionary<int, SongInfo> GetSongsFromFeed(IFeedSettings settings);
     }
 
+    public interface IFeedSettings
+    {
+
+    }
     public struct FeedInfo
     {
         public FeedInfo(string _name, string _baseUrl)
