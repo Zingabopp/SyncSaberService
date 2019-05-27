@@ -63,7 +63,7 @@ namespace SyncSaberService
                 Logger.Info($"Downloading songs from {ss.BeastSaberFeeds.ElementAt(1).Value} feed...");
                 try
                 {
-                    ss.DownloadBeastSaberFeed(1, Web.BeastSaberReader.GetMaxBeastSaberPages(1));
+                    //ss.DownloadBeastSaberFeed(1, Web.BeastSaberReader.GetMaxBeastSaberPages(1));
                 }
                 catch (Exception ex)
                 {
@@ -73,7 +73,7 @@ namespace SyncSaberService
                 Logger.Info($"Downloading songs from {ss.BeastSaberFeeds.ElementAt(2).Value} feed...");
                 try
                 {
-                    ss.DownloadBeastSaberFeed(2, Web.BeastSaberReader.GetMaxBeastSaberPages(2));
+                   // ss.DownloadBeastSaberFeed(2, Web.BeastSaberReader.GetMaxBeastSaberPages(2));
                 }
                 catch (Exception ex)
                 {

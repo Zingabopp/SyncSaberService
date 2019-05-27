@@ -6,7 +6,8 @@ using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Xml;
-using SimpleJSON;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System.Net;
 using System.Text;
 using System.Threading;
@@ -15,7 +16,7 @@ using System.Threading.Tasks.Dataflow;
 using System.Net.Http;
 using static SyncSaberService.Utilities;
 using static SyncSaberService.Web.HttpClientWrapper;
-
+//using SimpleJSON;
 namespace SyncSaberService.Web
 {
     class BeatSaverReader : IFeedReader
@@ -53,20 +54,32 @@ namespace SyncSaberService.Web
             mapperId = _authors.GetOrAdd(author, (a) => {
                 string searchURL = Feeds[99].BaseUrl.Replace(AUTHORKEY, a);
                 string pageText = GetPageText(searchURL);
-                JSONNode result = JSON.Parse(pageText);
-                if (result["total"].AsInt == 0)
+                //JSONNode result = JSON.Parse(pageText);
+                JObject result = new JObject() ;
+                try
+                {
+                    result = JObject.Parse(pageText);
+
+                }catch(Exception ex)
+                {
+                    Logger.Exception("Unable to parse JSON from text", ex);
+                }
+                var totalResults = result["total"]?.Value<int>();
+                if (totalResults == null || totalResults == 0)
                 {
                     Logger.Warning($"No songs by {a} found, is the name spelled correctly?");
                     return "0";
                 }
-                var songJSONAry = result["songs"].AsArray;
-                var matchingSong = songJSONAry.Children.FirstOrDefault(c => c["uploader"].Value.ToLower() == a.ToLower());
+                //var songJSONAry = result["songs"].AsArray;
+                var songJSONAry = result["songs"].ToArray();
+                //var matchingSong = songJSONAry.Children.FirstOrDefault(c => c["uploader"].Value.ToLower() == a.ToLower());
+                var matchingSong = songJSONAry.FirstOrDefault(c => c["uploader"]?.Value<string>()?.ToLower() == a.ToLower());
                 if (matchingSong == null)
                 {
                     Logger.Warning($"No songs by {a} found, is the name spelled correctly?");
                     return "0";
                 }
-                return matchingSong["uploaderId"].Value;
+                return matchingSong["uploaderId"].Value<string>();
             });
 
             return Feeds[feedIndex].BaseUrl.Replace(AUTHORIDKEY, mapperId).Replace(PAGEKEY, (pageIndex * SONGSPERUSERPAGE).ToString());
@@ -86,9 +99,19 @@ namespace SyncSaberService.Web
                 throw new InvalidCastException(INVALIDFEEDSETTINGSMESSAGE);
             List<SongInfo> songs = new List<SongInfo>();
             string pageText = GetPageText(GetPageUrl(settings.FeedIndex, settings.Author));
-            JSONNode result = JSON.Parse(pageText);
+            //JSONNode result = JSON.Parse(pageText);
+            JObject result = new JObject();
+            try
+            {
+                result = JObject.Parse(pageText);
+            }
+            catch (Exception ex)
+            {
+                Logger.Exception("Unable to parse JSON from text", ex);
+            }
             string mapperId = string.Empty;
-            int numSongs = result["total"].AsInt;
+            int? numSongs = result["total"]?.Value<int>();
+            if (numSongs == null) numSongs = 0;
             Logger.Info($"Found {numSongs} songs by {settings.Author}");
             int songCount = 0;
             int pageNum = 0;
@@ -114,21 +137,21 @@ namespace SyncSaberService.Web
             Dictionary<int, SongInfo> retDict = new Dictionary<int, SongInfo>();
             foreach (var song in songs)
             {
-                if (retDict.ContainsKey(song.SongID))
+                if (retDict.ContainsKey(song.id))
                 {
-                    if (retDict[song.SongID].SongVersion < song.SongVersion)
+                    if (retDict[song.id].SongVersion < song.SongVersion)
                     {
-                        Logger.Debug($"Song with ID {song.SongID} already exists, updating");
-                        retDict[song.SongID] = song;
+                        Logger.Debug($"Song with ID {song.id} already exists, updating");
+                        retDict[song.id] = song;
                     }
                     else
                     {
-                        Logger.Debug($"Song with ID {song.SongID} is already the newest version");
+                        Logger.Debug($"Song with ID {song.id} is already the newest version");
                     }
                 }
                 else
                 {
-                    retDict.Add(song.SongID, song);
+                    retDict.Add(song.id, song);
                 }
             }
             return retDict;
@@ -136,22 +159,65 @@ namespace SyncSaberService.Web
 
         public List<SongInfo> GetSongsFromPage(string pageText)
         {
-            JSONNode result = JSON.Parse(pageText);
+            //JSONNode result = JSON.Parse(pageText);
+            JObject result = new JObject();
+            try
+            {
+                result = JObject.Parse(pageText);
+
+            }
+            catch (Exception ex)
+            {
+                Logger.Exception("Unable to parse JSON from text", ex);
+            }
             List<SongInfo> songs = new List<SongInfo>();
-            if (result["total"].AsInt == 0)
+            int? resultTotal = result["total"]?.Value<int>();
+            if (resultTotal == null) resultTotal = 0;
+            if (resultTotal == 0)
             {
                 return songs;
             }
-            var songJSONAry = result["songs"].Linq.ToArray();
-
-            foreach (JSONObject song in songJSONAry)
+            var songJSONAry = result["songs"]?.ToArray();
+            if(songJSONAry == null)
+            {
+                Logger.Error("Invalid page text: 'songs' field not found.");
+            }
+            foreach (var song in songJSONAry)
             {
                 //JSONObject song = (JSONObject) aKeyValue;
-                string songIndex = song["version"].Value;
-                string songName = song["songName"].Value;
-                string author = song["uploader"].Value;
+                string songIndex = song["key"]?.Value<string>();
+                string songName = song["songName"]?.Value<string>();
+                string author = song["uploader"]?.Value<string>();
                 string songUrl = "https://beatsaver.com/download/" + songIndex;
-                songs.Add(new SongInfo(songIndex, songName, songUrl, author, "followings"));
+                /*
+                SongInfo newSong;
+                try
+                {
+                    newSong = song.ToObject<SongInfo>();
+                    newSong.Feed = "followings";
+                } catch(Exception ex)
+                {
+                    Logger.Exception($"Error deserializing song {songIndex}, using basic info", ex);
+                    newSong = new SongInfo(songIndex, songName, songUrl, author, "followings");
+                }
+                */
+
+                if (SongInfo.TryParseBeatSaver(song, out SongInfo newSong))
+                {
+                    newSong.Feed = "followings";
+                    songs.Add(newSong);
+                }
+                else
+                {
+                    if (!(string.IsNullOrEmpty(songIndex)))
+                    {
+                        Logger.Warning($"Couldn't parse song {songIndex}, using sparse definition.");
+                        songs.Add(new SongInfo(songIndex, songName, songUrl, author, "followings"));
+                    }
+                    else
+                        Logger.Error("Unable to identify song, skipping");
+                }
+                
             }
             return songs;
         }

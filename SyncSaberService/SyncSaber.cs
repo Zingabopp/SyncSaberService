@@ -6,7 +6,8 @@ using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Xml;
-using SimpleJSON;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
@@ -250,9 +251,9 @@ namespace SyncSaberService
             string outputPath = "";
             foreach (var song in queuedSongs.Values)
             {
-                tempPath = Path.Combine(Path.GetTempPath(), song.Index + ".zip");
-                outputPath = Path.Combine(Config.BeatSaberPath, "CustomSongs", song.Index);
-                if (existingSongs.Contains(song.Index) || _songDownloadHistory.Contains(song.Index) || Directory.Exists(outputPath))
+                tempPath = Path.Combine(Path.GetTempPath(), song.key + ".zip");
+                outputPath = Path.Combine(Config.BeatSaberPath, "CustomSongs", song.key);
+                if (existingSongs.Contains(song.key) || _songDownloadHistory.Contains(song.key) || Directory.Exists(outputPath))
                     continue; // We already have the song or don't want it, skip
                 DownloadJob job = new DownloadJob(song, tempPath, outputPath);
                 jobs.AddJob(job);
@@ -276,21 +277,21 @@ namespace SyncSaberService
             DownloadJob job;
             while (SuccessfulDownloads.TryDequeue(out job))
             {
-                if (!_songDownloadHistory.Contains(job.Song.Index))
-                    _songDownloadHistory.Add(job.Song.Index);
+                if (!_songDownloadHistory.Contains(job.Song.key))
+                    _songDownloadHistory.Add(job.Song.key);
 
-                UpdatePlaylist(_syncSaberSongs, job.Song.Index, job.Song.Name);
+                UpdatePlaylist(_syncSaberSongs, job.Song.key, job.Song.name);
                 if (!string.IsNullOrEmpty(job.Song.Feed))
-                    UpdatePlaylist(GetPlaylistForFeed(job.Song.Feed), job.Song.Index, job.Song.Name);
-                RemoveOldVersions(job.Song.Index);
+                    UpdatePlaylist(GetPlaylistForFeed(job.Song.Feed), job.Song.key, job.Song.name);
+                RemoveOldVersions(job.Song.key);
             }
             while (FailedDownloads.TryDequeue(out job))
             {
-                if (!_songDownloadHistory.Contains(job.Song.Index) && job.Result != DownloadJob.JobResult.TIMEOUT)
+                if (!_songDownloadHistory.Contains(job.Song.key) && job.Result != DownloadJob.JobResult.TIMEOUT)
                 {
-                    _songDownloadHistory.Add(job.Song.Index);
+                    _songDownloadHistory.Add(job.Song.key);
                 }
-                Logger.Error($"Failed to download {job.Song.Index} by {job.Song.Author}");
+                Logger.Error($"Failed to download {job.Song.key} by {job.Song.authorName}");
             }
 
             Utilities.WriteStringListSafe(_historyPath, _songDownloadHistory.Distinct<string>().ToList<string>(), true);
@@ -309,9 +310,9 @@ namespace SyncSaberService
             jobs.JobCompleted += OnJobFinished;
             foreach (var song in queuedSongs.Values)
             {
-                tempPath = Path.Combine(Path.GetTempPath(), song.Index + ".zip");
-                outputPath = Path.Combine(Config.BeatSaberPath, "CustomSongs", song.Index);
-                if (existingSongs.Contains(song.Index) || _songDownloadHistory.Contains(song.Index) || Directory.Exists(outputPath))
+                tempPath = Path.Combine(Path.GetTempPath(), song.key + ".zip");
+                outputPath = Path.Combine(Config.BeatSaberPath, "CustomSongs", song.key);
+                if (existingSongs.Contains(song.key) || _songDownloadHistory.Contains(song.key) || Directory.Exists(outputPath))
                     continue; // We already have the song or don't want it, skip
                 DownloadJob job = new DownloadJob(song, tempPath, outputPath);
                 jobs.AddJob(job);

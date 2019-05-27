@@ -6,7 +6,8 @@ using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Xml;
-using SimpleJSON;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System.Net;
 using System.Text;
 using System.Threading;
@@ -146,7 +147,7 @@ namespace SyncSaberService.Web
             XmlDocument xmlDocument = new XmlDocument();
 
             xmlDocument.LoadXml(pageText);
-
+            List<Task> populateTasks = new List<Task>();
             XmlNodeList xmlNodeList = xmlDocument.DocumentElement.SelectNodes("/rss/channel/item");
             foreach (object obj in xmlNodeList)
             {
@@ -170,12 +171,16 @@ namespace SyncSaberService.Web
                         string mapper = GetMapperFromBsaber(node.InnerText);
                         string songUrl = "https://beatsaver.com/download/" + songIndex;
                         SongInfo currentSong = new SongInfo(songIndex, songName, songUrl, mapper);
-                        string currentSongDirectory = Path.Combine(Config.BeatSaberPath, "CustomSongs", songIndex);
+                        //string currentSongDirectory = Path.Combine(Config.BeatSaberPath, "CustomSongs", songIndex);
                         //bool downloadFailed = false;
+                        //populateTasks.Add(currentSong.PopulateFieldsAsync());
+                        SongInfo.PopulateFields(currentSong);
                         songsOnPage.Add(currentSong);
                     }
                 }
             }
+            
+            Task.WaitAll(populateTasks.ToArray());
             return songsOnPage;
         }
 
@@ -291,21 +296,21 @@ namespace SyncSaberService.Web
             Dictionary<int, SongInfo> retDict = new Dictionary<int, SongInfo>();
             foreach (var song in songList)
             {
-                if (retDict.ContainsKey(song.SongID))
+                if (retDict.ContainsKey(song.id))
                 {
-                    if (retDict[song.SongID].SongVersion < song.SongVersion)
+                    if (retDict[song.id].SongVersion < song.SongVersion)
                     {
-                        Logger.Debug($"Song with ID {song.SongID} already exists, updating");
-                        retDict[song.SongID] = song;
+                        Logger.Debug($"Song with ID {song.id} already exists, updating");
+                        retDict[song.id] = song;
                     }
                     else
                     {
-                        Logger.Debug($"Song with ID {song.SongID} is already the newest version");
+                        Logger.Debug($"Song with ID {song.id} is already the newest version");
                     }
                 }
                 else
                 {
-                    retDict.Add(song.SongID, song);
+                    retDict.Add(song.id, song);
                 }
             }
             return retDict;
