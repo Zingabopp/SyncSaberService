@@ -92,6 +92,13 @@ namespace SyncSaberService
                     return CreateKeyData("MaxFollowingsPages", "0");
                 }
             }
+            public static KeyData MaxBeatSaverPages
+            {
+                get
+                {
+                    return CreateKeyData("MaxBeatSaverPages", "5");
+                }
+            }
             public static KeyData BeatSaberPath
             {
                 get
@@ -122,7 +129,334 @@ namespace SyncSaberService
             }
         }
 
-        
+
+        #region "Setting Properties"
+        public static bool AutoDownloadSongs
+        {
+            get
+            {
+                return Settings.GetBool(SettingKeys.AutoDownloadSongs);
+            }
+            set
+            {
+                Settings[SettingKeys.AutoDownloadSongs.KeyName] = value.ToString();
+                Write();
+            }
+        }
+
+        public static bool AutoUpdateSongs
+        {
+            get
+            {
+                return Settings.GetBool(SettingKeys.AutoUpdateSongs);
+            }
+            set
+            {
+                Settings[SettingKeys.AutoUpdateSongs.KeyName] = value.ToString();
+                Write();
+            }
+        }
+
+        public static string BeastSaberUsername
+        {
+            get
+            {
+                return Settings.GetString(SettingKeys.BeastSaberUsername);
+            }
+            set
+            {
+                Settings[SettingKeys.BeastSaberUsername.KeyName] = value.ToString();
+                Write();
+            }
+        }
+
+        public static string BeastSaberPassword
+        {
+            get
+            {
+                return Settings.GetString(SettingKeys.BeastSaberPassword);
+            }
+            set
+            {
+                Settings[SettingKeys.BeastSaberUsername.KeyName] = value.ToString();
+                Write();
+            }
+        }
+
+        public static int MaxFollowingsPages
+        {
+            get
+            {
+                KeyData setting = SettingKeys.MaxFollowingsPages;
+                int val = Settings.GetInt(setting);
+                if (val < 1)
+                {
+                    Logger.Warning($"Value of {val} is invalid for setting {setting.KeyName}, using {setting.Value} instead.");
+                    SettingError[setting.KeyName] = true;
+                    val = int.Parse(setting.Value);
+                }
+                else { SettingError[setting.KeyName] = false; }
+
+                return val;
+            }
+            set
+            {
+                Settings[SettingKeys.MaxFollowingsPages.KeyName] = value.ToString();
+                Write();
+            }
+        }
+
+        public static int MaxBookmarksPages
+        {
+            get
+            {
+                KeyData setting = SettingKeys.MaxBookmarksPages;
+                int val = Settings.GetInt(setting);
+                if (val < 1)
+                {
+                    Logger.Warning($"Value of {val} is invalid for setting {setting.KeyName}, using {setting.Value} instead.");
+                    SettingError[setting.KeyName] = true;
+                    val = int.Parse(setting.Value); ;
+                }
+                else { SettingError[setting.KeyName] = false; }
+                return val;
+            }
+            set
+            {
+                Settings[SettingKeys.MaxBookmarksPages.KeyName] = value.ToString();
+                Write();
+            }
+        }
+
+        public static int MaxCuratorRecommendedPages
+        {
+            get
+            {
+                KeyData setting = SettingKeys.MaxCuratorRecommendedPages;
+                int val = Settings.GetInt(setting);
+                if (val < 1)
+                {
+                    //Logger.Warning($"Value of {val} is invalid for setting {setting.KeyName}, using {setting.Value} instead.");
+                    SettingError[setting.KeyName] = true;
+                    val = int.Parse(setting.Value); ;
+                }
+                else { SettingError[setting.KeyName] = false; }
+                return val;
+            }
+            set
+            {
+                Settings[SettingKeys.MaxCuratorRecommendedPages.KeyName] = value.ToString();
+                Write();
+            }
+        }
+
+        public static int MaxBeatSaverPages
+        {
+            get
+            {
+                KeyData setting = SettingKeys.MaxBeatSaverPages;
+                int val = Settings.GetInt(setting);
+                if (val < 1)
+                {
+                    //Logger.Warning($"Value of {val} is invalid for setting {setting.KeyName}, using {setting.Value} instead.");
+                    SettingError[setting.KeyName] = true;
+                    val = int.Parse(setting.Value); ;
+                }
+                else { SettingError[setting.KeyName] = false; }
+                return val;
+            }
+            set
+            {
+                Settings[SettingKeys.MaxBeatSaverPages.KeyName] = value.ToString();
+                Write();
+            }
+        }
+
+        public static bool DeleteOldVersions
+        {
+            get
+            {
+                return Settings.GetBool(SettingKeys.DeleteOldVersions);
+            }
+            set
+            {
+                Settings[SettingKeys.DeleteOldVersions.KeyName] = value.ToString();
+                Write();
+            }
+        }
+
+        public static bool SyncBookmarksFeed
+        {
+            get
+            {
+                return Settings.GetBool(SettingKeys.SyncBookmarksFeed);
+            }
+            set
+            {
+                Settings[SettingKeys.SyncBookmarksFeed.KeyName] = value.ToString();
+                Write();
+            }
+        }
+
+        public static bool SyncCuratorRecommendedFeed
+        {
+            get
+            {
+                return Settings.GetBool(SettingKeys.SyncCuratorRecommendedFeed);
+            }
+            set
+            {
+                Settings[SettingKeys.SyncCuratorRecommendedFeed.KeyName] = value.ToString();
+                Write();
+            }
+        }
+
+        public static bool SyncFollowingsFeed
+        {
+            get
+            {
+                return Settings.GetBool(SettingKeys.SyncFollowingsFeed);
+            }
+            set
+            {
+                Settings[SettingKeys.SyncFollowingsFeed.KeyName] = value.ToString();
+                Write();
+            }
+        }
+
+        public static string BeatSaberPath
+        {
+            get
+            {
+                KeyData setting = SettingKeys.BeatSaberPath;
+                string path = Settings.GetString(setting);
+
+                if (!IsBeatSaberDirectory(path))
+                {
+                    if (!SettingError[setting.KeyName]) // don't repeat error message over and over
+                    {
+                        Logger.Error($"Beat Saber path {path} is invalid. Couldn't find 'Beat Saber.exe'");
+                        SettingError[setting.KeyName] = true;
+                        //throw new FileNotFoundException($"Unable to locate 'Beat Saber.exe' inside the specified BeatSaberPath folder {path}.");
+                    }
+                }
+                else { SettingError[setting.KeyName] = false; }
+
+                return path;
+            }
+            set
+            {
+                var bsDir = new DirectoryInfo(value);
+                if (bsDir.GetFiles("Beat Saber.exe").Length > 0)
+                    SettingError[SettingKeys.BeatSaberPath.KeyName] = false;
+                Settings[SettingKeys.BeatSaberPath.KeyName] = value.ToString();
+                Write();
+            }
+        }
+
+        /// <summary>
+        /// Timeout for Beat Saver downloads in seconds.
+        /// </summary>
+        public static int DownloadTimeout
+        {
+            get
+            {
+                KeyData setting = SettingKeys.DownloadTimeout;
+                int val = Settings.GetInt(setting);
+                if (val < 0)
+                {
+                    int defaultVal = int.Parse(setting.Value);
+                    if (!SettingError[setting.KeyName]) // don't repeat error message over and over
+                    {
+                        Logger.Warning($"Value of {val} is invalid for setting {setting.KeyName}, using {defaultVal} instead.");
+                        SettingError[setting.KeyName] = true;
+                    }
+                    val = defaultVal;
+                }
+                else { SettingError[setting.KeyName] = false; }
+                return val;
+            }
+            set
+            {
+                Settings[SettingKeys.DownloadTimeout.KeyName] = value.ToString();
+                Write();
+            }
+        }
+
+        public static int MaxConcurrentDownloads
+        {
+            get
+            {
+                KeyData setting = SettingKeys.MaxConcurrentDownloads;
+                int val = Settings.GetInt(setting);
+                if (val < 0)
+                {
+                    int defaultVal = int.Parse(setting.Value);
+                    if (!SettingError[setting.KeyName]) // don't repeat error message over and over
+                    {
+                        Logger.Warning($"Value of {val} is invalid for setting {setting.KeyName}, using {defaultVal} instead.");
+                        SettingError[setting.KeyName] = true;
+                    }
+                    val = defaultVal; ;
+                }
+                else { SettingError[setting.KeyName] = false; }
+                return val;
+            }
+            set
+            {
+                Settings[SettingKeys.MaxConcurrentDownloads.KeyName] = value.ToString();
+                Write();
+            }
+        }
+
+        public static int MaxConcurrentPageChecks
+        {
+            get
+            {
+                KeyData setting = SettingKeys.MaxConcurrentPageChecks;
+                int val = Settings.GetInt(setting);
+                if (val < 0)
+                {
+                    int defaultVal = int.Parse(setting.Value);
+                    if (!SettingError[setting.KeyName]) // don't repeat error message over and over
+                    {
+                        Logger.Warning($"Value of {val} is invalid for setting {setting.KeyName}, using {defaultVal} instead.");
+                        SettingError[setting.KeyName] = true;
+                    }
+                    val = defaultVal; ;
+                }
+                else { SettingError[setting.KeyName] = false; }
+                return val;
+            }
+            set
+            {
+                Settings[SettingKeys.MaxConcurrentPageChecks.KeyName] = value.ToString();
+                Write();
+            }
+        }
+
+        #endregion
+
+        public static void ReadAllSettings()
+        {
+            object setting = AutoDownloadSongs;
+            setting = AutoUpdateSongs;
+            setting = BeastSaberUsername;
+            setting = BeastSaberPassword;
+            setting = DeleteOldVersions;
+            setting = SyncBookmarksFeed;
+            setting = SyncCuratorRecommendedFeed;
+            setting = SyncFollowingsFeed;
+            setting = MaxBookmarksPages;
+            setting = MaxCuratorRecommendedPages;
+            setting = MaxFollowingsPages;
+            setting = MaxBeatSaverPages;
+            setting = DownloadTimeout;
+            setting = MaxConcurrentDownloads;
+            setting = MaxConcurrentPageChecks;
+            setting = BeatSaberPath;
+        }
+
 
         private static Dictionary<string, bool> _errorStatus;
         private static Dictionary<string, bool> SettingError
@@ -137,6 +471,7 @@ namespace SyncSaberService
                         { SettingKeys.BeastSaberUsername.KeyName, false },
                         { SettingKeys.MaxFollowingsPages.KeyName, false },
                         { SettingKeys.MaxBookmarksPages.KeyName, false },
+                        { SettingKeys.MaxBeatSaverPages.KeyName, false },
                         { SettingKeys.MaxCuratorRecommendedPages.KeyName, false },
                         { SettingKeys.DeleteOldVersions.KeyName, false },
                         { SettingKeys.SyncBookmarksFeed.KeyName, false },
@@ -170,25 +505,6 @@ namespace SyncSaberService
                 else
                     return false;
             }
-        }
-
-        public static void ReadAllSettings()
-        {
-            object setting = AutoDownloadSongs;
-            setting = AutoUpdateSongs;
-            setting = BeastSaberUsername;
-            setting = BeastSaberPassword;
-            setting = DeleteOldVersions;
-            setting = SyncBookmarksFeed;
-            setting = SyncCuratorRecommendedFeed;
-            setting = SyncFollowingsFeed;
-            setting = MaxBookmarksPages;
-            setting = MaxCuratorRecommendedPages;
-            setting = MaxFollowingsPages;
-            setting = DownloadTimeout;
-            setting = MaxConcurrentDownloads;
-            setting = MaxConcurrentPageChecks;
-            setting = BeatSaberPath;
         }
 
         /// <summary>
@@ -319,206 +635,6 @@ namespace SyncSaberService
             }
         }
 
-        public static bool AutoDownloadSongs
-        {
-            get
-            {
-                return Settings.GetBool(SettingKeys.AutoDownloadSongs);
-            }
-            set
-            {
-                Settings[SettingKeys.AutoDownloadSongs.KeyName] = value.ToString();
-                Write();
-            }
-        }
-
-        public static bool AutoUpdateSongs
-        {
-            get
-            {
-                return Settings.GetBool(SettingKeys.AutoUpdateSongs);
-            }
-            set
-            {
-                Settings[SettingKeys.AutoUpdateSongs.KeyName] = value.ToString();
-                Write();
-            }
-        }
-
-        public static string BeastSaberUsername
-        {
-            get
-            {
-                return Settings.GetString(SettingKeys.BeastSaberUsername);
-            }
-            set
-            {
-                Settings[SettingKeys.BeastSaberUsername.KeyName] = value.ToString();
-                Write();
-            }
-        }
-
-        public static string BeastSaberPassword
-        {
-            get
-            {
-                return Settings.GetString(SettingKeys.BeastSaberPassword);
-            }
-            set
-            {
-                Settings[SettingKeys.BeastSaberUsername.KeyName] = value.ToString();
-                Write();
-            }
-        }
-
-        public static int MaxFollowingsPages
-        {
-            get
-            {
-                KeyData setting = SettingKeys.MaxFollowingsPages;
-                int val = Settings.GetInt(setting);
-                if (val < 1)
-                {
-                    //Logger.Warning($"Value of {val} is invalid for setting {setting.KeyName}, using {setting.Value} instead.");
-                    SettingError[setting.KeyName] = true;
-                    val = 30;
-                }
-                else { SettingError[setting.KeyName] = false; }
-
-                return val;
-            }
-            set
-            {
-                Settings[SettingKeys.MaxFollowingsPages.KeyName] = value.ToString();
-                Write();
-            }
-        }
-
-        public static int MaxBookmarksPages
-        {
-            get
-            {
-                KeyData setting = SettingKeys.MaxBookmarksPages;
-                int val = Settings.GetInt(setting);
-                if (val < 1)
-                {
-                    //Logger.Warning($"Value of {val} is invalid for setting {setting.KeyName}, using {setting.Value} instead.");
-                    SettingError[setting.KeyName] = true;
-                    val = 30;
-                }
-                else { SettingError[setting.KeyName] = false; }
-                return val;
-            }
-            set
-            {
-                Settings[SettingKeys.MaxBookmarksPages.KeyName] = value.ToString();
-                Write();
-            }
-        }
-
-        public static int MaxCuratorRecommendedPages
-        {
-            get
-            {
-                KeyData setting = SettingKeys.MaxCuratorRecommendedPages;
-                int val = Settings.GetInt(setting);
-                if (val < 1)
-                {
-                    //Logger.Warning($"Value of {val} is invalid for setting {setting.KeyName}, using {setting.Value} instead.");
-                    SettingError[setting.KeyName] = true;
-                    val = 30;
-                }
-                else { SettingError[setting.KeyName] = false; }
-                return val;
-            }
-            set
-            {
-                Settings[SettingKeys.MaxCuratorRecommendedPages.KeyName] = value.ToString();
-                Write();
-            }
-        }
-
-        public static bool DeleteOldVersions
-        {
-            get
-            {
-                return Settings.GetBool(SettingKeys.DeleteOldVersions);
-            }
-            set
-            {
-                Settings[SettingKeys.DeleteOldVersions.KeyName] = value.ToString();
-                Write();
-            }
-        }
-
-        public static bool SyncBookmarksFeed
-        {
-            get
-            {
-                return Settings.GetBool(SettingKeys.SyncBookmarksFeed);
-            }
-            set
-            {
-                Settings[SettingKeys.SyncBookmarksFeed.KeyName] = value.ToString();
-                Write();
-            }
-        }
-
-        public static bool SyncCuratorRecommendedFeed
-        {
-            get
-            {
-                return Settings.GetBool(SettingKeys.SyncCuratorRecommendedFeed);
-            }
-            set
-            {
-                Settings[SettingKeys.SyncCuratorRecommendedFeed.KeyName] = value.ToString();
-                Write();
-            }
-        }
-
-        public static bool SyncFollowingsFeed
-        {
-            get
-            {
-                return Settings.GetBool(SettingKeys.SyncFollowingsFeed);
-            }
-            set
-            {
-                Settings[SettingKeys.SyncFollowingsFeed.KeyName] = value.ToString();
-                Write();
-            }
-        }
-
-        public static string BeatSaberPath
-        {
-            get
-            {
-                KeyData setting = SettingKeys.BeatSaberPath;
-                string path = Settings.GetString(setting);
-                
-                if (!IsBeatSaberDirectory(path))
-                {
-                    if (!SettingError[setting.KeyName]) // don't repeat error message over and over
-                    {
-                        Logger.Error($"Beat Saber path {path} is invalid. Couldn't find 'Beat Saber.exe'");
-                        SettingError[setting.KeyName] = true;
-                        //throw new FileNotFoundException($"Unable to locate 'Beat Saber.exe' inside the specified BeatSaberPath folder {path}.");
-                    }
-                }
-                else { SettingError[setting.KeyName] = false; }
-
-                return path;
-            }
-            set
-            {
-                var bsDir = new DirectoryInfo(value);
-                if(bsDir.GetFiles("Beat Saber.exe").Length > 0)
-                    SettingError[SettingKeys.BeatSaberPath.KeyName] = false;
-                Settings[SettingKeys.BeatSaberPath.KeyName] = value.ToString();
-                Write();
-            }
-        }
 
         public static bool IsBeatSaberDirectory(string path)
         {
@@ -530,87 +646,6 @@ namespace SyncSaberService
                 return files.Count() > 0;
             }
             return false;
-        }
-
-        /// <summary>
-        /// Timeout for Beat Saver downloads in seconds.
-        /// </summary>
-        public static int DownloadTimeout
-        {
-            get
-            {
-                KeyData setting = SettingKeys.DownloadTimeout;
-                int val = Settings.GetInt(setting);
-                if (val < 0)
-                {
-                    int defaultVal = int.Parse(setting.Value);
-                    if (!SettingError[setting.KeyName]) // don't repeat error message over and over
-                    {
-                        Logger.Warning($"Value of {val} is invalid for setting {setting.KeyName}, using {defaultVal} instead.");
-                        SettingError[setting.KeyName] = true;
-                    }
-                    val = defaultVal;
-                }
-                else { SettingError[setting.KeyName] = false; }
-                return val;
-            }
-            set
-            {
-                Settings[SettingKeys.DownloadTimeout.KeyName] = value.ToString();
-                Write();
-            }
-        }
-
-        public static int MaxConcurrentDownloads
-        {
-            get
-            {
-                KeyData setting = SettingKeys.MaxConcurrentDownloads;
-                int val = Settings.GetInt(setting);
-                if (val < 0)
-                {
-                    int defaultVal = int.Parse(setting.Value);
-                    if (!SettingError[setting.KeyName]) // don't repeat error message over and over
-                    {
-                        Logger.Warning($"Value of {val} is invalid for setting {setting.KeyName}, using {defaultVal} instead.");
-                        SettingError[setting.KeyName] = true;
-                    }
-                    val = defaultVal; ;
-                }
-                else { SettingError[setting.KeyName] = false; }
-                return val;
-            }
-            set
-            {
-                Settings[SettingKeys.MaxConcurrentDownloads.KeyName] = value.ToString();
-                Write();
-            }
-        }
-
-        public static int MaxConcurrentPageChecks
-        {
-            get
-            {
-                KeyData setting = SettingKeys.MaxConcurrentPageChecks;
-                int val = Settings.GetInt(setting);
-                if (val < 0)
-                {
-                    int defaultVal = int.Parse(setting.Value);
-                    if (!SettingError[setting.KeyName]) // don't repeat error message over and over
-                    {
-                        Logger.Warning($"Value of {val} is invalid for setting {setting.KeyName}, using {defaultVal} instead.");
-                        SettingError[setting.KeyName] = true;
-                    }
-                    val = defaultVal; ;
-                }
-                else { SettingError[setting.KeyName] = false; }
-                return val;
-            }
-            set
-            {
-                Settings[SettingKeys.MaxConcurrentPageChecks.KeyName] = value.ToString();
-                Write();
-            }
         }
 
         private static List<string> _favoriteMappers;

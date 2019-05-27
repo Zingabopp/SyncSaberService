@@ -15,7 +15,7 @@ namespace SyncSaberService.Web
             _batchComplete = false;
             int maxConcurrentDownloads = Config.MaxConcurrentDownloads; // Set it here so it doesn't error
             var actionBlock = new ActionBlock<DownloadJob>(job => {
-                Logger.Trace($"Running job {job.Song.Index} in ActionBlock");
+                Logger.Trace($"Running job {job.Song.key} in ActionBlock");
                 Task newTask = job.RunJob();
                 newTask.Wait();
                 TaskComplete(job.Song, job);
@@ -26,7 +26,7 @@ namespace SyncSaberService.Web
             while (_songDownloadQueue.Count > 0)
             {
                 var job = _songDownloadQueue.Pop();
-                Logger.Trace($"Adding job for {job.Song.Index}");
+                Logger.Trace($"Adding job for {job.Song.key}");
                 await actionBlock.SendAsync(job);
             }
 
@@ -43,19 +43,19 @@ namespace SyncSaberService.Web
             switch (job.Result)
             {
                 case DownloadJob.JobResult.SUCCESS:
-                    Logger.Info($"Finished job {song.Index}-{song.Name} by {song.Author} successfully.");
+                    Logger.Info($"Finished job {song.key}-{song.name} by {song.authorName} successfully.");
                     break;
                 case DownloadJob.JobResult.TIMEOUT:
-                    Logger.Warning($"Job {song.Index} failed due to download timeout.");
+                    Logger.Warning($"Job {song.key} failed due to download timeout.");
                     break;
                 case DownloadJob.JobResult.NOTFOUND:
-                    Logger.Info($"Job failed, {song.Index} could not be found on Beat Saver.");
+                    Logger.Info($"Job failed, {song.key} could not be found on Beat Saver.");
                     break;
                 case DownloadJob.JobResult.UNZIPFAILED:
-                    Logger.Warning($"Job failed, {song.Index} failed during unzipping.");
+                    Logger.Warning($"Job failed, {song.key} failed during unzipping.");
                     break;
                 case DownloadJob.JobResult.OTHER:
-                    Logger.Warning($"Job {song.Index} failed for...reasons.");
+                    Logger.Warning($"Job {song.key} failed for...reasons.");
                     break;
                 default:
                     break;
@@ -72,10 +72,10 @@ namespace SyncSaberService.Web
 
         public void AddJob(DownloadJob job)
         {
-            if (_songDownloadQueue.Where(j => j.Song.Index == job.Song.Index).Count() == 0)
+            if (_songDownloadQueue.Where(j => j.Song.key == job.Song.key).Count() == 0)
                 _songDownloadQueue.Push(job);
             else
-                Logger.Warning($"{job.Song.Index} is already in the queue");
+                Logger.Warning($"{job.Song.key} is already in the queue");
         }
 
         public event Action<DownloadJob> JobCompleted;

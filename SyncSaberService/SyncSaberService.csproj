@@ -51,6 +51,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Config.cs" />
+    <Compile Include="SimpleJson.cs" />
     <Compile Include="Web\BeatSaverReader.cs" />
     <Compile Include="Web\DownloadBatch.cs" />
     <Compile Include="Web\AsyncCookieCache.cs" />
@@ -61,7 +62,6 @@
     <Compile Include="Playlist.cs" />
     <Compile Include="PlaylistIO.cs" />
     <Compile Include="PlaylistSong.cs" />
-    <Compile Include="SimpleJSON.cs" />
     <Compile Include="SongInfo.cs" />
     <Compile Include="SongListUtils.cs" />
     <Compile Include="SyncSaber.cs" />

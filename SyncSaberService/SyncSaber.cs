@@ -6,7 +6,8 @@ using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Xml;
-using SimpleJSON;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
@@ -20,33 +21,10 @@ namespace SyncSaberService
     public class SyncSaber
     {
         public static SyncSaber Instance;
-        private Dictionary<string, string> _beastSaberFeeds;
-        public Dictionary<string, string> BeastSaberFeeds
-        {
-            get
-            {
-                if (_beastSaberFeeds == null)
-                    _beastSaberFeeds = new Dictionary<string, string>();
-                return _beastSaberFeeds;
-            }
-        }
-
-
+        public string CustomSongsPath;
         public SyncSaber()
         {
             Instance = this;
-            if (Config.SyncFollowingsFeed)
-            {
-                BeastSaberFeeds.Add("followings", "https://bsaber.com/members/" + Config.BeastSaberUsername + "/wall/followings");
-            }
-            if (Config.SyncBookmarksFeed)
-            {
-                BeastSaberFeeds.Add("bookmarks", "https://bsaber.com/members/" + Config.BeastSaberUsername + "/bookmarks");
-            }
-            if (Config.SyncCuratorRecommendedFeed)
-            {
-                BeastSaberFeeds.Add("curator recommended", "https://bsaber.com/members/curatorrecommended/bookmarks");
-            }
 
             _historyPath = Path.Combine(Config.BeatSaberPath, "UserData", "SyncSaberHistory.txt");
             if (File.Exists(_historyPath + ".bak"))
@@ -61,33 +39,19 @@ namespace SyncSaberService
             {
                 _songDownloadHistory = File.ReadAllLines(_historyPath).ToList<string>();
             }
-            if (!Directory.Exists(Config.BeatSaberPath + "\\CustomSongs"))
+            if (Directory.Exists(Config.BeatSaberPath))
             {
-                Directory.CreateDirectory(Config.BeatSaberPath + "\\CustomSongs");
+                CustomSongsPath = Path.Combine(Config.BeatSaberPath, "CustomSongs");
+                if (!Directory.Exists(CustomSongsPath))
+                {
+                    Directory.CreateDirectory(CustomSongsPath);
+                }
             }
-        }
 
-        private Playlist GetPlaylistForFeed(string feedName)
-        {
-            if (feedName == "followings")
-            {
-                return _followingsSongs;
-            }
-            if (feedName == "bookmarks")
-            {
-                return _bookmarksSongs;
-            }
-            if (!(feedName == "curator recommended"))
-            {
-                return null;
-            }
-            return _curatorRecommendedSongs;
-        }
-
-        private Playlist GetPlaylistForFeed(int feedToDownload)
-        {
-            string feedName = _beastSaberFeeds.ElementAt(feedToDownload).Key;
-            return GetPlaylistForFeed(feedName);
+            FeedReaders = new Dictionary<string, IFeedReader> {
+                {BeatSaverReader.NameKey, new BeatSaverReader() },
+                {BeastSaberReader.NameKey, new BeastSaberReader(Config.BeastSaberUsername, Config.BeastSaberPassword, Config.MaxConcurrentPageChecks) }
+            };
         }
 
         private void UpdatePlaylist(Playlist playlist, string songIndex, string songName)
@@ -136,7 +100,7 @@ namespace SyncSaberService
             {
                 return;
             }
-            string[] customSongDirectories = Directory.GetDirectories(Path.Combine(Config.BeatSaberPath, "CustomSongs"));
+            string[] customSongDirectories = Directory.GetDirectories(CustomSongsPath);
             string id = songIndex.Substring(0, songIndex.IndexOf("-"));
             string version = songIndex.Substring(songIndex.IndexOf("-") + 1);
             foreach (string directory in customSongDirectories)
@@ -156,7 +120,7 @@ namespace SyncSaberService
                             string oldVersion = directoryName;
                             if (Convert.ToInt32(directoryVersion) > Convert.ToInt32(version))
                             {
-                                directoryToRemove = Path.Combine(Config.BeatSaberPath, "CustomSongs", songIndex);
+                                directoryToRemove = Path.Combine(CustomSongsPath, songIndex);
                                 currentVersion = directoryName;
                                 oldVersion = songIndex;
                             }
@@ -192,13 +156,39 @@ namespace SyncSaberService
             // TODO: Add fail reason to FailedDownloads items
         }
 
-        public void DownloadAllSongsByAuthors(List<string> mappers)
+        public void DownloadSongsFromFeed(string feedType, IFeedSettings _settings)
         {
-            var feedReader = new BeatSaverReader();
-            foreach (string mapper in mappers)
+            if (!FeedReaders.ContainsKey(feedType))
             {
-                DownloadAllSongsByAuthor(mapper, feedReader);
+                Logger.Error($"Invalid feed type passed to DownloadSongsFromFeed: {feedType}");
+                return;
             }
+            var reader = FeedReaders[feedType];
+            DateTime startTime = DateTime.Now;
+            Dictionary<int, SongInfo> songs;
+            List<Playlist> playlists = new List<Playlist>();
+            playlists.Add(_syncSaberSongs);
+            playlists.AddRange(reader.PlaylistsForFeed(_settings.FeedIndex));
+            try
+            {
+                songs = reader.GetSongsFromFeed(_settings);
+            }
+            catch (InvalidCastException)
+            {
+                Logger.Error($"Wrong type of IFeedSettings given to {feedType}");
+                return;
+            }
+            int totalSongs = songs.Count;
+            Logger.Debug($"Finished checking pages, found {totalSongs} songs");
+            DownloadSongs(songs);
+            Logger.Debug("Jobs finished, Processing downloads...");
+            int downloadCount = SuccessfulDownloads.Count;
+            int failedCount = FailedDownloads.Count;
+            ProcessDownloads(playlists);
+            var timeElapsed = (DateTime.Now - startTime);
+            Logger.Info($"Downloaded {downloadCount} songs from {reader.Source}'s {_settings.FeedName} feed in {FormatTimeSpan(timeElapsed)}. " +
+                $"Skipped {totalSongs - downloadCount - failedCount} songs.");
+
         }
 
         public void DownloadAllSongsByAuthor(string mapper, IFeedReader feedReader = null)
@@ -210,7 +200,7 @@ namespace SyncSaberService
             {
                 case "BeatSaverReader":
                     songs = feedReader.GetSongsFromFeed(new BeatSaverFeedSettings(0, mapper));
-                    playlists.Add(GetPlaylistForFeed("followings"));
+                    //playlists.Add(GetPlaylistForFeed("followings"));
                     break;
                 default:
                     songs = new Dictionary<int, SongInfo>();
@@ -222,7 +212,7 @@ namespace SyncSaberService
             Logger.Debug("Jobs finished, Processing downloads...");
             int downloadCount = SuccessfulDownloads.Count;
             int failedCount = FailedDownloads.Count;
-            
+
 
             ProcessDownloads(playlists);
             var timeElapsed = (DateTime.Now - startTime);
@@ -244,15 +234,14 @@ namespace SyncSaberService
             totalSongs = queuedSongs.Count;
             Logger.Debug($"Finished checking pages, found {queuedSongs.Count} songs");
 
-            string customSongsPath = Path.Combine(Config.BeatSaberPath, "CustomSongs");
-            var existingSongs = Directory.GetDirectories(customSongsPath);
+            var existingSongs = Directory.GetDirectories(CustomSongsPath);
             string tempPath = "";
             string outputPath = "";
             foreach (var song in queuedSongs.Values)
             {
-                tempPath = Path.Combine(Path.GetTempPath(), song.Index + ".zip");
-                outputPath = Path.Combine(Config.BeatSaberPath, "CustomSongs", song.Index);
-                if (existingSongs.Contains(song.Index) || _songDownloadHistory.Contains(song.Index) || Directory.Exists(outputPath))
+                tempPath = Path.Combine(Path.GetTempPath(), song.key + ".zip");
+                outputPath = Path.Combine(Config.BeatSaberPath, "CustomSongs", song.key);
+                if (existingSongs.Contains(song.key) || _songDownloadHistory.Contains(song.key) || Directory.Exists(outputPath))
                     continue; // We already have the song or don't want it, skip
                 DownloadJob job = new DownloadJob(song, tempPath, outputPath);
                 jobs.AddJob(job);
@@ -264,7 +253,7 @@ namespace SyncSaberService
 
             ProcessDownloads();
             var timeElapsed = (DateTime.Now - startTime);
-            Logger.Info($"Downloaded {downloadCount} songs from BeastSaber {_beastSaberFeeds.ElementAt(feedToDownload).Key} feed in {FormatTimeSpan(timeElapsed)}. Skipped {totalSongs - downloadCount - failedCount} songs.");
+            Logger.Info($"Downloaded {downloadCount} songs from BeastSaber {BeastSaberReader.Feeds[feedToDownload].Name} feed in {FormatTimeSpan(timeElapsed)}. Skipped {totalSongs - downloadCount - failedCount} songs.");
         }
 
         private void ProcessDownloads(List<Playlist> playlists = null)
@@ -276,21 +265,25 @@ namespace SyncSaberService
             DownloadJob job;
             while (SuccessfulDownloads.TryDequeue(out job))
             {
-                if (!_songDownloadHistory.Contains(job.Song.Index))
-                    _songDownloadHistory.Add(job.Song.Index);
+                if (!_songDownloadHistory.Contains(job.Song.key))
+                    _songDownloadHistory.Add(job.Song.key);
 
-                UpdatePlaylist(_syncSaberSongs, job.Song.Index, job.Song.Name);
+                //UpdatePlaylist(_syncSaberSongs, job.Song.key, job.Song.name);
                 if (!string.IsNullOrEmpty(job.Song.Feed))
-                    UpdatePlaylist(GetPlaylistForFeed(job.Song.Feed), job.Song.Index, job.Song.Name);
-                RemoveOldVersions(job.Song.Index);
+                    foreach (var playlist in playlists)
+                    {
+                        // TODO: fix this maybe
+                        UpdatePlaylist(playlist, job.Song.key, job.Song.name);
+                    }
+                RemoveOldVersions(job.Song.key);
             }
             while (FailedDownloads.TryDequeue(out job))
             {
-                if (!_songDownloadHistory.Contains(job.Song.Index) && job.Result != DownloadJob.JobResult.TIMEOUT)
+                if (!_songDownloadHistory.Contains(job.Song.key) && job.Result != DownloadJob.JobResult.TIMEOUT)
                 {
-                    _songDownloadHistory.Add(job.Song.Index);
+                    _songDownloadHistory.Add(job.Song.key);
                 }
-                Logger.Error($"Failed to download {job.Song.Index} by {job.Song.Author}");
+                Logger.Error($"Failed to download {job.Song.key} by {job.Song.authorName}");
             }
 
             Utilities.WriteStringListSafe(_historyPath, _songDownloadHistory.Distinct<string>().ToList<string>(), true);
@@ -300,8 +293,7 @@ namespace SyncSaberService
 
         public void DownloadSongs(Dictionary<int, SongInfo> queuedSongs)
         {
-            string customSongsPath = Path.Combine(Config.BeatSaberPath, "CustomSongs");
-            var existingSongs = Directory.GetDirectories(customSongsPath);
+            var existingSongs = Directory.GetDirectories(CustomSongsPath);
             string tempPath = "";
             string outputPath = "";
 
@@ -309,9 +301,9 @@ namespace SyncSaberService
             jobs.JobCompleted += OnJobFinished;
             foreach (var song in queuedSongs.Values)
             {
-                tempPath = Path.Combine(Path.GetTempPath(), song.Index + ".zip");
-                outputPath = Path.Combine(Config.BeatSaberPath, "CustomSongs", song.Index);
-                if (existingSongs.Contains(song.Index) || _songDownloadHistory.Contains(song.Index) || Directory.Exists(outputPath))
+                tempPath = Path.Combine(Path.GetTempPath(), song.key + ".zip");
+                outputPath = Path.Combine(Config.BeatSaberPath, "CustomSongs", song.key);
+                if (existingSongs.Contains(song.key) || _songDownloadHistory.Contains(song.key) || Directory.Exists(outputPath))
                     continue; // We already have the song or don't want it, skip
                 DownloadJob job = new DownloadJob(song, tempPath, outputPath);
                 jobs.AddJob(job);
@@ -351,14 +343,9 @@ namespace SyncSaberService
 
         private List<string> _songDownloadHistory = new List<string>();
 
-        private readonly Playlist _syncSaberSongs = new Playlist("SyncSaberPlaylist", "SyncSaber Playlist", "brian91292", "1");
+        private readonly Playlist _syncSaberSongs = new Playlist("SyncSaberPlaylist", "SyncSaber Playlist", "SyncSaber", "1");
 
-        private readonly Playlist _curatorRecommendedSongs = new Playlist("SyncSaberCuratorRecommendedPlaylist", "BeastSaber Curator Recommended", "brian91292", "1");
-
-        private readonly Playlist _followingsSongs = new Playlist("SyncSaberFollowingsPlaylist", "BeastSaber Followings", "brian91292", "1");
-
-        private readonly Playlist _bookmarksSongs = new Playlist("SyncSaberBookmarksPlaylist", "BeastSaber Bookmarks", "brian91292", "1");
-
+        public Dictionary<string, IFeedReader> FeedReaders;
 
     }
 

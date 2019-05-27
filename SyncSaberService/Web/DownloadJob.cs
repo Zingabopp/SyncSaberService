@@ -55,7 +55,7 @@ namespace SyncSaberService.Web
         {
             _tokenSource = new CancellationTokenSource();
             _song = song;
-            TempPath = $"temp\\temp-{Song.Index}";
+            TempPath = $"temp\\temp-{Song.key}";
             _localZip = new FileInfo(downloadPath);
             _songDir = new DirectoryInfo(songDirectory);
             if (!_localZip.Directory.Exists)
@@ -67,27 +67,27 @@ namespace SyncSaberService.Web
         {
             //JobResult result = JobResult.SUCCESS;
             bool successful = true;
-            Task<bool> dwnl = DownloadFile("https://beatsaver.com/download/" + Song.Index, _localZip.FullName);
+            Task<bool> dwnl = DownloadFile("https://beatsaver.com/download/" + Song.key, _localZip.FullName);
             successful = await dwnl;
 
             if (successful)
             {
-                Logger.Debug($"Downloaded {Song.Index} successfully");
+                Logger.Debug($"Downloaded {Song.key} successfully");
                 successful = await ExtractZip(_localZip.FullName, _songDir.FullName, TempPath);
 
                 if (successful)
                 {
-                    Logger.Debug($"Extracted {Song.Index} successfully");
+                    Logger.Debug($"Extracted {Song.key} successfully");
                 }
                 else
                 {
-                    Logger.Error($"Extraction failed for {Song.Index}");
+                    Logger.Error($"Extraction failed for {Song.key}");
                     _result = JobResult.UNZIPFAILED;
                 }
             }
             else
             {
-                Logger.Debug($"Download failed for {Song.Index}");
+                Logger.Debug($"Download failed for {Song.key}");
                 //result = false;
                 if (_result == JobResult.SUCCESS)
                 {
@@ -102,12 +102,12 @@ namespace SyncSaberService.Web
 
         private void WebTimer_Elapsed(object sender, ElapsedEventArgs e)
         {
-            Logger.Debug($"WebTimer Elapsed for job {Song.Index}, canceling download...");
+            Logger.Debug($"WebTimer Elapsed for job {Song.key}, canceling download...");
             _tokenSource.Cancel();
         }
         public void OnDownloadProgressChanged(object sender, DownloadProgressChangedEventArgs e)
         {
-            //Logger.Trace($"DownloadProgressChanged for {Song.Index}, reseting Timeout");
+            //Logger.Debug($"                 DownloadProgressChanged for {Song.key}, reseting Timeout");
             webTimer.Stop();
             webTimer.Start();
         }

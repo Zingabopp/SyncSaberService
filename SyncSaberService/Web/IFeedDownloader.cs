@@ -4,15 +4,18 @@ namespace SyncSaberService.Web
 {
     public interface IFeedReader
     {
-        string Name { get; }
+        string Name { get; } // Name of the reader
+        string Source { get; } // Name of the site
         List<SongInfo> GetSongsFromPage(string pageText);
-        Dictionary<int, FeedInfo> Feeds { get; }
+        //Dictionary<int, FeedInfo> Feeds { get; }
         Dictionary<int, SongInfo> GetSongsFromFeed(IFeedSettings settings);
+        Playlist[] PlaylistsForFeed(int feedIndex);
     }
 
     public interface IFeedSettings
     {
-
+        string FeedName { get; }
+        int FeedIndex { get; }
     }
     public struct FeedInfo
     {
