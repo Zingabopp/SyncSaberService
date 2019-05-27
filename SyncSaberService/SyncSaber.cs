@@ -22,6 +22,7 @@ namespace SyncSaberService
     {
         public static SyncSaber Instance;
         public string CustomSongsPath;
+
         public SyncSaber()
         {
             Instance = this;
@@ -190,72 +191,7 @@ namespace SyncSaberService
                 $"Skipped {totalSongs - downloadCount - failedCount} songs.");
 
         }
-
-        public void DownloadAllSongsByAuthor(string mapper, IFeedReader feedReader = null)
-        {
-            DateTime startTime = DateTime.Now;
-            Dictionary<int, SongInfo> songs;
-            List<Playlist> playlists = new List<Playlist>();
-            switch (feedReader.Name)
-            {
-                case "BeatSaverReader":
-                    songs = feedReader.GetSongsFromFeed(new BeatSaverFeedSettings(0, mapper));
-                    //playlists.Add(GetPlaylistForFeed("followings"));
-                    break;
-                default:
-                    songs = new Dictionary<int, SongInfo>();
-                    break;
-            }
-            Logger.Debug($"Finished checking pages, found {songs.Count} songs");
-            int totalSongs = songs.Count;
-            DownloadSongs(songs);
-            Logger.Debug("Jobs finished, Processing downloads...");
-            int downloadCount = SuccessfulDownloads.Count;
-            int failedCount = FailedDownloads.Count;
-
-
-            ProcessDownloads(playlists);
-            var timeElapsed = (DateTime.Now - startTime);
-            Logger.Info($"Downloaded {downloadCount} songs from mapper {mapper} in {FormatTimeSpan(timeElapsed)}. " +
-                $"Skipped {totalSongs - downloadCount} songs.");
-        }
-
-        public void DownloadBeastSaberFeed(int feedToDownload, int maxPages)
-        {
-            DownloadBatch jobs = new DownloadBatch();
-            jobs.JobCompleted += OnJobFinished;
-            ClearResultQueues();
-            DateTime startTime = DateTime.Now;
-            int downloadCount = 0;
-            int totalSongs = 0;
-
-            var bReader = new BeastSaberReader(Config.BeastSaberUsername, Config.BeastSaberPassword, Config.MaxConcurrentPageChecks);
-            var queuedSongs = bReader.GetSongsFromFeed(new BeastSaberFeedSettings(feedToDownload, maxPages));
-            totalSongs = queuedSongs.Count;
-            Logger.Debug($"Finished checking pages, found {queuedSongs.Count} songs");
-
-            var existingSongs = Directory.GetDirectories(CustomSongsPath);
-            string tempPath = "";
-            string outputPath = "";
-            foreach (var song in queuedSongs.Values)
-            {
-                tempPath = Path.Combine(Path.GetTempPath(), song.key + ".zip");
-                outputPath = Path.Combine(Config.BeatSaberPath, "CustomSongs", song.key);
-                if (existingSongs.Contains(song.key) || _songDownloadHistory.Contains(song.key) || Directory.Exists(outputPath))
-                    continue; // We already have the song or don't want it, skip
-                DownloadJob job = new DownloadJob(song, tempPath, outputPath);
-                jobs.AddJob(job);
-            }
-            jobs.RunJobs().Wait();
-            Logger.Debug("Jobs finished, Processing downloads...");
-            downloadCount = SuccessfulDownloads.Count;
-            int failedCount = FailedDownloads.Count;
-
-            ProcessDownloads();
-            var timeElapsed = (DateTime.Now - startTime);
-            Logger.Info($"Downloaded {downloadCount} songs from BeastSaber {BeastSaberReader.Feeds[feedToDownload].Name} feed in {FormatTimeSpan(timeElapsed)}. Skipped {totalSongs - downloadCount - failedCount} songs.");
-        }
-
+        
         private void ProcessDownloads(List<Playlist> playlists = null)
         {
             if (playlists == null)
