@@ -7,6 +7,7 @@ using System.Threading;
 using System.Net;
 using System.IO;
 using System.Diagnostics;
+using SyncSaberService.Web;
 
 namespace SyncSaberService
 {
@@ -14,7 +15,7 @@ namespace SyncSaberService
     {
         static void Main(string[] args)
         {
-            Logger.LogLevel = LogLevel.Info;
+            Logger.LogLevel = LogLevel.Debug;
             Logger.fileWriter.AutoFlush = true;
             Logger.ShortenSourceName = true;
 
@@ -41,7 +42,7 @@ namespace SyncSaberService
                         Logger.Warning($"Provided directory does not appear to be Beat Saber's root folder, ignoring it");
                 }
             }
-            
+
 
             if (!Config.CriticalError)
             {
@@ -50,40 +51,64 @@ namespace SyncSaberService
                 sw.Start();
                 SyncSaber ss = new SyncSaber();
                 Console.WriteLine();
-                Logger.Info($"Downloading songs from {ss.BeastSaberFeeds.ElementAt(0).Value} feed...");
+                // Followings
+                Logger.Info($"Downloading songs from {BeastSaberReader.Feeds[0].Name} feed...");
                 try
                 {
-                    ss.DownloadBeastSaberFeed(0, Web.BeastSaberReader.GetMaxBeastSaberPages(0));
+                    //ss.DownloadBeastSaberFeed(0, Web.BeastSaberReader.GetMaxBeastSaberPages(0));
+                    ss.DownloadSongsFromFeed(BeastSaberReader.NameKey, new BeastSaberFeedSettings(0) {
+                        MaxPages = Config.MaxFollowingsPages
+                    });
                 }
                 catch (Exception ex)
                 {
                     Logger.Exception($"Exception downloading BeastSaberFeed (0)", ex);
                 }
                 Console.WriteLine();
-                Logger.Info($"Downloading songs from {ss.BeastSaberFeeds.ElementAt(1).Value} feed...");
+                // Bookmarks
+                Logger.Info($"Downloading songs from {BeastSaberReader.Feeds[1].Name} feed...");
                 try
                 {
                     //ss.DownloadBeastSaberFeed(1, Web.BeastSaberReader.GetMaxBeastSaberPages(1));
+                    ss.DownloadSongsFromFeed(BeastSaberReader.NameKey, new BeastSaberFeedSettings(1) {
+                        MaxPages = Config.MaxBookmarksPages
+                    });
                 }
                 catch (Exception ex)
                 {
                     Logger.Exception($"Exception downloading BeastSaberFeed (1)", ex);
                 }
                 Console.WriteLine();
-                Logger.Info($"Downloading songs from {ss.BeastSaberFeeds.ElementAt(2).Value} feed...");
+                // Curator Recommended
+                Logger.Info($"Downloading songs from {BeastSaberReader.Feeds[2].Name} feed...");
                 try
                 {
-                   // ss.DownloadBeastSaberFeed(2, Web.BeastSaberReader.GetMaxBeastSaberPages(2));
+                    //ss.DownloadBeastSaberFeed(2, Web.BeastSaberReader.GetMaxBeastSaberPages(2));
+                    ss.DownloadSongsFromFeed(BeastSaberReader.NameKey, new BeastSaberFeedSettings(2) {
+                        MaxPages = Config.MaxCuratorRecommendedPages
+                    });
                 }
                 catch (Exception ex)
                 {
                     Logger.Exception($"Exception downloading BeastSaberFeed (2)", ex);
                 }
                 Console.WriteLine();
-                Logger.Info($"Downloading songs from FavoriteMappers.ini...");
+                Logger.Info($"Downloading newest songs on Beat Saver...");
                 try
                 {
                     ss.DownloadAllSongsByAuthors(Config.FavoriteMappers);
+                }
+                catch (Exception ex)
+                {
+                    Logger.Exception("Exception downloading BeatSaver authors feed.", ex);
+                }
+                Console.WriteLine();
+                Logger.Info($"Downloading songs from FavoriteMappers.ini...");
+                try
+                {
+                    ss.DownloadSongsFromFeed(BeastSaberReader.NameKey, new BeastSaberFeedSettings(2) {
+                        MaxPages = Config.MaxCuratorRecommendedPages
+                    });
                 }
                 catch (Exception ex)
                 {

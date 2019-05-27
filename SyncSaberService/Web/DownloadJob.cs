@@ -107,7 +107,7 @@ namespace SyncSaberService.Web
         }
         public void OnDownloadProgressChanged(object sender, DownloadProgressChangedEventArgs e)
         {
-            //Logger.Trace($"DownloadProgressChanged for {Song.Index}, reseting Timeout");
+            //Logger.Debug($"                 DownloadProgressChanged for {Song.key}, reseting Timeout");
             webTimer.Stop();
             webTimer.Start();
         }

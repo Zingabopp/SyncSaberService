@@ -22,7 +22,9 @@ namespace SyncSaberService.Web
     public class BeastSaberReader : IFeedReader
     {
         public static readonly string NameKey = "BeastSaberReader";
+        public static readonly string SourceKey = "BeastSaber";
         public string Name { get { return NameKey; } }
+        public string Source { get { return SourceKey; } }
 
         private string _username, _password, _loginUri;
         private int _maxConcurrency;
@@ -48,8 +50,8 @@ namespace SyncSaberService.Web
                 _cookies = value;
             }
         }
-        private Dictionary<int, FeedInfo> _feeds;
-        public Dictionary<int, FeedInfo> Feeds
+        private static Dictionary<int, FeedInfo> _feeds;
+        public static Dictionary<int, FeedInfo> Feeds
         {
             get
             {
@@ -64,6 +66,25 @@ namespace SyncSaberService.Web
                 }
                 return _feeds;
             }
+        }
+
+
+        private readonly Playlist _curatorRecommendedSongs = new Playlist("SyncSaberCuratorRecommendedPlaylist", "BeastSaber Curator Recommended", "brian91292", "1");
+        private readonly Playlist _followingsSongs = new Playlist("SyncSaberFollowingsPlaylist", "BeastSaber Followings", "brian91292", "1");
+        private readonly Playlist _bookmarksSongs = new Playlist("SyncSaberBookmarksPlaylist", "BeastSaber Bookmarks", "brian91292", "1");
+
+        public Playlist[] PlaylistsForFeed(int feedIndex)
+        {
+            switch (feedIndex)
+            {
+                case 0:
+                    return new Playlist[] { _followingsSongs };
+                case 1:
+                    return new Playlist[] { _bookmarksSongs };
+                case 2:
+                    return new Playlist[] { _curatorRecommendedSongs };
+            }
+            return new Playlist[0];
         }
 
         public BeastSaberReader(string username, string password, int maxConcurrency, string loginUri = DefaultLoginUri)
@@ -174,13 +195,13 @@ namespace SyncSaberService.Web
                         //string currentSongDirectory = Path.Combine(Config.BeatSaberPath, "CustomSongs", songIndex);
                         //bool downloadFailed = false;
                         //populateTasks.Add(currentSong.PopulateFieldsAsync());
-                        SongInfo.PopulateFields(currentSong);
+                        //SongInfo.PopulateFields(currentSong);
                         songsOnPage.Add(currentSong);
                     }
                 }
             }
-            
-            Task.WaitAll(populateTasks.ToArray());
+
+            //Task.WaitAll(populateTasks.ToArray());
             return songsOnPage;
         }
 
@@ -213,6 +234,7 @@ namespace SyncSaberService.Web
                 return "";
         }
         private const string INVALIDFEEDSETTINGSMESSAGE = "The IFeedSettings passed is not a BeastSaberFeedSettings.";
+
         /// <summary>
         /// Gets all songs from the feed defined by the provided settings.
         /// </summary>
@@ -221,7 +243,8 @@ namespace SyncSaberService.Web
         /// <returns></returns>
         public Dictionary<int, SongInfo> GetSongsFromFeed(IFeedSettings settings)
         {
-            if (!(settings is BeastSaberFeedSettings _settings))
+            BeastSaberFeedSettings _settings = settings as BeastSaberFeedSettings;
+            if (_settings == null)
                 throw new InvalidCastException(INVALIDFEEDSETTINGSMESSAGE);
             if (_settings.FeedIndex != 2 && _username == string.Empty)
             {
@@ -331,22 +354,35 @@ namespace SyncSaberService.Web
             }           
         }
 
-        public struct FeedPageInfo
-        {
-            public int feedToDownload;
-            public string feedUrl;
-            public int FeedIndex;
-            public int pageIndex;
-        }
+        
     }
-
+    
+    public struct FeedPageInfo
+    {
+        public int feedToDownload;
+        public string feedUrl;
+        public int FeedIndex;
+        public int pageIndex;
+    }
+    
     public class BeastSaberFeedSettings : IFeedSettings
     {
-        public int MaxPages;
-        public int FeedIndex;
-        public BeastSaberFeedSettings(int _feedIndex, int _maxPages = 0)
+        public string FeedName
         {
-            FeedIndex = _feedIndex;
+            get
+            {
+                return BeastSaberReader.Feeds[FeedIndex].Name;
+            }
         }
+        public int FeedIndex { get { return _feedIndex; } }
+        public int MaxPages;
+        public int _feedIndex;
+        public BeastSaberFeedSettings(int feedIndex, int _maxPages = 0)
+        {
+            _feedIndex = feedIndex;
+            MaxPages = _maxPages;
+        }
+
+        
     }
 }

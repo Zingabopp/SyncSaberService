@@ -21,15 +21,19 @@ namespace SyncSaberService.Web
 {
     class BeatSaverReader : IFeedReader
     {
+        public static string NameKey => "BeatSaverReader";
+        public string Name { get { return NameKey; } }
+        public static readonly string SourceKey = "BeatSaver";
+        public string Source { get { return SourceKey; } }
+
         private static readonly string AUTHORKEY = "{AUTHOR}";
         private static readonly string AUTHORIDKEY = "{AUTHORID}";
         private static readonly string PAGEKEY = "{PAGE}";
         private const int SONGSPERUSERPAGE = 20;
-        public static string NameKey => "BeatSaverReader";
-        public string Name { get { return NameKey; } }
+
         private ConcurrentDictionary<string, string> _authors = new ConcurrentDictionary<string, string>();
-        private Dictionary<int, FeedInfo> _feeds;
-        public Dictionary<int, FeedInfo> Feeds
+        private static Dictionary<int, FeedInfo> _feeds;
+        public static Dictionary<int, FeedInfo> Feeds
         {
             get
             {
@@ -46,6 +50,18 @@ namespace SyncSaberService.Web
                 return _feeds;
             }
         }
+        private readonly Playlist _beatSaverNewest = new Playlist("BeatSaverNewestPlaylist", "BeatSaver Newest", "SyncSaber", "1");
+
+        public Playlist[] PlaylistsForFeed(int feedIndex)
+        {
+            switch (feedIndex)
+            {
+                case 1:
+                    return new Playlist[] { _beatSaverNewest };
+            }
+            return new Playlist[0];
+        }
+
 
         public string GetPageUrl(int feedIndex, string author = "", int pageIndex = 0)
         {
@@ -121,7 +137,7 @@ namespace SyncSaberService.Web
             {
                 songCount = songs.Count;
                 url = GetPageUrl(settings.FeedIndex, settings.Author, pageNum);
-                Logger.Debug($"Creating task for {url}");
+                //Logger.Debug($"Creating task for {url}");
                 pageReadTasks.Add(GetPageTextAsync(url));
                 pageNum++;
 
@@ -225,19 +241,32 @@ namespace SyncSaberService.Web
 
     public class BeatSaverFeedSettings : IFeedSettings
     {
-        public int FeedIndex;
-        public int MaxPages;
+        public int _feedIndex;
+        public int MaxPages = 0;
         public string Author;
-
-        public BeatSaverFeedSettings(int _feedIndex, int _maxPages)
+        public string[] Authors;
+        public string FeedName
         {
-            FeedIndex = _feedIndex;
+            get
+            {
+                return BeatSaverReader.Feeds[FeedIndex].Name;
+            }
+        }
+        public int FeedIndex { get { return _feedIndex; } }
+        public BeatSaverFeedSettings(int feedIndex)
+        {
+            _feedIndex = feedIndex;
+        }
+
+        public BeatSaverFeedSettings(int feedIndex, int _maxPages)
+        {
+            _feedIndex = feedIndex;
             MaxPages = _maxPages;
             Author = "";
         }
-        public BeatSaverFeedSettings(int _feedIndex, string _author)
+        public BeatSaverFeedSettings(int feedIndex, string _author)
         {
-            FeedIndex = _feedIndex;
+            _feedIndex = feedIndex;
             Author = _author;
             MaxPages = 0;
         }

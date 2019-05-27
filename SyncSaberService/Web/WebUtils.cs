@@ -86,7 +86,7 @@ namespace SyncSaberService.Web
             
             string pageText = await httpClient.GetStringAsync(url);
             //Logger.Debug(pageText.Result);
-            Logger.Debug($"Got page text for {url}");
+            //Logger.Debug($"Got page text for {url}");
             return pageText;
         }
 

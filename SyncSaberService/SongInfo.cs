@@ -8,6 +8,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Net.Http;
 using System.Net;
+using System.Reflection;
 using System.Runtime.Serialization;
 
 namespace SyncSaberService
@@ -51,6 +52,24 @@ namespace SyncSaberService
         }
         private bool _populated = false;
         public bool Populated { get { return _populated; } }
+        private readonly Regex _digitRegex = new Regex("^[0-9]+$", RegexOptions.Compiled);
+        private readonly Regex _beatSaverRegex = new Regex("^[0-9]+-[0-9]+$", RegexOptions.Compiled);
+
+        public object this[string propertyName]
+        {
+            get
+            {
+                Type myType = typeof(SongInfo);
+                PropertyInfo myPropInfo = myType.GetProperty(propertyName);
+                return myPropInfo.GetValue(this, null);
+            }
+            set
+            {
+                Type myType = typeof(SongInfo);
+                PropertyInfo myPropInfo = myType.GetProperty(propertyName);
+                myPropInfo.SetValue(this, value, null);
+            }
+        }
 
         /// <summary>
         /// Downloads the page and returns it as a string.
@@ -77,7 +96,7 @@ namespace SyncSaberService
                 Logger.Exception("Unable to parse JSON from text", ex);
             }
             JsonConvert.PopulateObject(result["song"].ToString(), song);
-           
+
             return true;
         }
 
@@ -103,7 +122,7 @@ namespace SyncSaberService
                 Logger.Error($"Timeout occurred while trying to populate fields for {key}");
                 return false;
             }
-            catch(HttpRequestException)
+            catch (HttpRequestException)
             {
                 Logger.Error($"HttpRequestException while trying to populate fields for {key}");
                 return false;
@@ -175,7 +194,19 @@ namespace SyncSaberService
             }
         }
         [JsonProperty("id")]
-        public int id;
+        private int _id;
+        [JsonIgnore]
+        public int id
+        {
+            get
+            {
+                if (!(_id > 0))
+                    if (key != null && _beatSaverRegex.IsMatch(key))
+                        _id = int.Parse(key.Substring(0, key.IndexOf('-')));
+                return _id;
+            }
+            set { _id = value; }
+        }
         [JsonProperty("key")]
         public string key;
         [JsonProperty("name")]
@@ -306,6 +337,34 @@ namespace SyncSaberService
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
         {
             serializer.Serialize(writer, value);
+        }
+    }
+
+    public static class SongInfoExtensions
+    {
+        public static void PopulateFromBeatSaver(this IEnumerable<SongInfo> songs)
+        {
+            List<Task> populateTasks = new List<Task>();
+            for (int i = 0; i < songs.Count(); i++)
+            {
+                if (!songs.ElementAt(i).Populated)
+                    populateTasks.Add(songs.ElementAt(i).PopulateFieldsAsync());
+            }
+
+            Task.WaitAll(populateTasks.ToArray());
+        }
+
+        public static async Task PopulateFromBeatSaverAsync(this IEnumerable<SongInfo> songs)
+        {
+            List<Task> populateTasks = new List<Task>();
+            for (int i = 0; i < songs.Count(); i++)
+            {
+                if (!songs.ElementAt(i).Populated)
+                    populateTasks.Add(songs.ElementAt(i).PopulateFieldsAsync());
+            }
+
+            await Task.WhenAll(populateTasks);
+            Logger.Warning("Finished PopulateAsync?");
         }
     }
 
