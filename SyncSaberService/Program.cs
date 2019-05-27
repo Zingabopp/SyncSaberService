@@ -50,6 +50,15 @@ namespace SyncSaberService
                 Stopwatch sw = new Stopwatch();
                 sw.Start();
                 SyncSaber ss = new SyncSaber();
+
+                ss.DownloadSongsFromFeed(BeatSaverReader.NameKey, new BeatSaverFeedSettings(1) {
+                    MaxPages = 5
+                });
+
+                ss.DownloadSongsFromFeed(BeatSaverReader.NameKey, new BeatSaverFeedSettings(0) {
+                    Authors = Config.FavoriteMappers.ToArray(),
+                });
+
                 Console.WriteLine();
                 // Followings
                 Logger.Info($"Downloading songs from {BeastSaberReader.Feeds[0].Name} feed...");
@@ -92,22 +101,26 @@ namespace SyncSaberService
                 {
                     Logger.Exception($"Exception downloading BeastSaberFeed (2)", ex);
                 }
+
+
                 Console.WriteLine();
                 Logger.Info($"Downloading newest songs on Beat Saver...");
                 try
                 {
-                    ss.DownloadAllSongsByAuthors(Config.FavoriteMappers);
+                    ss.DownloadSongsFromFeed(BeatSaverReader.NameKey, new BeatSaverFeedSettings(1) {
+                        MaxPages = Config.MaxBeatSaverPages
+                    });
                 }
                 catch (Exception ex)
                 {
-                    Logger.Exception("Exception downloading BeatSaver authors feed.", ex);
+                    Logger.Exception("Exception downloading BeatSaver newest feed.", ex);
                 }
                 Console.WriteLine();
                 Logger.Info($"Downloading songs from FavoriteMappers.ini...");
                 try
                 {
-                    ss.DownloadSongsFromFeed(BeastSaberReader.NameKey, new BeastSaberFeedSettings(2) {
-                        MaxPages = Config.MaxCuratorRecommendedPages
+                    ss.DownloadSongsFromFeed(BeatSaverReader.NameKey, new BeatSaverFeedSettings(0) {
+                        Authors = Config.FavoriteMappers.ToArray()
                     });
                 }
                 catch (Exception ex)

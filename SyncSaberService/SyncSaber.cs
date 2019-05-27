@@ -156,15 +156,6 @@ namespace SyncSaberService
             // TODO: Add fail reason to FailedDownloads items
         }
 
-        public void DownloadAllSongsByAuthors(List<string> mappers)
-        {
-            var feedReader = new BeatSaverReader();
-            foreach (string mapper in mappers)
-            {
-                DownloadAllSongsByAuthor(mapper, feedReader);
-            }
-        }
-
         public void DownloadSongsFromFeed(string feedType, IFeedSettings _settings)
         {
             if (!FeedReaders.ContainsKey(feedType))
