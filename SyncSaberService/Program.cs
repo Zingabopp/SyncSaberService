@@ -102,7 +102,7 @@ namespace SyncSaberService
                     Logger.Exception($"Exception downloading BeastSaberFeed (2)", ex);
                 }
 
-
+                /*
                 Console.WriteLine();
                 Logger.Info($"Downloading newest songs on Beat Saver...");
                 try
@@ -111,10 +111,12 @@ namespace SyncSaberService
                         MaxPages = Config.MaxBeatSaverPages
                     });
                 }
+                
                 catch (Exception ex)
                 {
                     Logger.Exception("Exception downloading BeatSaver newest feed.", ex);
                 }
+                */
                 Console.WriteLine();
                 Logger.Info($"Downloading songs from FavoriteMappers.ini...");
                 try
