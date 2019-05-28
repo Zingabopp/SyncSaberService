@@ -2,6 +2,7 @@
 using System.Text.RegularExpressions;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
@@ -10,6 +11,7 @@ using System.Net.Http;
 using System.Net;
 using System.Reflection;
 using System.Runtime.Serialization;
+using Binbin.Linq;
 
 namespace SyncSaberService
 {
@@ -60,8 +62,9 @@ namespace SyncSaberService
             get
             {
                 Type myType = typeof(SongInfo);
-                PropertyInfo myPropInfo = myType.GetProperty(propertyName);
-                return myPropInfo.GetValue(this, null);
+                var myPropInfo = myType.GetRuntimeField(propertyName);
+                
+                return myPropInfo.GetValue(this);
             }
             set
             {
@@ -366,6 +369,84 @@ namespace SyncSaberService
             await Task.WhenAll(populateTasks);
             Logger.Warning("Finished PopulateAsync?");
         }
+    }
+    public class SongFilter
+    {
+        public object this[string propertyName]
+        {
+            get
+            {
+                Type myType = typeof(SongInfo);
+                PropertyInfo myPropInfo = myType.GetProperty(propertyName);
+                return myPropInfo.GetValue(this, null);
+            }
+            set
+            {
+                Type myType = typeof(SongInfo);
+                PropertyInfo myPropInfo = myType.GetProperty(propertyName);
+                myPropInfo.SetValue(this, value, null);
+            }
+        }
+    }
+
+    public static class FilterExtensions
+    {
+        public static SongInfo[] FilterSongs(this IEnumerable<SongInfo> songs, Operation<string> filter)
+        {
+            var query = songs.AsQueryable();
+
+
+
+            return new SongInfo[0];
+        }
+
+        public static IQueryable<SongInfo> FilterSongsStr(this IEnumerable<SongInfo> songs, Operation<string>[] ops)
+        {
+            var predicate = PredicateBuilder.False<SongInfo>();
+
+            foreach (Operation<string> op in ops)
+            {
+                var temp = op;
+                predicate = predicate.Or(p => p.authorName.Contains(temp.CompareValue));
+            }
+            return songs.AsQueryable().Where(predicate);
+        }
+    }
+
+    public class Operation<T>
+    {
+        public enum Operator
+        {
+            Equals,
+            GreaterThan,
+            LessThan,
+            GreaterOrEquals,
+            LessOrEquals,
+            Max,
+            Min,
+            Contains
+        }
+        public SongInfo Song;
+        public string SongFieldName;
+        public Operator Op;
+        public T SongValue;
+        public T CompareValue;
+
+        public Operation(SongInfo song, string songField, Operator op, T compValue)
+        {
+            Song = song;
+            SongFieldName = songField;
+            SongValue = (T) song[songField];
+            /*
+            if (SongValue == null)
+                throw new InvalidCastException($"Song field {songField} cannot be converted to {typeof(T).ToString()}");
+                */
+            Op = op;
+            CompareValue = compValue;
+
+            
+        }
+
     }
 
 }

@@ -71,6 +71,9 @@
     <Compile Include="Web\WebUtils.cs" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="Binbin.Linq.PredicateBuilder">
+      <Version>2.0.1</Version>
+    </PackageReference>
     <PackageReference Include="ini-parser">
       <Version>2.5.2</Version>
     </PackageReference>

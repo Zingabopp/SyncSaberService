@@ -18,6 +18,8 @@ namespace SyncSaberService
             Logger.LogLevel = LogLevel.Debug;
             Logger.fileWriter.AutoFlush = true;
             Logger.ShortenSourceName = true;
+            SongInfo testSong = new SongInfo("111-111", "Test Song Name", "http://testsong.com", "TestAuthor", "testfeed");
+            Operation<string> test = new Operation<string>(testSong, "key", Operation<string>.Operator.Equals, "111-111");
 
             try
             {
