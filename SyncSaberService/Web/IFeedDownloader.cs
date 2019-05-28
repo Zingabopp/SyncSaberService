@@ -6,6 +6,8 @@ namespace SyncSaberService.Web
     {
         string Name { get; } // Name of the reader
         string Source { get; } // Name of the site
+        bool Ready { get; }
+        void PrepareReader();
         List<SongInfo> GetSongsFromPage(string pageText);
         //Dictionary<int, FeedInfo> Feeds { get; }
         Dictionary<int, SongInfo> GetSongsFromFeed(IFeedSettings settings);

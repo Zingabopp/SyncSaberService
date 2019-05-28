@@ -16,7 +16,7 @@ using System.Threading.Tasks.Dataflow;
 using System.Net.Http;
 using static SyncSaberService.Utilities;
 using static SyncSaberService.Web.HttpClientWrapper;
-//using SimpleJSON;
+
 namespace SyncSaberService.Web
 {
     class BeatSaverReader : IFeedReader
@@ -25,7 +25,7 @@ namespace SyncSaberService.Web
         public string Name { get { return NameKey; } }
         public static readonly string SourceKey = "BeatSaver";
         public string Source { get { return SourceKey; } }
-
+        public bool Ready { get; private set; }
         private static readonly string AUTHORKEY = "{AUTHOR}";
         private static readonly string AUTHORIDKEY = "{AUTHORID}";
         private static readonly string PAGEKEY = "{PAGE}";
@@ -58,15 +58,21 @@ namespace SyncSaberService.Web
             {
                 case 1:
                     return new Playlist[] { _beatSaverNewest };
+                default:
+                    break;
             }
             return new Playlist[0];
         }
 
+        public void PrepareReader()
+        {
+            Ready = true;
+        }
 
         public string GetPageUrl(int feedIndex, string author = "", int pageIndex = 0)
         {
             string mapperId = string.Empty;
-            if(!string.IsNullOrEmpty(author) && author.Length > 3)
+            if (!string.IsNullOrEmpty(author) && author.Length > 3)
                 mapperId = GetAuthorID(author);
             return Feeds[feedIndex].BaseUrl.Replace(AUTHORIDKEY, mapperId).Replace(PAGEKEY, (pageIndex * SONGSPERUSERPAGE).ToString());
         }
@@ -81,6 +87,7 @@ namespace SyncSaberService.Web
         /// <returns></returns>
         public Dictionary<int, SongInfo> GetSongsFromFeed(IFeedSettings _settings)
         {
+            PrepareReader();
             if (!(_settings is BeatSaverFeedSettings settings))
                 throw new InvalidCastException(INVALIDFEEDSETTINGSMESSAGE);
             List<SongInfo> songs = new List<SongInfo>();
@@ -96,7 +103,7 @@ namespace SyncSaberService.Web
                     break;
                 // Newest
                 case 1:
-                    songs.AddRange(GetNewestSongs(settings.MaxPages));
+                    songs.AddRange(GetNewestSongs(settings));
                     break;
                 // Top
                 case 2:
@@ -128,9 +135,10 @@ namespace SyncSaberService.Web
             return retDict;
         }
 
-        public List<SongInfo> GetNewestSongs(int maxPages)
+        public List<SongInfo> GetNewestSongs(BeatSaverFeedSettings settings)
         {
             int feedIndex = 1;
+            bool useMaxPages = settings.MaxPages != 0;
             List<SongInfo> songs = new List<SongInfo>();
             string pageText = GetPageText(GetPageUrl(feedIndex));
 
@@ -149,23 +157,34 @@ namespace SyncSaberService.Web
             Logger.Info($"{numSongs} songs available");
             int songCount = 0;
             int pageNum = 0;
-            List<Task<string>> pageReadTasks = new List<Task<string>>();
+            List<Task<List<SongInfo>>> pageReadTasks = new List<Task<List<SongInfo>>>();
             string url = "";
+            bool continueLooping = true;
             do
             {
                 songCount = songs.Count;
                 url = GetPageUrl(feedIndex, "", pageNum);
                 //Logger.Debug($"Creating task for {url}");
-                pageReadTasks.Add(GetPageTextAsync(url));
+                pageReadTasks.Add(GetSongsFromPageAsync(url, true));
                 pageNum++;
-
-            } while ((pageNum * SONGSPERUSERPAGE < numSongs) && (pageNum < maxPages));
+                if ((pageNum * SONGSPERUSERPAGE >= numSongs))
+                    continueLooping = false;
+                if (useMaxPages && (pageNum >= settings.MaxPages))
+                    continueLooping = false;
+            } while (continueLooping);
 
             Task.WaitAll(pageReadTasks.ToArray());
             foreach (var job in pageReadTasks)
             {
-                songs.AddRange(GetSongsFromPage(job.Result));
+                songs.AddRange(job.Result);
             }
+            return songs;
+        }
+
+        public async Task<List<SongInfo>> GetSongsFromPageAsync(string url, bool useDateLimit = false)
+        {
+            string pageText = await GetPageTextAsync(url).ConfigureAwait(false);
+            List<SongInfo> songs = GetSongsFromPage(pageText);
             return songs;
         }
 
@@ -199,7 +218,6 @@ namespace SyncSaberService.Web
                 //Logger.Debug($"Creating task for {url}");
                 pageReadTasks.Add(GetPageTextAsync(url));
                 pageNum++;
-
             } while (pageNum * SONGSPERUSERPAGE < numSongs);
 
             Task.WaitAll(pageReadTasks.ToArray());
@@ -212,7 +230,6 @@ namespace SyncSaberService.Web
 
         public List<SongInfo> GetSongsFromPage(string pageText)
         {
-            //JSONNode result = JSON.Parse(pageText);
             JObject result = new JObject();
             try
             {
@@ -242,18 +259,6 @@ namespace SyncSaberService.Web
                 string songName = song["songName"]?.Value<string>();
                 string author = song["uploader"]?.Value<string>();
                 string songUrl = "https://beatsaver.com/download/" + songIndex;
-                /*
-                SongInfo newSong;
-                try
-                {
-                    newSong = song.ToObject<SongInfo>();
-                    newSong.Feed = "followings";
-                } catch(Exception ex)
-                {
-                    Logger.Exception($"Error deserializing song {songIndex}, using basic info", ex);
-                    newSong = new SongInfo(songIndex, songName, songUrl, author, "followings");
-                }
-                */
 
                 if (SongInfo.TryParseBeatSaver(song, out SongInfo newSong))
                 {
@@ -335,19 +340,6 @@ namespace SyncSaberService.Web
         public BeatSaverFeedSettings(int feedIndex)
         {
             _feedIndex = feedIndex;
-        }
-
-        public BeatSaverFeedSettings(int feedIndex, int _maxPages)
-        {
-            _feedIndex = feedIndex;
-            MaxPages = _maxPages;
-            Authors = new string[0];
-        }
-        public BeatSaverFeedSettings(int feedIndex, string _author)
-        {
-            _feedIndex = feedIndex;
-            Authors = new string[] { _author };
-            MaxPages = 0;
         }
     }
 }

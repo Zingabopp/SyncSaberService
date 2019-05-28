@@ -15,7 +15,7 @@ namespace SyncSaberService
     {
         static void Main(string[] args)
         {
-            Logger.LogLevel = LogLevel.Debug;
+            Logger.LogLevel = LogLevel.Info;
             Logger.fileWriter.AutoFlush = true;
             Logger.ShortenSourceName = true;
 
@@ -50,7 +50,7 @@ namespace SyncSaberService
                 Stopwatch sw = new Stopwatch();
                 sw.Start();
                 SyncSaber ss = new SyncSaber();
-
+                /*
                 ss.DownloadSongsFromFeed(BeatSaverReader.NameKey, new BeatSaverFeedSettings(1) {
                     MaxPages = 5
                 });
@@ -58,7 +58,7 @@ namespace SyncSaberService
                 ss.DownloadSongsFromFeed(BeatSaverReader.NameKey, new BeatSaverFeedSettings(0) {
                     Authors = Config.FavoriteMappers.ToArray(),
                 });
-
+                */
                 Console.WriteLine();
                 // Followings
                 Logger.Info($"Downloading songs from {BeastSaberReader.Feeds[0].Name} feed...");

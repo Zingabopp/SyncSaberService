@@ -22,6 +22,7 @@ namespace SyncSaberService
     {
         public static SyncSaber Instance;
         public string CustomSongsPath;
+        private static readonly string zipExtension = ".zip";
 
         public SyncSaber()
         {
@@ -222,25 +223,30 @@ namespace SyncSaberService
                 Logger.Error($"Failed to download {job.Song.key} by {job.Song.authorName}");
             }
 
-            Utilities.WriteStringListSafe(_historyPath, _songDownloadHistory.Distinct<string>().ToList<string>(), true);
+            Utilities.WriteStringListSafe(_historyPath, _songDownloadHistory.Distinct().ToList(), true);
             foreach (Playlist playlist in playlists)
                 playlist.WritePlaylist();
         }
 
         public void DownloadSongs(Dictionary<int, SongInfo> queuedSongs)
         {
-            var existingSongs = Directory.GetDirectories(CustomSongsPath);
+            //var existingSongs = Directory.GetDirectories(CustomSongsPath);
             string tempPath = "";
             string outputPath = "";
-
+            
             DownloadBatch jobs = new DownloadBatch();
             jobs.JobCompleted += OnJobFinished;
             foreach (var song in queuedSongs.Values)
             {
-                tempPath = Path.Combine(Path.GetTempPath(), song.key + ".zip");
-                outputPath = Path.Combine(Config.BeatSaberPath, "CustomSongs", song.key);
-                if (existingSongs.Contains(song.key) || _songDownloadHistory.Contains(song.key) || Directory.Exists(outputPath))
+                tempPath = Path.Combine(Path.GetTempPath(), song.key + zipExtension);
+                outputPath = Path.Combine(CustomSongsPath, song.key);
+                bool songExists = Directory.Exists(outputPath);
+                bool songInHistory = _songDownloadHistory.Contains(song.key);
+                if (songExists || songInHistory)
+                {
+                    //Logger.Debug($"Skipping song - SongExists: {songExists}, SongInHistory: {songInHistory}");
                     continue; // We already have the song or don't want it, skip
+                }
                 DownloadJob job = new DownloadJob(song, tempPath, outputPath);
                 jobs.AddJob(job);
             }
