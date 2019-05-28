@@ -9,3 +9,4 @@ This is currently a standalone application you can run to automatically download
 <p>The app's settings are in the SyncSaberService.ini file in the same folder as the executable</p>
 <p>You must add your BeastSaber username and password if you want to download your bookmarks and following feeds.</p>
 <p>You can either manually enter your Beat Saber game's folder or drag and drop the folder onto SyncSaberService.exe to provide your game directory.</p>
+<p>SyncSaberService uses the same FavoriteMappers.ini in Beat Saber's UserData folder as the original did. Format is a single mapper's name on each line.</p>
