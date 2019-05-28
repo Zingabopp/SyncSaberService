@@ -59,6 +59,25 @@ namespace SyncSaberService
                     Authors = Config.FavoriteMappers.ToArray(),
                 });
                 */
+                Console.WriteLine();
+                if (Config.FavoriteMappers.Count > 0)
+                {
+                    Logger.Info($"Downloading songs from FavoriteMappers.ini...");
+                    try
+                    {
+                        ss.DownloadSongsFromFeed(BeatSaverReader.NameKey, new BeatSaverFeedSettings(0) {
+                            Authors = Config.FavoriteMappers.ToArray()
+                        });
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.Exception("Exception downloading BeatSaver authors feed.", ex);
+                    }
+                } else
+                {
+                    Logger.Warning($"Skipping FavoriteMappers.ini feed, no authors found in {Config.BeatSaberPath + @"\UserData\FavoriteMappers.ini"}");
+                }
+
                 if (Config.SyncFollowingsFeed)
                 {
                     // Followings
@@ -125,18 +144,7 @@ namespace SyncSaberService
                     Logger.Exception("Exception downloading BeatSaver newest feed.", ex);
                 }
                 */
-                Console.WriteLine();
-                Logger.Info($"Downloading songs from FavoriteMappers.ini...");
-                try
-                {
-                    ss.DownloadSongsFromFeed(BeatSaverReader.NameKey, new BeatSaverFeedSettings(0) {
-                        Authors = Config.FavoriteMappers.ToArray()
-                    });
-                }
-                catch (Exception ex)
-                {
-                    Logger.Exception("Exception downloading BeatSaver authors feed.", ex);
-                }
+                
                 sw.Stop();
                 var processingTime = new TimeSpan(sw.ElapsedTicks);
                 Console.WriteLine();
