@@ -59,49 +59,57 @@ namespace SyncSaberService
                     Authors = Config.FavoriteMappers.ToArray(),
                 });
                 */
-                Console.WriteLine();
-                // Followings
-                Logger.Info($"Downloading songs from {BeastSaberReader.Feeds[0].Name} feed...");
-                try
+                if (Config.SyncFollowingsFeed)
                 {
-                    //ss.DownloadBeastSaberFeed(0, Web.BeastSaberReader.GetMaxBeastSaberPages(0));
-                    ss.DownloadSongsFromFeed(BeastSaberReader.NameKey, new BeastSaberFeedSettings(0) {
-                        MaxPages = Config.MaxFollowingsPages
-                    });
+                    // Followings
+                    Console.WriteLine();
+                    Logger.Info($"Downloading songs from {BeastSaberReader.Feeds[0].Name} feed...");
+                    try
+                    {
+                        //ss.DownloadBeastSaberFeed(0, Web.BeastSaberReader.GetMaxBeastSaberPages(0));
+                        ss.DownloadSongsFromFeed(BeastSaberReader.NameKey, new BeastSaberFeedSettings(0) {
+                            MaxPages = Config.MaxFollowingsPages
+                        });
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.Exception($"Exception downloading BeastSaberFeed (0)", ex);
+                    }
                 }
-                catch (Exception ex)
-                {
-                    Logger.Exception($"Exception downloading BeastSaberFeed (0)", ex);
-                }
-                Console.WriteLine();
                 // Bookmarks
-                Logger.Info($"Downloading songs from {BeastSaberReader.Feeds[1].Name} feed...");
-                try
+                if (Config.SyncBookmarksFeed)
                 {
-                    //ss.DownloadBeastSaberFeed(1, Web.BeastSaberReader.GetMaxBeastSaberPages(1));
-                    ss.DownloadSongsFromFeed(BeastSaberReader.NameKey, new BeastSaberFeedSettings(1) {
-                        MaxPages = Config.MaxBookmarksPages
-                    });
+                    Console.WriteLine();
+                    Logger.Info($"Downloading songs from {BeastSaberReader.Feeds[1].Name} feed...");
+                    try
+                    {
+                        //ss.DownloadBeastSaberFeed(1, Web.BeastSaberReader.GetMaxBeastSaberPages(1));
+                        ss.DownloadSongsFromFeed(BeastSaberReader.NameKey, new BeastSaberFeedSettings(1) {
+                            MaxPages = Config.MaxBookmarksPages
+                        });
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.Exception($"Exception downloading BeastSaberFeed (1)", ex);
+                    }
                 }
-                catch (Exception ex)
+                if (Config.SyncCuratorRecommendedFeed)
                 {
-                    Logger.Exception($"Exception downloading BeastSaberFeed (1)", ex);
+                    // Curator Recommended
+                    Console.WriteLine();
+                    Logger.Info($"Downloading songs from {BeastSaberReader.Feeds[2].Name} feed...");
+                    try
+                    {
+                        //ss.DownloadBeastSaberFeed(2, Web.BeastSaberReader.GetMaxBeastSaberPages(2));
+                        ss.DownloadSongsFromFeed(BeastSaberReader.NameKey, new BeastSaberFeedSettings(2) {
+                            MaxPages = Config.MaxCuratorRecommendedPages
+                        });
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.Exception($"Exception downloading BeastSaberFeed (2)", ex);
+                    }
                 }
-                Console.WriteLine();
-                // Curator Recommended
-                Logger.Info($"Downloading songs from {BeastSaberReader.Feeds[2].Name} feed...");
-                try
-                {
-                    //ss.DownloadBeastSaberFeed(2, Web.BeastSaberReader.GetMaxBeastSaberPages(2));
-                    ss.DownloadSongsFromFeed(BeastSaberReader.NameKey, new BeastSaberFeedSettings(2) {
-                        MaxPages = Config.MaxCuratorRecommendedPages
-                    });
-                }
-                catch (Exception ex)
-                {
-                    Logger.Exception($"Exception downloading BeastSaberFeed (2)", ex);
-                }
-
                 /*
                 Console.WriteLine();
                 Logger.Info($"Downloading newest songs on Beat Saver...");

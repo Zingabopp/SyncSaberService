@@ -189,7 +189,7 @@ namespace SyncSaberService
             {
                 KeyData setting = SettingKeys.MaxFollowingsPages;
                 int val = Settings.GetInt(setting);
-                if (val < 1)
+                if (val < 0)
                 {
                     Logger.Warning($"Value of {val} is invalid for setting {setting.KeyName}, using {setting.Value} instead.");
                     SettingError[setting.KeyName] = true;
@@ -212,7 +212,7 @@ namespace SyncSaberService
             {
                 KeyData setting = SettingKeys.MaxBookmarksPages;
                 int val = Settings.GetInt(setting);
-                if (val < 1)
+                if (val < 0)
                 {
                     Logger.Warning($"Value of {val} is invalid for setting {setting.KeyName}, using {setting.Value} instead.");
                     SettingError[setting.KeyName] = true;
@@ -234,9 +234,9 @@ namespace SyncSaberService
             {
                 KeyData setting = SettingKeys.MaxCuratorRecommendedPages;
                 int val = Settings.GetInt(setting);
-                if (val < 1)
+                if (val < 0)
                 {
-                    //Logger.Warning($"Value of {val} is invalid for setting {setting.KeyName}, using {setting.Value} instead.");
+                    Logger.Warning($"Value of {val} is invalid for setting {setting.KeyName}, using {setting.Value} instead.");
                     SettingError[setting.KeyName] = true;
                     val = int.Parse(setting.Value); ;
                 }
@@ -655,7 +655,7 @@ namespace SyncSaberService
             {
                 if (_favoriteMappers == null)
                     _favoriteMappers = new List<string>();
-                FileInfo mapperFile = new FileInfo(Path.Combine(BeatSaberPath, "UserData\\FavoriteMappers.ini"));
+                FileInfo mapperFile = new FileInfo(Path.Combine(BeatSaberPath, "UserData", "Favoritemappers.ini"));
                 //Logger.Debug($"MapperFile: {mapperFile.FullName}");
 
                 if (mapperFile.Exists)
