@@ -60,8 +60,20 @@ namespace SyncSaberService
             get
             {
                 Type myType = typeof(SongInfo);
-                PropertyInfo myPropInfo = myType.GetProperty(propertyName);
-                return myPropInfo.GetValue(this, null);
+                object retVal;
+                FieldInfo test = myType.GetField(propertyName);
+                if (test != null)
+                {
+                    retVal = test.GetValue(this);
+                }
+                else
+                {
+                    PropertyInfo myPropInfo = myType.GetProperty(propertyName);
+                    retVal = myPropInfo.GetValue(this);
+                }
+
+                Type whatType = retVal.GetType();
+                return retVal;
             }
             set
             {
@@ -98,6 +110,11 @@ namespace SyncSaberService
             JsonConvert.PopulateObject(result["song"].ToString(), song);
 
             return true;
+        }
+
+        public bool PopulateFields()
+        {
+            return SongInfo.PopulateFields(this);
         }
 
         /// <summary>
@@ -143,6 +160,8 @@ namespace SyncSaberService
             Logger.Debug($"Finished PopulateFieldsAsync for {key}");
             return successful;
         }
+
+
 
         public SongInfo(string songIndex, string songName, string songUrl, string _authorName, string feedName = "")
         {
