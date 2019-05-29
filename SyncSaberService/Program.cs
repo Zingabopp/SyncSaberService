@@ -24,7 +24,7 @@ namespace SyncSaberService
 
         static void Main(string[] args)
         {
-            //Tests();
+            Tests();
             Logger.LogLevel = LogLevel.Info;
             Logger.fileWriter.AutoFlush = true;
             Logger.ShortenSourceName = true;

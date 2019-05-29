@@ -68,6 +68,7 @@
     <Compile Include="Utilities.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Web\ScoreSaberReader.cs" />
     <Compile Include="Web\WebUtils.cs" />
   </ItemGroup>
   <ItemGroup>
