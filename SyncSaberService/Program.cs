@@ -32,8 +32,8 @@ namespace SyncSaberService
 
         static void Main(string[] args)
         {
-            
-            Logger.LogLevel = LogLevel.Debug;
+
+            Logger.LogLevel = Config.StrToLogLevel(Config.LoggingLevel);
             Logger.fileWriter.AutoFlush = true;
             Logger.ShortenSourceName = true;
             try

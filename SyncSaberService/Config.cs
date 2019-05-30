@@ -141,6 +141,14 @@ namespace SyncSaberService
                     return CreateKeyData("MaxScoreSaberPages", "10");
                 }
             }
+            public static KeyData LoggingLevel
+            {
+                get
+                {
+                    return CreateKeyData("LoggingLevel", "Info");
+                }
+            }
+
         }
 
 
@@ -484,6 +492,30 @@ namespace SyncSaberService
             }
         }
 
+        public static string LoggingLevel
+        {
+            get
+            {
+                KeyData setting = SettingKeys.LoggingLevel;
+                string path = Settings.GetString(setting);
+                return path;
+            }
+            set
+            {
+                try
+                {
+                    var logLevel = StrToLogLevel(value);
+                    Settings[SettingKeys.LoggingLevel.KeyName] = value.ToString();
+                    Write();
+                }
+                catch (InvalidCastException)
+                {
+                    Logger.Error($"{value} does not correspond to a valid LogLevel.");
+                }
+
+            }
+        }
+
         #endregion
 
         public static void ReadAllSettings()
@@ -506,8 +538,34 @@ namespace SyncSaberService
             setting = BeatSaberPath;
             setting = SyncTopPPFeed;
             setting = MaxScoreSaberPages;
+            setting = LoggingLevel;
         }
 
+        public static LogLevel StrToLogLevel(string lvlStr)
+        {
+            LogLevel level;
+            switch (lvlStr.ToLower())
+            {
+                case "info":
+                    level = LogLevel.Info;
+                    break;
+                case "debug":
+                    level = LogLevel.Debug;
+                    break;
+                case "warn":
+                    level = LogLevel.Warn;
+                    break;
+                case "error":
+                    level = LogLevel.Error;
+                    break;
+                case "trace":
+                    level = LogLevel.Trace;
+                    break;
+                default:
+                    throw new InvalidCastException($"{lvlStr} does not correspond to a LogLevel");
+            }
+            return level;
+        }
 
         private static Dictionary<string, bool> _errorStatus;
         private static Dictionary<string, bool> SettingError
@@ -674,9 +732,9 @@ namespace SyncSaberService
         {
             get
             {
-                if (_data == null)
-                    if (!_data.Sections.ContainsSection(SectionName))
-                        Initialize();
+                var dataSections = _data?.Sections?.ContainsSection(SectionName);
+                if (dataSections == null || (dataSections == false))
+                    Initialize();
                 return _data.Sections[SectionName];
             }
             set
