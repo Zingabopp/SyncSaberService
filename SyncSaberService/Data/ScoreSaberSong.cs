@@ -4,14 +4,39 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using SyncSaberService.Web;
 
 namespace SyncSaberService.Data
 {
     class ScoreSaberSong
     {
+        public static bool TryParseScoreSaberSong(JToken token, out ScoreSaberSong song)
+        {
+            string songName = token["name"]?.Value<string>();
+            if (songName == null)
+                songName = "";
+            bool successful = true;
+            try
+            {
+                song = token.ToObject<ScoreSaberSong>(new JsonSerializer() {
+                    NullValueHandling = NullValueHandling.Ignore,
+                    MissingMemberHandling = MissingMemberHandling.Ignore
+                });
+                //Logger.Debug(song.ToString());
+            }
+            catch (Exception ex)
+            {
+                Logger.Exception($"Unable to create a ScoreSaberSong from the JSON for {songName}\n", ex);
+                successful = false;
+                song = null;
+            }
+            return successful;
+        }
+
+
         [JsonProperty("uid")]
-        public int uid;
+        public string uid;
         [JsonProperty("id")]
         public string md5Hash;
         [JsonProperty("name")]
@@ -40,7 +65,14 @@ namespace SyncSaberService.Data
 
         public SongInfo GetSongInfo()
         {
-            throw new NotImplementedException();
+            try
+            {
+                song = BeatSaverReader.Search(md5Hash, BeatSaverReader.SearchType.hash).FirstOrDefault();
+            } catch (JsonException ex)
+            {
+                Logger.Exception("Error trying to get SongInfo from Beat Saver.", ex);
+            }
+            return song;
         }
     }
 }

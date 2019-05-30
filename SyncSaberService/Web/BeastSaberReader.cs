@@ -15,6 +15,7 @@ using System.Threading.Tasks;
 using System.Threading.Tasks.Dataflow;
 using System.Net.Http;
 using static SyncSaberService.Utilities;
+using SyncSaberService.Data;
 using static SyncSaberService.Web.HttpClientWrapper;
 
 namespace SyncSaberService.Web

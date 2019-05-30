@@ -127,6 +127,20 @@ namespace SyncSaberService
                     return CreateKeyData("MaxConcurrentPageChecks", "10");
                 }
             }
+            public static KeyData SyncTopPPFeed
+            {
+                get
+                {
+                    return CreateKeyData("SyncTopPPFeed", "1");
+                }
+            }
+            public static KeyData MaxScoreSaberPages
+            {
+                get
+                {
+                    return CreateKeyData("MaxScoreSaberPages", "10");
+                }
+            }
         }
 
 
@@ -324,6 +338,41 @@ namespace SyncSaberService
             }
         }
 
+        public static bool SyncTopPPFeed
+        {
+            get
+            {
+                return Settings.GetBool(SettingKeys.SyncTopPPFeed);
+            }
+            set
+            {
+                Settings[SettingKeys.SyncTopPPFeed.KeyName] = value.ToString();
+                Write();
+            }
+        }
+
+        public static int MaxScoreSaberPages
+        {
+            get
+            {
+                KeyData setting = SettingKeys.MaxScoreSaberPages;
+                int val = Settings.GetInt(setting);
+                if (val < 1)
+                {
+                    //Logger.Warning($"Value of {val} is invalid for setting {setting.KeyName}, using {setting.Value} instead.");
+                    SettingError[setting.KeyName] = true;
+                    val = int.Parse(setting.Value); ;
+                }
+                else { SettingError[setting.KeyName] = false; }
+                return val;
+            }
+            set
+            {
+                Settings[SettingKeys.MaxScoreSaberPages.KeyName] = value.ToString();
+                Write();
+            }
+        }
+
         public static string BeatSaberPath
         {
             get
@@ -455,6 +504,8 @@ namespace SyncSaberService
             setting = MaxConcurrentDownloads;
             setting = MaxConcurrentPageChecks;
             setting = BeatSaberPath;
+            setting = SyncTopPPFeed;
+            setting = MaxScoreSaberPages;
         }
 
 

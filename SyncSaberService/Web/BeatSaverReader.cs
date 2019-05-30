@@ -14,6 +14,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Threading.Tasks.Dataflow;
 using System.Net.Http;
+using SyncSaberService.Data;
 using static SyncSaberService.Utilities;
 using static SyncSaberService.Web.HttpClientWrapper;
 
@@ -29,7 +30,10 @@ namespace SyncSaberService.Web
         private static readonly string AUTHORKEY = "{AUTHOR}";
         private static readonly string AUTHORIDKEY = "{AUTHORID}";
         private static readonly string PAGEKEY = "{PAGE}";
+        private static readonly string SEARCHTYPEKEY = "{TYPE}";
+        private static readonly string SEARCHKEY = "{SEARCH}";
         private const int SONGSPERUSERPAGE = 20;
+        private const string INVALIDFEEDSETTINGSMESSAGE = "The IFeedSettings passed is not a BeatSaverFeedSettings.";
 
         private ConcurrentDictionary<string, string> _authors = new ConcurrentDictionary<string, string>();
         private static Dictionary<int, FeedInfo> _feeds;
@@ -44,7 +48,8 @@ namespace SyncSaberService.Web
                         { 0, new FeedInfo("author", "https://beatsaver.com/api/songs/byuser/" +  AUTHORIDKEY + "/" + PAGEKEY) },
                         { 1, new FeedInfo("newest", "https://beatsaver.com/api/songs/new/" + PAGEKEY) },
                         { 2, new FeedInfo("top", "https://beatsaver.com/api/songs/top/" + PAGEKEY) },
-                        {99, new FeedInfo("search-by-author", "https://beatsaver.com/api/songs/search/user/" + AUTHORKEY) }
+                        { 98, new FeedInfo("search", $"https://beatsaver.com/api/songs/search/{SEARCHTYPEKEY}/{SEARCHKEY}") },
+                        { 99, new FeedInfo("search-by-author", "https://beatsaver.com/api/songs/search/user/" + AUTHORKEY) }
                     };
                 }
                 return _feeds;
@@ -77,7 +82,7 @@ namespace SyncSaberService.Web
             return Feeds[feedIndex].BaseUrl.Replace(AUTHORIDKEY, mapperId).Replace(PAGEKEY, (pageIndex * SONGSPERUSERPAGE).ToString());
         }
 
-        private const string INVALIDFEEDSETTINGSMESSAGE = "The IFeedSettings passed is not a BeatSaverFeedSettings.";
+        
 
         /// <summary>
         /// 
@@ -230,6 +235,11 @@ namespace SyncSaberService.Web
 
         public List<SongInfo> GetSongsFromPage(string pageText)
         {
+            return ParseSongsFromPage(pageText);
+        }
+
+        public static List<SongInfo> ParseSongsFromPage(string pageText)
+        {
             JObject result = new JObject();
             try
             {
@@ -262,7 +272,7 @@ namespace SyncSaberService.Web
 
                 if (SongInfo.TryParseBeatSaver(song, out SongInfo newSong))
                 {
-                    newSong.Feed = "followings";
+                    newSong.Feed = "followings"; // TODO: What?
                     songs.Add(newSong);
                 }
                 else
@@ -278,6 +288,25 @@ namespace SyncSaberService.Web
 
             }
             return songs;
+        }
+
+        public enum SearchType
+        {
+            author, // author name (not necessarily uploader)
+            name, // song name only
+            user, // user (uploader) name
+            hash, // MD5 Hash
+            song, // song name, song subname, author 
+            all // name, user, song
+        }
+
+        public static List<SongInfo> Search(string criteria, SearchType type)
+        {
+            StringBuilder url = new StringBuilder(Feeds[98].BaseUrl);
+            url.Replace(SEARCHTYPEKEY, type.ToString());
+            url.Replace(SEARCHKEY, criteria);
+            string pageText = GetPageText(url.ToString());
+            return ParseSongsFromPage(pageText);
         }
 
         public string GetAuthorID(string authorName)

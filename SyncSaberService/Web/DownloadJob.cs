@@ -10,6 +10,7 @@ using System.IO.Compression;
 using System.Net;
 using System.Diagnostics;
 using static SyncSaberService.Utilities;
+using SyncSaberService.Data;
 
 namespace SyncSaberService.Web
 {

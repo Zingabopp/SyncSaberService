@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using SyncSaberService.Data;
 
 namespace SyncSaberService.Web
 {

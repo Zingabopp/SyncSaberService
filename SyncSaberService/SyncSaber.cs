@@ -14,6 +14,7 @@ using System.Threading.Tasks;
 using System.Threading.Tasks.Dataflow;
 using System.Net.Http;
 using static SyncSaberService.Utilities;
+using SyncSaberService.Data;
 using SyncSaberService.Web;
 
 namespace SyncSaberService
@@ -52,7 +53,8 @@ namespace SyncSaberService
 
             FeedReaders = new Dictionary<string, IFeedReader> {
                 {BeatSaverReader.NameKey, new BeatSaverReader() },
-                {BeastSaberReader.NameKey, new BeastSaberReader(Config.BeastSaberUsername, Config.BeastSaberPassword, Config.MaxConcurrentPageChecks) }
+                {BeastSaberReader.NameKey, new BeastSaberReader(Config.BeastSaberUsername, Config.BeastSaberPassword, Config.MaxConcurrentPageChecks) },
+                {ScoreSaberReader.NameKey, new ScoreSaberReader() }
             };
         }
 

@@ -8,6 +8,7 @@ using System.Net;
 using System.IO;
 using System.Diagnostics;
 using SyncSaberService.Web;
+using SyncSaberService.Data;
 
 namespace SyncSaberService
 {
@@ -15,6 +16,13 @@ namespace SyncSaberService
     {
         private static void Tests()
         {
+            Web.HttpClientWrapper.Initialize(5);
+            var searchTest = BeatSaverReader.Search("6A097D39A5FA94F3B736E6EEF5A519A2", BeatSaverReader.SearchType.hash);
+            var testReader = new ScoreSaberReader();
+            var songs = testReader.GetSongsFromFeed(new ScoreSaberFeedSettings(0) {
+                MaxPages = 10
+            });
+            
             SongInfo song = new SongInfo("18750-20381", "test", "testUrl", "testAuthor");
             song.PopulateFields();
             var test = song["key"];
@@ -24,8 +32,8 @@ namespace SyncSaberService
 
         static void Main(string[] args)
         {
-            Tests();
-            Logger.LogLevel = LogLevel.Info;
+            
+            Logger.LogLevel = LogLevel.Debug;
             Logger.fileWriter.AutoFlush = true;
             Logger.ShortenSourceName = true;
             try
@@ -38,6 +46,7 @@ namespace SyncSaberService
                 {
                     Logger.Exception("Error initializing Config", ex);
                 }
+                //Tests();
                 try
                 {
                     if (args.Length > 0)
@@ -148,6 +157,24 @@ namespace SyncSaberService
                         catch (Exception ex)
                         {
                             Logger.Exception($"Exception downloading BeastSaberFeed (2)", ex);
+                        }
+                    }
+
+                    if (Config.SyncTopPPFeed)
+                    {
+                        // ScoreSaber Top PP
+                        Console.WriteLine();
+                        Logger.Info($"Downloading songs from {ScoreSaberReader.Feeds[0].Name} feed...");
+                        try
+                        {
+                            //ss.DownloadBeastSaberFeed(2, Web.BeastSaberReader.GetMaxBeastSaberPages(2));
+                            ss.DownloadSongsFromFeed(ScoreSaberReader.NameKey, new ScoreSaberFeedSettings(0) {
+                                MaxPages = Config.MaxScoreSaberPages
+                            });
+                        }
+                        catch (Exception ex)
+                        {
+                            Logger.Exception($"Exception downloading ScoreSaberFeed (0)", ex);
                         }
                     }
                     /*

@@ -11,7 +11,7 @@ using System.Net;
 using System.Reflection;
 using System.Runtime.Serialization;
 
-namespace SyncSaberService
+namespace SyncSaberService.Data
 {
     public class SongInfo
     {
@@ -348,9 +348,20 @@ namespace SyncSaberService
                     // create empty dictionary
                     return Activator.CreateInstance(objectType);
                 }
+                // Handles case where Beat Saver gives the slashstat in the form of an array.
+                if(objectType != typeof(Dictionary<string, int>))
+                {
+                    var retDict = new Dictionary<string, int>();
+                    for(int i = 0; i < token.Count(); i++)
+                    {
+                        retDict.Add(i.ToString(), (int) token.ElementAt(i));
+                    }
+                    return retDict;
+                }
             }
-
-            throw new JsonSerializationException("Object or empty array expected");
+            //throw new JsonSerializationException($"{objectType.ToString()} or empty array expected, received a {token.Type.ToString()}");
+            Logger.Error($"{objectType.ToString()} or empty array expected, received a {token.Type.ToString()}");
+            return Activator.CreateInstance(objectType);
         }
 
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
