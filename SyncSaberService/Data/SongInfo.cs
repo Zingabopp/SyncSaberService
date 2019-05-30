@@ -349,7 +349,7 @@ namespace SyncSaberService.Data
                     return Activator.CreateInstance(objectType);
                 }
                 // Handles case where Beat Saver gives the slashstat in the form of an array.
-                if(objectType != typeof(Dictionary<string, int>))
+                if(objectType == typeof(Dictionary<string, int>))
                 {
                     var retDict = new Dictionary<string, int>();
                     for(int i = 0; i < token.Count(); i++)
@@ -360,7 +360,7 @@ namespace SyncSaberService.Data
                 }
             }
             //throw new JsonSerializationException($"{objectType.ToString()} or empty array expected, received a {token.Type.ToString()}");
-            Logger.Error($"{objectType.ToString()} or empty array expected, received a {token.Type.ToString()}");
+            Logger.Warning($"{objectType.ToString()} or empty array expected, received a {token.Type.ToString()}");
             return Activator.CreateInstance(objectType);
         }
 

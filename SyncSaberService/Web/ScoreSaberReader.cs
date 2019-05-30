@@ -175,7 +175,7 @@ namespace SyncSaberService.Web
                 url.Append(Feeds[settings.FeedIndex].BaseUrl);
                 urlReplacements.AddOrUpdate(PAGENUMKEY, pageNum.ToString());
                 GetPageUrl(ref url, urlReplacements);
-                Logger.Warning($"Adding pageReadTask {url.ToString()}");
+                Logger.Trace($"Adding pageReadTask {url.ToString()}");
                 pageReadTasks.Add(GetSongsFromPageAsync(url.ToString()));
                 if (useMaxPages && (pageNum >= settings.MaxPages))
                     continueLooping = false;
