@@ -16,6 +16,7 @@ namespace SyncSaberService.Data
     public class SongInfo
     {
         private static readonly string SONG_DETAILS_URL_BASE = "https://beatsaver.com/api/songs/detail/";
+        private static readonly string SONG_BY_HASH_URL_BASE = "https://beatsaver.com/api/songs/search/hash/";
         private static object lockObject = new object();
         private static HttpClientHandler _httpClientHandler;
         public static HttpClientHandler httpClientHandler
@@ -91,11 +92,23 @@ namespace SyncSaberService.Data
         /// <returns></returns>
         public static bool PopulateFields(SongInfo song)
         {
-            if (string.IsNullOrEmpty(song.key))
+            SongGetMethod searchMethod;
+            string url;
+            if (!string.IsNullOrEmpty(song.key))
+            {
+                url = SONG_DETAILS_URL_BASE + song.key;
+                searchMethod = SongGetMethod.SongIndex;
+            }
+            else if (!string.IsNullOrEmpty(song.hashMd5))
+            {
+                url = SONG_BY_HASH_URL_BASE + song.hashMd5;
+                searchMethod = SongGetMethod.Hash;
+            }
+            else
                 return false;
             Task<string> pageReadTask;
             //lock (lockObject)
-            pageReadTask = httpClient.GetStringAsync(SONG_DETAILS_URL_BASE + song.key);
+            pageReadTask = httpClient.GetStringAsync(url);
             pageReadTask.Wait();
             string pageText = pageReadTask.Result;
             JObject result = new JObject();
@@ -107,7 +120,10 @@ namespace SyncSaberService.Data
             {
                 Logger.Exception("Unable to parse JSON from text", ex);
             }
-            JsonConvert.PopulateObject(result["song"].ToString(), song);
+            if (searchMethod == SongGetMethod.SongIndex)
+                JsonConvert.PopulateObject(result["song"].ToString(), song);
+            else if (searchMethod == SongGetMethod.Hash)
+                JsonConvert.PopulateObject(result["songs"].First.ToString(), song);
 
             return true;
         }
@@ -117,6 +133,12 @@ namespace SyncSaberService.Data
             return SongInfo.PopulateFields(this);
         }
 
+        enum SongGetMethod
+        {
+            SongIndex,
+            Hash
+        }
+
         /// <summary>
         /// Downloads the page and returns it as a string in an asynchronous operation.
         /// </summary>
@@ -124,11 +146,23 @@ namespace SyncSaberService.Data
         /// <returns></returns>
         public async Task<bool> PopulateFieldsAsync()
         {
-            if (string.IsNullOrEmpty(key))
+            SongGetMethod searchMethod;
+            string url;
+            if (!string.IsNullOrEmpty(key))
+            {
+                url = SONG_DETAILS_URL_BASE + key;
+                searchMethod = SongGetMethod.SongIndex;
+            }
+            else if (!string.IsNullOrEmpty(hashMd5))
+            {
+                url = SONG_BY_HASH_URL_BASE + hashMd5;
+                searchMethod = SongGetMethod.Hash;
+            }
+            else
                 return false;
             Logger.Debug($"Starting PopulateFieldsAsync for {key}");
             bool successful = true;
-            string url = SONG_DETAILS_URL_BASE + key;
+
             string pageText = "";
             try
             {
@@ -155,13 +189,20 @@ namespace SyncSaberService.Data
             }
             lock (this)
             {
-                JsonConvert.PopulateObject(result["song"].ToString(), this);
+                if (searchMethod == SongGetMethod.SongIndex)
+                    JsonConvert.PopulateObject(result["song"].ToString(), this);
+                else if (searchMethod == SongGetMethod.Hash)
+                    JsonConvert.PopulateObject(result["songs"].First.ToString(), this);
             }
             Logger.Debug($"Finished PopulateFieldsAsync for {key}");
             return successful;
         }
 
 
+        public SongInfo()
+        {
+
+        }
 
         public SongInfo(string songIndex, string songName, string songUrl, string _authorName, string feedName = "")
         {
@@ -349,10 +390,10 @@ namespace SyncSaberService.Data
                     return Activator.CreateInstance(objectType);
                 }
                 // Handles case where Beat Saver gives the slashstat in the form of an array.
-                if(objectType == typeof(Dictionary<string, int>))
+                if (objectType == typeof(Dictionary<string, int>))
                 {
                     var retDict = new Dictionary<string, int>();
-                    for(int i = 0; i < token.Count(); i++)
+                    for (int i = 0; i < token.Count(); i++)
                     {
                         retDict.Add(i.ToString(), (int) token.ElementAt(i));
                     }

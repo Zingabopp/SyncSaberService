@@ -19,6 +19,11 @@ namespace SyncSaberService
             Web.HttpClientWrapper.Initialize(5);
             var searchTest = BeatSaverReader.Search("6A097D39A5FA94F3B736E6EEF5A519A2", BeatSaverReader.SearchType.hash);
             var testReader = new ScoreSaberReader();
+            var sssongs = testReader.GetSSSongsFromPage(HttpClientWrapper.GetPageText("https://scoresaber.com/api.php?function=get-leaderboards&cat=3&limit=5&page=39&ranked=1"));
+            foreach (var sssong in sssongs)
+            {
+                sssong.PopulateFields();
+            }
             var songs = testReader.GetSongsFromFeed(new ScoreSaberFeedSettings(0) {
                 MaxPages = 10
             });

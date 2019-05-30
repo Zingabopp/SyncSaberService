@@ -9,8 +9,13 @@ using SyncSaberService.Web;
 
 namespace SyncSaberService.Data
 {
-    class ScoreSaberSong
+    class ScoreSaberSong : SongInfo
     {
+        public ScoreSaberSong()
+        {
+
+        }
+
         public static bool TryParseScoreSaberSong(JToken token, out ScoreSaberSong song)
         {
             string songName = token["name"]?.Value<string>();
@@ -38,15 +43,15 @@ namespace SyncSaberService.Data
         [JsonProperty("uid")]
         public string uid;
         [JsonProperty("id")]
-        public string md5Hash;
-        [JsonProperty("name")]
-        public string name;
-        [JsonProperty("songSubName")]
-        public string songSubName;
+        public string md5Hash { get { return hashMd5; } set { hashMd5 = value; } }
+        //[JsonProperty("name")]
+        //public string name;
+        //[JsonProperty("songSubName")]
+        //public string songSubName;
         [JsonProperty("author")]
-        public string author;
-        [JsonProperty("bpm")]
-        public float bpm;
+        public string author { get { return authorName; } set { authorName = value; } }
+        //[JsonProperty("bpm")]
+        //public float bpm;
         [JsonProperty("diff")]
         public string difficulty;
         [JsonProperty("scores")]
