@@ -13,6 +13,9 @@ using System.Runtime.Serialization;
 
 namespace SyncSaberService.Data
 {
+    /// <summary>
+    /// TODO: Make Scrapped song the base with separate objects (using Lazy<>) for Beat Saver and Score Saber data.
+    /// </summary>
     public class SongInfo
     {
         private static readonly string SONG_DETAILS_URL_BASE = "https://beatsaver.com/api/songs/detail/";

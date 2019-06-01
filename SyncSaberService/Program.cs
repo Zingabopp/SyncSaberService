@@ -18,10 +18,10 @@ namespace SyncSaberService
     {
         private static void Tests()
         {
-
+            var thing = new ScrappedSong();
             Web.HttpClientWrapper.Initialize(5);
             List<ScrappedSong> scrapedDict;
-            using(StreamReader file = File.OpenText(@"C:\Users\Jared\source\repos\SyncSaberService\SyncSaberService\bin\Debug\ScrappedData\combinedScrappedData.json"))
+            using(StreamReader file = File.OpenText(@"C:\Users\Jared\source\repos\SyncSaberService\SyncSaberService\bin\Debug\ScrapedData\combinedScrappedData.json"))
             {
                 JsonSerializer serializer = new JsonSerializer();
                 scrapedDict = (List<ScrappedSong>) serializer.Deserialize(file, typeof(List<ScrappedSong>));

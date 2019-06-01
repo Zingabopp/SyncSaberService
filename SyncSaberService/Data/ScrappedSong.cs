@@ -13,8 +13,9 @@ using System.Runtime.Serialization;
 
 namespace SyncSaberService.Data
 {
-    class ScrappedSong
+    public class ScrappedSong
     {
+        // Link: https://raw.githubusercontent.com/andruzzzhka/BeatSaberScrappedData/master/beatSaverScrappedData.json
         private readonly Regex _digitRegex = new Regex("^[0-9]+$", RegexOptions.Compiled);
         private readonly Regex _beatSaverRegex = new Regex("^[0-9]+-[0-9]+$", RegexOptions.Compiled);
 
@@ -39,6 +40,18 @@ namespace SyncSaberService.Data
         [JsonProperty("hash")]
         public string hashMd5;
 
+
+        public struct ScrappedDifficulties
+        {
+            [JsonProperty("Diff")]
+            public string difficulty;
+            [JsonProperty("scores")]
+            public int scores;
+            [JsonProperty("Stars")]
+            public float stars;
+
+        }
+
         public override string ToString()
         {
             StringBuilder retStr = new StringBuilder();
@@ -48,17 +61,36 @@ namespace SyncSaberService.Data
             retStr.AppendLine("   Author: " + authorName);
             return retStr.ToString();
         }
+
+        public object this[string propertyName]
+        {
+            get
+            {
+                Type myType = typeof(SongInfo);
+                object retVal;
+                FieldInfo test = myType.GetField(propertyName);
+                if (test != null)
+                {
+                    retVal = test.GetValue(this);
+                }
+                else
+                {
+                    PropertyInfo myPropInfo = myType.GetProperty(propertyName);
+                    retVal = myPropInfo.GetValue(this);
+                }
+
+                Type whatType = retVal.GetType();
+                return retVal;
+            }
+            set
+            {
+                Type myType = typeof(SongInfo);
+                PropertyInfo myPropInfo = myType.GetProperty(propertyName);
+                myPropInfo.SetValue(this, value, null);
+            }
+        }
     }
 
-    public class ScrappedDifficulties
-    {
-        [JsonProperty("Diff")]
-        public string difficulty;
-        [JsonProperty("scores")]
-        public int scores;
-        [JsonProperty("Stars")]
-        public float stars;
-
-    }
+    
 
 }
