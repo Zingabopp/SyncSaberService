@@ -52,6 +52,7 @@
   <ItemGroup>
     <Compile Include="Config.cs" />
     <Compile Include="Data\ScoreSaberSong.cs" />
+    <Compile Include="Data\ScrappedSong.cs" />
     <Compile Include="SimpleJson.cs" />
     <Compile Include="Web\BeatSaverReader.cs" />
     <Compile Include="Web\DownloadBatch.cs" />

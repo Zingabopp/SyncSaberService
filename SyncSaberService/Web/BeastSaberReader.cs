@@ -45,18 +45,19 @@ namespace SyncSaberService.Web
         }
         private static object _cookieLock = new object();
         private static CookieContainer Cookies { get; set; }
-        private static Dictionary<int, FeedInfo> _feeds;
-        public static Dictionary<int, FeedInfo> Feeds
+
+        private static Dictionary<BeastSaberFeeds, FeedInfo> _feeds;
+        public static Dictionary<BeastSaberFeeds, FeedInfo> Feeds
         {
             get
             {
                 if (_feeds == null)
                 {
-                    _feeds = new Dictionary<int, FeedInfo>()
+                    _feeds = new Dictionary<BeastSaberFeeds, FeedInfo>()
                     {
-                        { 0, new FeedInfo("followings", "https://bsaber.com/members/" + USERNAMEKEY + "/wall/followings/feed/?acpage=" + PAGENUMKEY) },
-                        { 1, new FeedInfo("bookmarks", "https://bsaber.com/members/" + USERNAMEKEY + "/bookmarks/feed/?acpage=" + PAGENUMKEY )},
-                        { 2, new FeedInfo("curator recommended", "https://bsaber.com/members/curatorrecommended/bookmarks/feed/?acpage=" + PAGENUMKEY) }
+                        { (BeastSaberFeeds)0, new FeedInfo("followings", "https://bsaber.com/members/" + USERNAMEKEY + "/wall/followings/feed/?acpage=" + PAGENUMKEY) },
+                        { (BeastSaberFeeds)1, new FeedInfo("bookmarks", "https://bsaber.com/members/" + USERNAMEKEY + "/bookmarks/feed/?acpage=" + PAGENUMKEY )},
+                        { (BeastSaberFeeds)2, new FeedInfo("curator recommended", "https://bsaber.com/members/curatorrecommended/bookmarks/feed/?acpage=" + PAGENUMKEY) }
                     };
                 }
                 return _feeds;
@@ -88,7 +89,7 @@ namespace SyncSaberService.Web
                 Cookies = GetBSaberCookies(_username, _password);
                 AddCookies(Cookies, FeedRootUri);
                 for (int i = 0; i < Feeds.Keys.Count; i++)
-                    _earliestEmptyPage.AddOrUpdate(Feeds.Keys.ElementAt(i), 9999);
+                    _earliestEmptyPage.AddOrUpdate((int)Feeds.Keys.ElementAt(i), 9999);
                 Ready = true;
             }
         }
@@ -216,7 +217,7 @@ namespace SyncSaberService.Web
 
         public string GetPageUrl(int feedIndex, int page)
         {
-            return GetPageUrl(Feeds[feedIndex].BaseUrl, page);
+            return GetPageUrl(Feeds[(BeastSaberFeeds)feedIndex].BaseUrl, page);
         }
 
         private static string GetMapperFromBsaber(string innerText)
@@ -296,7 +297,7 @@ namespace SyncSaberService.Web
                 {
                     earliestEmptyPage = _earliestEmptyPage[_settings.FeedIndex];
                 }
-                string feedUrl = GetPageUrl(Feeds[_settings.FeedIndex].BaseUrl, pageIndex);
+                string feedUrl = GetPageUrl(Feeds[_settings.Feed].BaseUrl, pageIndex);
 
                 FeedPageInfo pageInfo = new FeedPageInfo {
                     feedToDownload = _settings.FeedIndex,
@@ -369,14 +370,9 @@ namespace SyncSaberService.Web
 
     public class BeastSaberFeedSettings : IFeedSettings
     {
-        public string FeedName
-        {
-            get
-            {
-                return BeastSaberReader.Feeds[FeedIndex].Name;
-            }
-        }
+        public string FeedName { get { return BeastSaberReader.Feeds[Feed].Name; } }
         public int FeedIndex { get; set; }
+        public BeastSaberFeeds Feed { get { return (BeastSaberFeeds) FeedIndex; } set { FeedIndex = (int) value; } }
         public bool UseSongKeyAsOutputFolder { get; set; }
         public int MaxPages;
         public BeastSaberFeedSettings(int feedIndex, int _maxPages = 0)
@@ -385,7 +381,12 @@ namespace SyncSaberService.Web
             MaxPages = _maxPages;
             UseSongKeyAsOutputFolder = true;
         }
+    }
 
-
+    public enum BeastSaberFeeds
+    {
+        FOLLOWING = 0,
+        BOOKMARKS = 1,
+        CURATOR_RECOMMENDED = 2
     }
 }

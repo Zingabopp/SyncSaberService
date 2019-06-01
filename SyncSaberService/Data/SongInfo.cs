@@ -353,7 +353,7 @@ namespace SyncSaberService.Data
         [JsonProperty("jsonPath")]
         public string jsonPath;
         [JsonProperty("stats")]
-        BeatSaverSongDifficultyStats stats;
+        BeatSaverSongDifficultyStats stats { get; set; }
     }
 
     public class BeatSaverSongDifficultyStats

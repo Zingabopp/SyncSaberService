@@ -9,6 +9,8 @@ using System.IO;
 using System.Diagnostics;
 using SyncSaberService.Web;
 using SyncSaberService.Data;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace SyncSaberService
 {
@@ -16,7 +18,15 @@ namespace SyncSaberService
     {
         private static void Tests()
         {
+
             Web.HttpClientWrapper.Initialize(5);
+            List<ScrappedSong> scrapedDict;
+            using(StreamReader file = File.OpenText(@"C:\Users\Jared\source\repos\SyncSaberService\SyncSaberService\bin\Debug\ScrappedData\combinedScrappedData.json"))
+            {
+                JsonSerializer serializer = new JsonSerializer();
+                scrapedDict = (List<ScrappedSong>) serializer.Deserialize(file, typeof(List<ScrappedSong>));
+            }
+            
 
             DownloadJob testJob = new DownloadJob(new SongInfo("111-111", "testName", "", "testAuthor"), "temp", "CustomSongs");
 
@@ -122,7 +132,7 @@ namespace SyncSaberService
                     {
                         // Followings
                         Console.WriteLine();
-                        Logger.Info($"Downloading songs from {BeastSaberReader.Feeds[0].Name} feed...");
+                        Logger.Info($"Downloading songs from {BeastSaberReader.Feeds[BeastSaberFeeds.FOLLOWING].Name} feed...");
                         try
                         {
                             //ss.DownloadBeastSaberFeed(0, Web.BeastSaberReader.GetMaxBeastSaberPages(0));
@@ -132,14 +142,14 @@ namespace SyncSaberService
                         }
                         catch (Exception ex)
                         {
-                            Logger.Exception($"Exception downloading BeastSaberFeed (0)", ex);
+                            Logger.Exception($"Exception downloading BeastSaberFeed: Following", ex);
                         }
                     }
                     // Bookmarks
                     if (Config.SyncBookmarksFeed)
                     {
                         Console.WriteLine();
-                        Logger.Info($"Downloading songs from {BeastSaberReader.Feeds[1].Name} feed...");
+                        Logger.Info($"Downloading songs from {BeastSaberReader.Feeds[BeastSaberFeeds.BOOKMARKS].Name} feed...");
                         try
                         {
                             //ss.DownloadBeastSaberFeed(1, Web.BeastSaberReader.GetMaxBeastSaberPages(1));
@@ -149,14 +159,14 @@ namespace SyncSaberService
                         }
                         catch (Exception ex)
                         {
-                            Logger.Exception($"Exception downloading BeastSaberFeed (1)", ex);
+                            Logger.Exception($"Exception downloading BeastSaberFeed: Bookmarks", ex);
                         }
                     }
                     if (Config.SyncCuratorRecommendedFeed)
                     {
                         // Curator Recommended
                         Console.WriteLine();
-                        Logger.Info($"Downloading songs from {BeastSaberReader.Feeds[2].Name} feed...");
+                        Logger.Info($"Downloading songs from {BeastSaberReader.Feeds[BeastSaberFeeds.CURATOR_RECOMMENDED].Name} feed...");
                         try
                         {
                             //ss.DownloadBeastSaberFeed(2, Web.BeastSaberReader.GetMaxBeastSaberPages(2));
@@ -166,7 +176,7 @@ namespace SyncSaberService
                         }
                         catch (Exception ex)
                         {
-                            Logger.Exception($"Exception downloading BeastSaberFeed (2)", ex);
+                            Logger.Exception($"Exception downloading BeastSaberFeed: Curator Recommended", ex);
                         }
                     }
 
@@ -174,7 +184,7 @@ namespace SyncSaberService
                     {
                         // ScoreSaber Top PP
                         Console.WriteLine();
-                        Logger.Info($"Downloading songs from {ScoreSaberReader.Feeds[0].Name} feed...");
+                        Logger.Info($"Downloading songs from {ScoreSaberReader.Feeds[ScoreSaberFeeds.TOP_RANKED].Name} feed...");
                         try
                         {
                             //ss.DownloadBeastSaberFeed(2, Web.BeastSaberReader.GetMaxBeastSaberPages(2));
@@ -184,7 +194,7 @@ namespace SyncSaberService
                         }
                         catch (Exception ex)
                         {
-                            Logger.Exception($"Exception downloading ScoreSaberFeed (0)", ex);
+                            Logger.Exception($"Exception downloading ScoreSaberFeed: Top Ranked", ex);
                         }
                     }
                     /*

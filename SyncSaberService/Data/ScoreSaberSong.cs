@@ -42,7 +42,7 @@ namespace SyncSaberService.Data
 
 
         [JsonProperty("uid")]
-        public string uid;
+        public string uid { get; set; }
         [JsonProperty("id")]
         public string md5Hash { get { return hashMd5; } set { hashMd5 = value; } }
         //[JsonProperty("name")]
@@ -54,17 +54,17 @@ namespace SyncSaberService.Data
         //[JsonProperty("bpm")]
         //public float bpm;
         [JsonProperty("diff")]
-        public string difficulty;
+        public string difficulty { get; set; }
         [JsonProperty("scores")]
-        public string scores;
+        public string scores { get; set; }
         [JsonProperty("24hr")]
-        public int hr24;
+        public int hr24 { get; set; }
         [JsonProperty("ranked")]
-        public bool ranked;
+        public bool ranked { get; set; }
         [JsonProperty("stars")]
-        public float stars;
+        public float stars { get; set; }
         [JsonProperty("image")]
-        public string image;
+        public string image { get; set; }
 
         [JsonIgnore]
         public SongInfo Song
