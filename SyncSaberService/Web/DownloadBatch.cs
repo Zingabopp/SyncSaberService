@@ -17,8 +17,8 @@ namespace SyncSaberService.Web
             _batchComplete = false;
             int maxConcurrentDownloads = Config.MaxConcurrentDownloads; // Set it here so it doesn't error
             var actionBlock = new ActionBlock<DownloadJob>(job => {
-                Logger.Trace($"Running job {job.Song.key} in ActionBlock");
-                Task newTask = job.RunJob();
+                Logger.Debug($"Running job {job.Song.key} in ActionBlock");
+                Task newTask = job.RunJobAsync();
                 newTask.Wait();
                 TaskComplete(job.Song, job);
             }, new ExecutionDataflowBlockOptions {
@@ -56,7 +56,7 @@ namespace SyncSaberService.Web
                 case DownloadJob.JobResult.UNZIPFAILED:
                     Logger.Warning($"Job failed, {song.key} failed during unzipping.");
                     break;
-                case DownloadJob.JobResult.OTHER:
+                case DownloadJob.JobResult.OTHERERROR:
                     Logger.Warning($"Job {song.key} failed for...reasons.");
                     break;
                 default:

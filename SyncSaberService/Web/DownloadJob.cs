@@ -8,6 +8,7 @@ using System.Timers;
 using System.IO;
 using System.IO.Compression;
 using System.Net;
+using System.Net.Http;
 using System.Diagnostics;
 using static SyncSaberService.Utilities;
 using SyncSaberService.Data;
@@ -17,6 +18,8 @@ namespace SyncSaberService.Web
     public class DownloadJob
     {
         public const string NOTFOUNDERROR = "The remote server returned an error: (404) Not Found.";
+        public const string BEATSAVER_DOWNLOAD_URL_BASE = "https://beatsaver.com/download/";
+        private const string TIMEOUTERROR = "The request was aborted: The request was canceled.";
 
         public enum JobResult
         {
@@ -25,7 +28,7 @@ namespace SyncSaberService.Web
             TIMEOUT,
             NOTFOUND,
             UNZIPFAILED,
-            OTHER
+            OTHERERROR
         }
 
         public string TempPath = ".syncsabertemp";
@@ -46,17 +49,19 @@ namespace SyncSaberService.Web
         }
         private FileInfo _localZip;
         private DirectoryInfo _songDir;
-        private JobResult _result;
-        public JobResult Result
-        {
-            get { return _result; }
-        }
+        public JobResult Result { get; private set; }
 
+        /// <summary>
+        /// Creates a new DownloadJob.
+        /// </summary>
+        /// <param name="song"></param>
+        /// <param name="downloadPath">Temp folder where the zip is downloaded to.</param>
+        /// <param name="songDirectory">Folder the contents of the zip file are moved to.</param>
         public DownloadJob(SongInfo song, string downloadPath, string songDirectory)
         {
             _tokenSource = new CancellationTokenSource();
             _song = song;
-            TempPath = $"temp\\temp-{Song.key}";
+            TempPath = $"temp\\temp-{Song.key}"; // Folder the zip file is extracted to.
             _localZip = new FileInfo(downloadPath);
             _songDir = new DirectoryInfo(songDirectory);
             if (!_localZip.Directory.Exists)
@@ -64,17 +69,18 @@ namespace SyncSaberService.Web
 
         }
 
-        public async Task<bool> RunJob()
+        public async Task<bool> RunJobAsync()
         {
             //JobResult result = JobResult.SUCCESS;
             bool successful = true;
-            Task<bool> dwnl = DownloadFile("https://beatsaver.com/download/" + Song.key, _localZip.FullName);
+            Task<bool> dwnl = DownloadFile(BEATSAVER_DOWNLOAD_URL_BASE + Song.key, _localZip.FullName);
+            //Task<bool> dwnl = DownloadFile("http://releases.ubuntu.com/18.04.2/ubuntu-18.04.2-desktop-amd64.iso", "test.iso");
             successful = await dwnl;
 
             if (successful)
             {
                 Logger.Debug($"Downloaded {Song.key} successfully");
-                successful = await ExtractZip(_localZip.FullName, _songDir.FullName, TempPath);
+                successful = await ExtractZipAsync(_localZip.FullName, _songDir.FullName, TempPath);
 
                 if (successful)
                 {
@@ -83,16 +89,16 @@ namespace SyncSaberService.Web
                 else
                 {
                     Logger.Error($"Extraction failed for {Song.key}");
-                    _result = JobResult.UNZIPFAILED;
+                    Result = JobResult.UNZIPFAILED;
                 }
             }
             else
             {
                 Logger.Debug($"Download failed for {Song.key}");
                 //result = false;
-                if (_result == JobResult.SUCCESS)
+                if (Result == JobResult.SUCCESS)
                 {
-                    _result = JobResult.OTHER;
+                    Result = JobResult.OTHERERROR;
                 }
             }
 
@@ -108,47 +114,30 @@ namespace SyncSaberService.Web
         }
         public void OnDownloadProgressChanged(object sender, DownloadProgressChangedEventArgs e)
         {
-            //Logger.Debug($"                 DownloadProgressChanged for {Song.key}, reseting Timeout");
-            webTimer.Stop();
-            webTimer.Start();
+            Logger.Debug($"                 DownloadProgressChanged for {Song.key}, reseting Timeout");
+            //webTimer.Stop();
+            //webTimer.Start();
         }
-        private const string TIMEOUTERROR = "The request was aborted: The request was canceled.";
+
         public async Task<bool> DownloadFile(string url, string path)
         {
             bool successful = true;
-            _result = JobResult.SUCCESS;
+            Result = JobResult.SUCCESS;
 
             FileInfo zipFile = new FileInfo(path);
             WebClient client = new WebClient();
 
-            
             var token = _tokenSource.Token;
 
-            webTimer = new System.Timers.Timer(Config.DownloadTimeout*1000);
+            webTimer = new System.Timers.Timer(Config.DownloadTimeout * 1000);
             webTimer.Elapsed += WebTimer_Elapsed;
-            client.DownloadProgressChanged += OnDownloadProgressChanged;
-            token.Register(() => client.CancelAsync());
-            webTimer.Start();
-            Task downloadAsync = client.DownloadFileTaskAsync(new Uri(url), path);
-            try
-            {
-                await downloadAsync;
-                webTimer.Stop();
-            }
-            catch (Exception)
-            {
-                // Used to catch the cancellation exception.
-                // TODO: Catch specific exceptions.
-            }
-            finally
-            {
-                webTimer.Stop();
-                client.DownloadProgressChanged -= OnDownloadProgressChanged;
-            }
 
-            //if (await Task.WhenAny(dwnl, Task.Delay(Config.Timeout)) == dwnl)
-            //{
-            zipFile.Refresh();
+            var downloadAsync = HttpClientWrapper.httpClient.GetAsync(url).ContinueWith((requestTask) => {
+                HttpResponseMessage response = requestTask.Result;
+                response.EnsureSuccessStatusCode();
+                response.Content.ReadAsFileAsync(path, true);
+            });
+            await downloadAsync;
             if (downloadAsync.IsFaulted || !File.Exists(path))
             {
                 successful = false;
@@ -157,52 +146,44 @@ namespace SyncSaberService.Web
                     if (downloadAsync.Exception.InnerException.Message == NOTFOUNDERROR)
                     {
                         Logger.Error($"{url} was not found on Beat Saver.");
-                        _result = JobResult.NOTFOUND;
+                        Result = JobResult.NOTFOUND;
                     }
                     else if (downloadAsync.Exception.InnerException.Message == TIMEOUTERROR)
                     {
                         Logger.Error($"Download of {url} timed out.");
-                        _result = JobResult.TIMEOUT;
+                        Result = JobResult.TIMEOUT;
                     }
                     else
                     {
                         Logger.Exception($"Error downloading {url}", downloadAsync.Exception.InnerException);
-                        _result = JobResult.OTHER;
+                        Result = JobResult.OTHERERROR;
                     }
                 }
                 else
                 {
-                    _result = JobResult.OTHER;
+                    Result = JobResult.OTHERERROR;
                 }
             }
-            //}
-            /*else
-            {
-                client.CancelAsync();
-                _result = JobResult.TIMEOUT;
-                successful = false;
-                Logger.Error($"Timeout occured when downloading {url}");
-            }*/
-            //} catch (Exception ex)
-            //{
-            //    successful = false;
-            //    Logger.Exception($"Failed to download file {url}", ex);
-            //}
+
             zipFile.Refresh();
-            if (!(_result == JobResult.SUCCESS) && zipFile.Exists)
+            if (!(Result == JobResult.SUCCESS) && zipFile.Exists)
             {
                 Logger.Warning($"Failed download, deleting {zipFile.FullName}");
                 try
                 {
                     var time = Stopwatch.StartNew();
-                    while (!(IsFileReady(zipFile.FullName) || !(time.ElapsedMilliseconds < 3000)))
-                    { }
+                    bool waitTimeout = false;
+                    while (!(IsFileReady(zipFile.FullName) || !waitTimeout))
+                        waitTimeout = time.ElapsedMilliseconds < 3000;
+                    if (waitTimeout)
+                        Logger.Warning($"Timeout waiting for {zipFile.FullName} to be released for deletion.");
                     File.Delete(zipFile.FullName);
                 }
                 catch (System.IO.IOException)
                 {
                     Logger.Warning("File is in use and can't be deleted");
                 }
+                
                 successful = false;
             }
             return successful;
@@ -211,13 +192,12 @@ namespace SyncSaberService.Web
 
 
 
-        public async Task<bool> ExtractZip(string zipPath, string extractPath, string tempPath)
+        public async Task<bool> ExtractZipAsync(string zipPath, string extractPath, string tempPath)
         {
             bool extracted = true;
             if (File.Exists(zipPath))
             {
                 DirectoryInfo tempDir = new DirectoryInfo(tempPath);
-                ZipArchive zipFile = ZipFile.OpenRead(zipPath);
                 try
                 {
                     if (tempDir.Exists)
@@ -228,9 +208,15 @@ namespace SyncSaberService.Web
 
                     Logger.Trace($"Extracting files from {zipPath} to {tempDir.FullName}");
                     await Task.Run(() => {
-                        zipFile.ExtractToDirectory(tempDir.FullName, true);
+                        var time = Stopwatch.StartNew();
+                        bool waitTimeout = false;
+                        while (!(IsFileReady(zipPath) || !waitTimeout))
+                            waitTimeout = time.ElapsedMilliseconds < 3000;
+                        if (waitTimeout)
+                            Logger.Warning($"Timeout waiting for {zipPath} to be released for extraction.");
+                        using (ZipArchive zipFile = ZipFile.OpenRead(zipPath))
+                            zipFile.ExtractToDirectory(tempDir.FullName, true);
                     });
-                    zipFile.Dispose();
                 }
                 catch (Exception ex)
                 {
@@ -241,8 +227,11 @@ namespace SyncSaberService.Web
                 try
                 {
                     var time = Stopwatch.StartNew();
-                    while (!(IsFileReady(zipPath) || !(time.ElapsedMilliseconds < 3000)))
-                    { }
+                    bool waitTimeout = false;
+                    while (!(IsFileReady(zipPath) || !waitTimeout))
+                        waitTimeout = time.ElapsedMilliseconds < 3000;
+                    if (waitTimeout)
+                        Logger.Warning($"Timeout waiting for {zipPath} to be released for extraction.");
                     File.Delete(zipPath);
                 }
                 catch (System.IO.IOException)
