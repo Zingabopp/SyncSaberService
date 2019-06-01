@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using System.Runtime.Serialization;
 using SyncSaberService.Web;
 
 namespace SyncSaberService.Data
@@ -66,8 +67,15 @@ namespace SyncSaberService.Data
         public string image;
 
         [JsonIgnore]
-        public SongInfo song;
-
+        public SongInfo Song
+        {
+            get
+            {
+                this.PopulateFields();
+                return this as SongInfo;
+            }
+        }
+        /*
         public SongInfo GetSongInfo()
         {
             try
@@ -79,6 +87,7 @@ namespace SyncSaberService.Data
             }
             return song;
         }
+        */
     }
 }
 

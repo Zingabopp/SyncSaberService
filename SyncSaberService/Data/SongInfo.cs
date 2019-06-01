@@ -51,8 +51,8 @@ namespace SyncSaberService.Data
                 return _httpClient;
             }
         }
-        private bool _populated = false;
-        public bool Populated { get { return _populated; } }
+        private bool _songInfoPopulated = false;
+        public bool SongInfoPopulated { get { return _songInfoPopulated; } }
         private readonly Regex _digitRegex = new Regex("^[0-9]+$", RegexOptions.Compiled);
         private readonly Regex _beatSaverRegex = new Regex("^[0-9]+-[0-9]+$", RegexOptions.Compiled);
 
@@ -92,6 +92,9 @@ namespace SyncSaberService.Data
         /// <returns></returns>
         public static bool PopulateFields(SongInfo song)
         {
+            if (song.SongInfoPopulated)
+                return true;
+            bool successful = true;
             SongGetMethod searchMethod;
             string url;
             if (!string.IsNullOrEmpty(song.key))
@@ -118,6 +121,7 @@ namespace SyncSaberService.Data
             }
             catch (Exception ex)
             {
+                successful = false;
                 Logger.Exception("Unable to parse JSON from text", ex);
             }
             if (searchMethod == SongGetMethod.SongIndex)
@@ -125,7 +129,8 @@ namespace SyncSaberService.Data
             else if (searchMethod == SongGetMethod.Hash)
                 JsonConvert.PopulateObject(result["songs"].First.ToString(), song);
 
-            return true;
+            song._songInfoPopulated = successful;
+            return successful;
         }
 
         public bool PopulateFields()
@@ -146,6 +151,8 @@ namespace SyncSaberService.Data
         /// <returns></returns>
         public async Task<bool> PopulateFieldsAsync()
         {
+            if (SongInfoPopulated)
+                return true;
             SongGetMethod searchMethod;
             string url;
             if (!string.IsNullOrEmpty(key))
@@ -195,6 +202,7 @@ namespace SyncSaberService.Data
                     JsonConvert.PopulateObject(result["songs"].First.ToString(), this);
             }
             Logger.Debug($"Finished PopulateFieldsAsync for {key}");
+            _songInfoPopulated = successful;
             return successful;
         }
 
@@ -214,9 +222,14 @@ namespace SyncSaberService.Data
         }
 
         [OnDeserialized]
-        private void OnDeserialized(StreamingContext context)
+        protected void OnDeserialized(StreamingContext context)
         {
-            _populated = true;
+            //if (!(this is ScoreSaberSong))
+            if(!this.GetType().IsSubclassOf(typeof(SongInfo)))
+            {
+                //Logger.Warning("SongInfo OnDeserialized");
+                _songInfoPopulated = true;
+            }
         }
 
         public static bool TryParseBeatSaver(JToken token, out SongInfo song)
@@ -418,7 +431,7 @@ namespace SyncSaberService.Data
             List<Task> populateTasks = new List<Task>();
             for (int i = 0; i < songs.Count(); i++)
             {
-                if (!songs.ElementAt(i).Populated)
+                if (!songs.ElementAt(i).SongInfoPopulated)
                     populateTasks.Add(songs.ElementAt(i).PopulateFieldsAsync());
             }
 
@@ -430,7 +443,7 @@ namespace SyncSaberService.Data
             List<Task> populateTasks = new List<Task>();
             for (int i = 0; i < songs.Count(); i++)
             {
-                if (!songs.ElementAt(i).Populated)
+                if (!songs.ElementAt(i).SongInfoPopulated)
                     populateTasks.Add(songs.ElementAt(i).PopulateFieldsAsync());
             }
 
