@@ -148,6 +148,13 @@ namespace SyncSaberService
                     return CreateKeyData("LoggingLevel", "Info");
                 }
             }
+            public static KeyData SyncFavoriteMappersFeed
+            {
+                get
+                {
+                    return CreateKeyData("SyncFavoriteMappersFeed", "1");
+                }
+            }
 
         }
 
@@ -516,29 +523,49 @@ namespace SyncSaberService
             }
         }
 
+        public static bool SyncFavoriteMappersFeed
+        {
+            get
+            {
+                return Settings.GetBool(SettingKeys.SyncFavoriteMappersFeed);
+            }
+            set
+            {
+                Settings[SettingKeys.SyncFavoriteMappersFeed.KeyName] = value.ToString();
+                Write();
+            }
+        }
+
+
         #endregion
 
         public static void ReadAllSettings()
         {
-            object setting = AutoDownloadSongs;
-            setting = AutoUpdateSongs;
+            object setting = null;
+            setting = SyncCuratorRecommendedFeed;
+            setting = SyncBookmarksFeed;
+            setting = SyncFollowingsFeed;
+            setting = SyncTopPPFeed;
+            setting = SyncFavoriteMappersFeed;
+
+            setting = MaxCuratorRecommendedPages;
+            setting = MaxBookmarksPages;
+            setting = MaxFollowingsPages;
+            setting = MaxScoreSaberPages;
+            setting = MaxBeatSaverPages;
+
+            setting = BeatSaberPath;
             setting = BeastSaberUsername;
             setting = BeastSaberPassword;
+            //setting = AutoDownloadSongs;
+            //setting = AutoUpdateSongs;
+
             setting = DeleteOldVersions;
-            setting = SyncBookmarksFeed;
-            setting = SyncCuratorRecommendedFeed;
-            setting = SyncFollowingsFeed;
-            setting = MaxBookmarksPages;
-            setting = MaxCuratorRecommendedPages;
-            setting = MaxFollowingsPages;
-            setting = MaxBeatSaverPages;
             setting = DownloadTimeout;
             setting = MaxConcurrentDownloads;
             setting = MaxConcurrentPageChecks;
-            setting = BeatSaberPath;
-            setting = SyncTopPPFeed;
-            setting = MaxScoreSaberPages;
             setting = LoggingLevel;
+            
         }
 
         public static LogLevel StrToLogLevel(string lvlStr)

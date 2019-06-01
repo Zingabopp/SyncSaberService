@@ -17,6 +17,11 @@ namespace SyncSaberService
         private static void Tests()
         {
             Web.HttpClientWrapper.Initialize(5);
+
+            DownloadJob testJob = new DownloadJob(new SongInfo("111-111", "testName", "", "testAuthor"), "temp", "CustomSongs");
+
+            var testTask = testJob.RunJobAsync();
+            testTask.Wait();
             var searchTest = BeatSaverReader.Search("6A097D39A5FA94F3B736E6EEF5A519A2", BeatSaverReader.SearchType.hash);
             var testReader = new ScoreSaberReader();
             var sssongs = testReader.GetSSSongsFromPage(HttpClientWrapper.GetPageText("https://scoresaber.com/api.php?function=get-leaderboards&cat=3&limit=5&page=39&ranked=1"));
@@ -94,7 +99,7 @@ namespace SyncSaberService
                     });
                     */
                     Console.WriteLine();
-                    if (Config.FavoriteMappers.Count > 0)
+                    if (Config.SyncFavoriteMappersFeed && Config.FavoriteMappers.Count > 0)
                     {
                         Logger.Info($"Downloading songs from FavoriteMappers.ini...");
                         try
