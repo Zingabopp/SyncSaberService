@@ -184,7 +184,7 @@ namespace SyncSaberService
             }
             int totalSongs = songs.Count;
             Logger.Debug($"Finished checking pages, found {totalSongs} songs");
-            DownloadSongs(songs, out int skippedSongs);
+            List<SongInfo> matchedSongs = DownloadSongs(songs, out int skippedSongs, _settings.UseSongKeyAsOutputFolder);
             Logger.Debug("Jobs finished, Processing downloads...");
             int downloadCount = SuccessfulDownloads.Count;
             int failedCount = FailedDownloads.Count;
@@ -211,7 +211,7 @@ namespace SyncSaberService
                 foreach (var playlist in playlists)
                 {
                     // TODO: fix this maybe
-                    UpdatePlaylist(playlist, job.Song.key, job.Song.name);
+                    //UpdatePlaylist(playlist, job.Song.key, job.Song.name);
 
                 }
                 RemoveOldVersions(job.Song.key);
@@ -226,24 +226,39 @@ namespace SyncSaberService
             }
 
             Utilities.WriteStringListSafe(_historyPath, _songDownloadHistory.Distinct().ToList(), true);
-            foreach (Playlist playlist in playlists)
-                playlist.WritePlaylist();
+            //foreach (Playlist playlist in playlists)
+                //playlist.WritePlaylist();
         }
-
-        public void DownloadSongs(Dictionary<int, SongInfo> queuedSongs, out int skippedsongs)
+        
+        /// <summary>
+        /// Downloads the songs in the provided Dictionary.
+        /// </summary>
+        /// <param name="queuedSongs"></param>
+        /// <param name="skippedsongs"></param>
+        /// <param name="useSongKeyAsOutputFolder"></param>
+        /// <returns></returns>
+        public List<SongInfo> DownloadSongs(Dictionary<int, SongInfo> queuedSongs, out int skippedsongs, bool useSongKeyAsOutputFolder)
         {
             //var existingSongs = Directory.GetDirectories(CustomSongsPath);
             string tempPath = "";
             string outputPath = "";
+            List<SongInfo> matchedSongs = new List<SongInfo>();
             skippedsongs = 0;
             DownloadBatch jobs = new DownloadBatch();
             jobs.JobCompleted += OnJobFinished;
             foreach (var song in queuedSongs.Values)
             {
                 tempPath = Path.Combine(Path.GetTempPath(), song.key + zipExtension);
-                outputPath = Path.Combine(CustomSongsPath, song.key);
+                if (useSongKeyAsOutputFolder)
+                    outputPath = Path.Combine(CustomSongsPath, song.key);
+                else
+                    outputPath = CustomSongsPath;
                 bool songExists = Directory.Exists(outputPath);
                 bool songInHistory = _songDownloadHistory.Contains(song.key);
+                if((songExists && songInHistory) || !songInHistory)
+                {
+                    matchedSongs.Add(song);
+                }
                 if (songExists || songInHistory)
                 {
                     skippedsongs++;
@@ -254,6 +269,7 @@ namespace SyncSaberService
                 jobs.AddJob(job);
             }
             jobs.RunJobs().Wait();
+            return matchedSongs;
         }
 
         private readonly Regex _digitRegex = new Regex("^[0-9]+$", RegexOptions.Compiled);

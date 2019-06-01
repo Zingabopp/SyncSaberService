@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.IO;
 using System.Net.Http;
 using System.Net;
 
@@ -104,6 +105,38 @@ namespace SyncSaberService.Web
         public static void AddCookies(CookieContainer newCookies, string url)
         {
             AddCookies(newCookies, new Uri(url));
+        }
+    }
+
+    // From https://stackoverflow.com/questions/45711428/download-file-with-webclient-or-httpclient
+    public static class HttpContentExtensions
+    {
+        public static Task ReadAsFileAsync(this HttpContent content, string filename, bool overwrite)
+        {
+            string pathname = Path.GetFullPath(filename);
+            if (!overwrite && File.Exists(filename))
+            {
+                throw new InvalidOperationException(string.Format("File {0} already exists.", pathname));
+            }
+
+            FileStream fileStream = null;
+            try
+            {
+                fileStream = new FileStream(pathname, FileMode.Create, FileAccess.Write, FileShare.None);
+                return content.CopyToAsync(fileStream).ContinueWith(
+                    (copyTask) => {
+                        fileStream.Close();
+                    });
+            }
+            catch
+            {
+                if (fileStream != null)
+                {
+                    fileStream.Close();
+                }
+
+                throw;
+            }
         }
     }
 }

@@ -367,7 +367,7 @@ namespace SyncSaberService.Web
         }
         public int FeedIndex { get { return _feedIndex; } }
         public bool UseSongKeyAsOutputFolder { get; set; }
-
+        
         public BeatSaverFeedSettings(int feedIndex)
         {
             _feedIndex = feedIndex;
