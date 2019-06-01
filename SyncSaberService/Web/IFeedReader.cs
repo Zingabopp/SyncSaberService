@@ -19,6 +19,7 @@ namespace SyncSaberService.Web
     {
         string FeedName { get; }
         int FeedIndex { get; }
+        bool UseSongKeyAsOutputFolder { get; set; }
     }
     public struct FeedInfo
     {

@@ -223,7 +223,7 @@ namespace SyncSaberService.Web
         {
             //TODO: Needs testing for when a mapper's name isn't obvious
             string prefix = "Mapper: ";
-            string suffix = "</p>";
+            string suffix = "<"; //"</p>"; Some mapper names don't end with </p>
 
             int startIndex = innerText.IndexOf(prefix);
             if (startIndex < 0)
@@ -376,13 +376,14 @@ namespace SyncSaberService.Web
                 return BeastSaberReader.Feeds[FeedIndex].Name;
             }
         }
-        public int FeedIndex { get { return _feedIndex; } }
+        public int FeedIndex { get; set; }
+        public bool UseSongKeyAsOutputFolder { get; set; }
         public int MaxPages;
-        public int _feedIndex;
         public BeastSaberFeedSettings(int feedIndex, int _maxPages = 0)
         {
-            _feedIndex = feedIndex;
+            FeedIndex = feedIndex;
             MaxPages = _maxPages;
+            UseSongKeyAsOutputFolder = true;
         }
 
 
