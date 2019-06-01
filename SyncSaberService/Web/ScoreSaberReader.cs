@@ -25,12 +25,18 @@ namespace SyncSaberService.Web
         /// API Examples:
         /// https://scoresaber.com/api.php?function=get-leaderboards&cat=3&limit=50&page=1&ranked=1 // Sorted by PP
         /// https://scoresaber.com/api.php?function=get-leaderboards&cat=3&limit=10&page=1&search=honesty&ranked=1
+        /// cat options:
+        /// 0 = trending
+        /// 1 = date ranked
+        /// 2 = scores set
+        /// 3 = star rating
+        /// 4 = author
         #region Constants
         public static readonly string NameKey = "ScoreSaberReader";
         public static readonly string SourceKey = "ScoreSaber";
-        private static readonly string USERNAMEKEY = "{USERNAME}";
+        //private static readonly string USERNAMEKEY = "{USERNAME}";
         private static readonly string PAGENUMKEY = "{PAGENUM}";
-        private static readonly string CATKEY = "{CAT}";
+        //private static readonly string CATKEY = "{CAT}";
         private static readonly string RANKEDKEY = "{RANKKEY}";
         private static readonly string LIMITKEY = "{LIMIT}";
         private const string DefaultLoginUri = "https://bsaber.com/wp-login.php?jetpack-sso-show-default-form=1";
@@ -51,7 +57,10 @@ namespace SyncSaberService.Web
                 {
                     _feeds = new Dictionary<int, FeedInfo>()
                     {
-                        { 0, new FeedInfo("top ranked", $"https://scoresaber.com/api.php?function=get-leaderboards&cat={CATKEY}&limit={LIMITKEY}&page={PAGENUMKEY}&ranked={RANKEDKEY}") }
+                        { 0, new FeedInfo("top ranked", $"https://scoresaber.com/api.php?function=get-leaderboards&cat=3&limit={LIMITKEY}&page={PAGENUMKEY}&ranked={RANKEDKEY}") },
+                        { 1, new FeedInfo("trending", $"https://scoresaber.com/api.php?function=get-leaderboards&cat=0&limit={LIMITKEY}&page={PAGENUMKEY}&ranked={RANKEDKEY}") },
+                        { 2, new FeedInfo("top played", $"https://scoresaber.com/api.php?function=get-leaderboards&cat=2&limit={LIMITKEY}&page={PAGENUMKEY}&ranked={RANKEDKEY}") },
+                        { 3, new FeedInfo("latest ranked", $"https://scoresaber.com/api.php?function=get-leaderboards&cat=1&limit={LIMITKEY}&page={PAGENUMKEY}&ranked={RANKEDKEY}") }
                     };
                 }
                 return _feeds;
@@ -85,7 +94,7 @@ namespace SyncSaberService.Web
                         Logger.Debug($"Song with ID {song.id} already exists, updating");
                         retDict[song.id] = song;
                     }
-                    else if(retDict[song.id].SongVersion == song.SongVersion)
+                    else if (retDict[song.id].SongVersion == song.SongVersion)
                     {
                         Logger.Debug($"Tried to add a song we already got");
                     }
@@ -100,9 +109,6 @@ namespace SyncSaberService.Web
                 }
             }
             return retDict;
-
-
-
 
             /*
             var pageText = Web.HttpClientWrapper.GetPageText("https://scoresaber.com/api.php?function=get-leaderboards&cat=3&limit=50&page=1&ranked=1");
@@ -145,7 +151,6 @@ namespace SyncSaberService.Web
             List<SongInfo> songs = new List<SongInfo>();
             StringBuilder url = new StringBuilder(Feeds[settings.FeedIndex].BaseUrl);
             Dictionary<string, string> urlReplacements = new Dictionary<string, string>() {
-                { CATKEY, "3" },
                 {LIMITKEY, songsPerPage.ToString() },
                 {PAGENUMKEY, pageNum.ToString()},
                 {RANKEDKEY, "1" }
@@ -153,7 +158,7 @@ namespace SyncSaberService.Web
             GetPageUrl(ref url, urlReplacements);
 
             string pageText = GetPageText(url.ToString());
-            
+
             JObject result = new JObject();
             try
             {
@@ -164,13 +169,13 @@ namespace SyncSaberService.Web
                 Logger.Exception("Unable to parse JSON from text", ex);
             }
             songs.AddRange(GetSongsFromPage(pageText));
-
             List<Task<List<SongInfo>>> pageReadTasks = new List<Task<List<SongInfo>>>();
             bool continueLooping = true;
             do
             {
-                
                 pageNum++;
+                if (pageNum > settings.MaxPages)
+                    break;
                 url.Clear();
                 url.Append(Feeds[settings.FeedIndex].BaseUrl);
                 urlReplacements.AddOrUpdate(PAGENUMKEY, pageNum.ToString());
@@ -191,20 +196,19 @@ namespace SyncSaberService.Web
         public async Task<List<SongInfo>> GetSongsFromPageAsync(string url)
         {
             string pageText = await GetPageTextAsync(url).ConfigureAwait(false);
-            testBag.Add(pageText);
             List<SongInfo> songs = GetSongsFromPage(pageText);
             return songs;
         }
-        ConcurrentBag<string> testBag = new ConcurrentBag<string>();
         public List<SongInfo> GetSongsFromPage(string pageText)
         {
             var sssongs = GetSSSongsFromPage(pageText);
 
             List<SongInfo> songs = new List<SongInfo>();
             SongInfo tempSong;
+            sssongs.AsParallel().ForAll(s => s.PopulateFields());
             foreach (var song in sssongs)
             {
-                tempSong = song.GetSongInfo();
+                tempSong = song.Song;
                 if (tempSong != null && !string.IsNullOrEmpty(tempSong.key))
                 {
                     songs.Add(tempSong);
@@ -296,11 +300,13 @@ namespace SyncSaberService.Web
             }
         }
         public int FeedIndex { get { return _feedIndex; } }
+        public bool UseSongKeyAsOutputFolder { get; set; }
         public int MaxPages;
         public int _feedIndex;
         public ScoreSaberFeedSettings(int feedIndex)
         {
             _feedIndex = feedIndex;
+            UseSongKeyAsOutputFolder = true;
         }
     }
 }
