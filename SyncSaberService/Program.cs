@@ -20,7 +20,13 @@ namespace SyncSaberService
         {
             var thing = new SongInfo();
             Web.HttpClientWrapper.Initialize(5);
-            List<SongInfo> scrapedDict = ScrapedDataProvider.ReadScrapedFile(@"C:\Users\Jared\source\repos\SyncSaberService\SyncSaberService\bin\Debug\ScrapedData\combinedScrappedData.json");
+            Stopwatch timer = new Stopwatch();
+            Thread.Sleep(500);
+            timer.Start();
+            var scrapedDict = ScrapedDataProvider.ReadDefaultScrapedAsync();
+            timer.Stop();
+            Logger.Warning(timer.ElapsedMilliseconds.ToString());
+            scrapedDict.Wait();
             //using(StreamReader file = File.OpenText(@"C:\Users\Jared\source\repos\SyncSaberService\SyncSaberService\bin\Debug\ScrapedData\combinedScrappedData.json"))
             //{
             //    JsonSerializer serializer = new JsonSerializer();
@@ -66,7 +72,7 @@ namespace SyncSaberService
                 {
                     Logger.Exception("Error initializing Config", ex);
                 }
-                Tests();
+                //Tests();
                 try
                 {
                     if (args.Length > 0)

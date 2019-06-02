@@ -14,7 +14,7 @@ namespace SyncSaberService.Data
     {
         public static readonly string ASSEMBLY_PATH = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
         public static readonly DirectoryInfo DATA_DIRECTORY =  new DirectoryInfo(Path.Combine(ASSEMBLY_PATH, "ScrapedData"));
-        private static readonly FileInfo BEATSAVER_SCRAPE_PATH =
+        public static readonly FileInfo BEATSAVER_SCRAPE_PATH =
             new FileInfo(Path.Combine(ASSEMBLY_PATH, DATA_DIRECTORY.FullName, "combinedScrappedData.json"));
         private static List<SongInfo> _beatSaverScrape;
         public static List<SongInfo> BeatSaverScrape
@@ -39,6 +39,16 @@ namespace SyncSaberService.Data
                 }
 
             return results;
+        }
+
+        public static List<SongInfo> ReadDefaultScraped()
+        {
+            return ReadScrapedFile(BEATSAVER_SCRAPE_PATH.FullName);
+        }
+
+        public static async Task<List<SongInfo>> ReadDefaultScrapedAsync()
+        {
+            return await Task.Run(() => ReadDefaultScraped());
         }
 
     }

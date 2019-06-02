@@ -235,18 +235,21 @@ namespace SyncSaberService.Data
             }
         }
 
-        public static bool TryParseBeatSaver(JToken token, out SongInfoEnhanced song)
+        public static bool TryParseBeatSaver(JToken token, out SongInfo song)
         {
             string songIndex = token["key"]?.Value<string>();
             if (songIndex == null)
                 songIndex = "";
             bool successful = true;
+            SongInfoEnhanced enhancedSong;
             try
             {
-                song = token.ToObject<SongInfoEnhanced>(new JsonSerializer() {
+                enhancedSong = token.ToObject<SongInfoEnhanced>(new JsonSerializer() {
                     NullValueHandling = NullValueHandling.Ignore,
                     MissingMemberHandling = MissingMemberHandling.Ignore
                 });
+                song = enhancedSong.ToSongInfo();
+                song.EnhancedInfo = enhancedSong;
                 //Logger.Debug(song.ToString());
             }
             catch (Exception ex)
@@ -257,6 +260,25 @@ namespace SyncSaberService.Data
             }
             return successful;
         }
+
+        public SongInfo ToSongInfo()
+        {
+            SongInfo song = new SongInfo() {
+                key = this.key,
+                songName = songName,
+                songSubName = songSubName,
+                authorName = authorName,
+                bpm = bpm,
+                playedCount = playedCount,
+                upVotes = upVotes,
+                downVotes = downVotes,
+                hash = hashMd5,
+                
+                
+            };
+            return song;
+        }
+
 
         [JsonIgnore]
         public string Feed;
