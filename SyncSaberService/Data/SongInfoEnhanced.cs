@@ -56,8 +56,8 @@ namespace SyncSaberService.Data
         }
         private bool _songInfoPopulated = false;
         public bool SongInfoPopulated { get { return _songInfoPopulated; } }
-        private readonly Regex _digitRegex = new Regex("^[0-9]+$", RegexOptions.Compiled);
-        private readonly Regex _beatSaverRegex = new Regex("^[0-9]+-[0-9]+$", RegexOptions.Compiled);
+        private static readonly Regex _digitRegex = new Regex("^[0-9]+$", RegexOptions.Compiled);
+        private static readonly Regex _beatSaverRegex = new Regex("^[0-9]+-[0-9]+$", RegexOptions.Compiled);
 
         public object this[string propertyName]
         {

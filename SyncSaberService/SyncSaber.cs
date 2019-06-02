@@ -112,7 +112,7 @@ namespace SyncSaberService
                 try
                 {
                     string directoryName = Path.GetFileName(directory);
-                    if (this._beatSaverRegex.IsMatch(directoryName) && directoryName != songIndex)
+                    if (_beatSaverRegex.IsMatch(directoryName) && directoryName != songIndex)
                     {
                         string directoryId = directoryName.Substring(0, directoryName.IndexOf("-"));
                         if (directoryId == id)
@@ -132,7 +132,7 @@ namespace SyncSaberService
                             Directory.Delete(directoryToRemove, true);
                         }
                     }
-                    else if (this._digitRegex.IsMatch(directoryName) && directoryName == id)
+                    else if (_digitRegex.IsMatch(directoryName) && directoryName == id)
                     {
                         Logger.Info($"Deleting old song with identifier \"{directoryName}\" (current version: {id}-{version})");
                         Directory.Delete(directory, true);
@@ -272,9 +272,9 @@ namespace SyncSaberService
             return matchedSongs;
         }
 
-        private readonly Regex _digitRegex = new Regex("^[0-9]+$", RegexOptions.Compiled);
+        private static readonly Regex _digitRegex = new Regex("^[0-9]+$", RegexOptions.Compiled);
 
-        private readonly Regex _beatSaverRegex = new Regex("^[0-9]+-[0-9]+$", RegexOptions.Compiled);
+        private static readonly Regex _beatSaverRegex = new Regex("^[0-9]+-[0-9]+$", RegexOptions.Compiled);
 
         private readonly string _historyPath;
 
