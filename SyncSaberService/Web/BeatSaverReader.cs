@@ -262,7 +262,7 @@ namespace SyncSaberService.Web
             {
                 Logger.Error("Invalid page text: 'songs' field not found.");
             }
-            foreach (var song in songJSONAry)
+            foreach (JObject song in songJSONAry)
             {
                 //JSONObject song = (JSONObject) aKeyValue;
                 string songIndex = song["key"]?.Value<string>();

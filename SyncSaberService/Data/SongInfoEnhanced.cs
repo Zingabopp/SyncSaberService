@@ -283,8 +283,9 @@ namespace SyncSaberService.Data
             }
             set { _id = value; }
         }
+
         [JsonProperty("key")]
-        public string key;
+        public string key; // in Scraped
         [JsonProperty("name")]
         public string name;
         [JsonProperty("description")]
@@ -294,25 +295,25 @@ namespace SyncSaberService.Data
         [JsonProperty("uploaderId")]
         public int uploaderId;
         [JsonProperty("songName")]
-        public string songName;
+        public string songName; // in Scraped
         [JsonProperty("songSubName")]
-        public string songSubName;
+        public string songSubName; // in Scraped
         [JsonProperty("authorName")]
-        public string authorName;
+        public string authorName; // in Scraped
         [JsonProperty("bpm")]
-        public float bpm;
+        public float bpm; // in Scraped
         [JsonProperty("difficulties")]
         public Dictionary<string, BeatSaverSongDifficulty> difficulties;
         [JsonProperty("downloadCount")]
         public int downloadCount;
         [JsonProperty("playedCount")]
-        public int playedCount;
+        public int playedCount; // in Scraped
         [JsonProperty("upVotes")]
-        public int upVotes;
+        public int upVotes; // in Scraped
         [JsonProperty("upVotesTotal")]
         public int upVotesTotal;
         [JsonProperty("downVotes")]
-        public int downVotes;
+        public int downVotes; // in Scraped
         [JsonProperty("downVotesTotal")]
         public int downVotesTotal;
         [JsonProperty("rating")]

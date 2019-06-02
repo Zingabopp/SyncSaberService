@@ -10,7 +10,7 @@ using SyncSaberService.Web;
 
 namespace SyncSaberService.Data
 {
-    class ScoreSaberSong : SongInfoEnhanced
+    public class ScoreSaberSong : SongInfoEnhanced
     {
         public ScoreSaberSong()
         {
