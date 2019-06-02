@@ -67,12 +67,14 @@ namespace SyncSaberService.Data
         public string image { get; set; }
 
         [JsonIgnore]
-        public SongInfoEnhanced Song
+        public SongInfo Song
         {
             get
             {
-                this.PopulateFields();
-                return this as SongInfoEnhanced;
+                throw new NotImplementedException();
+                //this.PopulateFields();
+                //return this as SongInfoEnhanced;
+                return new SongInfo();
             }
         }
         /*

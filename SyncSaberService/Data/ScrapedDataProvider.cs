@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.IO;
 using System.Reflection;
 using Newtonsoft.Json;
+using System.Text.RegularExpressions;
 
 namespace SyncSaberService.Data
 {
@@ -40,5 +41,22 @@ namespace SyncSaberService.Data
             return results;
         }
 
+    }
+    // From: https://stackoverflow.com/questions/43747477/how-to-parse-huge-json-file-as-stream-in-json-net?rq=1
+    public static class JsonReaderExtensions
+    {
+        public static IEnumerable<T> SelectTokensWithRegex<T>(
+            this JsonReader jsonReader, Regex regex)
+        {
+            JsonSerializer serializer = new JsonSerializer();
+            while (jsonReader.Read())
+            {
+                if (regex.IsMatch(jsonReader.Path)
+                    && jsonReader.TokenType != JsonToken.PropertyName)
+                {
+                    yield return serializer.Deserialize<T>(jsonReader);
+                }
+            }
+        }
     }
 }
