@@ -272,7 +272,7 @@ namespace SyncSaberService.Web
 
                 if (SongInfo.TryParseBeatSaver(song, out SongInfo newSong))
                 {
-                    newSong.Feed = "followings"; // TODO: What?
+                    //newSong.Feed = "followings"; // TODO: What?
                     songs.Add(newSong);
                 }
                 else
@@ -280,7 +280,7 @@ namespace SyncSaberService.Web
                     if (!(string.IsNullOrEmpty(songIndex)))
                     {
                         Logger.Warning($"Couldn't parse song {songIndex}, using sparse definition.");
-                        songs.Add(new SongInfo(songIndex, songName, songUrl, author, "followings"));
+                        songs.Add(new SongInfo(songIndex, songName, songUrl, author));
                     }
                     else
                         Logger.Error("Unable to identify song, skipping");

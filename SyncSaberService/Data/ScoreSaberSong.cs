@@ -10,7 +10,7 @@ using SyncSaberService.Web;
 
 namespace SyncSaberService.Data
 {
-    class ScoreSaberSong : SongInfo
+    class ScoreSaberSong : SongInfoEnhanced
     {
         public ScoreSaberSong()
         {
@@ -67,12 +67,12 @@ namespace SyncSaberService.Data
         public string image { get; set; }
 
         [JsonIgnore]
-        public SongInfo Song
+        public SongInfoEnhanced Song
         {
             get
             {
                 this.PopulateFields();
-                return this as SongInfo;
+                return this as SongInfoEnhanced;
             }
         }
         /*

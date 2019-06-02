@@ -53,7 +53,7 @@
     <Compile Include="Config.cs" />
     <Compile Include="Data\ScoreSaberSong.cs" />
     <Compile Include="Data\ScrapedDataProvider.cs" />
-    <Compile Include="Data\ScrappedSong.cs" />
+    <Compile Include="Data\SongInfo.cs" />
     <Compile Include="SimpleJson.cs" />
     <Compile Include="Web\BeatSaverReader.cs" />
     <Compile Include="Web\DownloadBatch.cs" />
@@ -65,7 +65,7 @@
     <Compile Include="Playlist.cs" />
     <Compile Include="PlaylistIO.cs" />
     <Compile Include="PlaylistSong.cs" />
-    <Compile Include="Data\SongInfo.cs" />
+    <Compile Include="Data\SongInfoEnhanced.cs" />
     <Compile Include="SyncSaber.cs" />
     <Compile Include="Utilities.cs" />
     <Compile Include="Program.cs" />

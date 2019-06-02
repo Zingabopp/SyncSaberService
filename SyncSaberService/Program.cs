@@ -18,13 +18,13 @@ namespace SyncSaberService
     {
         private static void Tests()
         {
-            var thing = new ScrappedSong();
+            var thing = new SongInfo();
             Web.HttpClientWrapper.Initialize(5);
-            List<ScrappedSong> scrapedDict;
+            List<SongInfo> scrapedDict;
             using(StreamReader file = File.OpenText(@"C:\Users\Jared\source\repos\SyncSaberService\SyncSaberService\bin\Debug\ScrapedData\combinedScrappedData.json"))
             {
                 JsonSerializer serializer = new JsonSerializer();
-                scrapedDict = (List<ScrappedSong>) serializer.Deserialize(file, typeof(List<ScrappedSong>));
+                scrapedDict = (List<SongInfo>) serializer.Deserialize(file, typeof(List<SongInfo>));
             }
             
 

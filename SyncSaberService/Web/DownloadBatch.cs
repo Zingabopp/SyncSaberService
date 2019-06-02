@@ -45,7 +45,7 @@ namespace SyncSaberService.Web
             switch (job.Result)
             {
                 case DownloadJob.JobResult.SUCCESS:
-                    Logger.Info($"Finished job {song.key}-{song.name} by {song.authorName} successfully.");
+                    Logger.Info($"Finished job {song.key}-{song.songName} by {song.authorName} successfully.");
                     break;
                 case DownloadJob.JobResult.TIMEOUT:
                     Logger.Warning($"Job {song.key} failed due to download timeout.");
