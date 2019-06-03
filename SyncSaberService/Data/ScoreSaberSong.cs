@@ -10,7 +10,7 @@ using SyncSaberService.Web;
 
 namespace SyncSaberService.Data
 {
-    public class ScoreSaberSong : SongInfoEnhanced
+    public class ScoreSaberSong
     {
         public ScoreSaberSong()
         {
@@ -44,15 +44,15 @@ namespace SyncSaberService.Data
         [JsonProperty("uid")]
         public string uid { get; set; }
         [JsonProperty("id")]
-        public string md5Hash { get { return hashMd5; } set { hashMd5 = value; } }
-        //[JsonProperty("name")]
-        //public string name;
-        //[JsonProperty("songSubName")]
-        //public string songSubName;
+        public string md5Hash { get; set; }
+        [JsonProperty("name")]
+        private string name { get; set; }
+        [JsonProperty("songSubName")]
+        private string songSubName { get; set; }
         [JsonProperty("author")]
-        public string author { get { return authorName; } set { authorName = value; } }
-        //[JsonProperty("bpm")]
-        //public float bpm;
+        private string author { get; set; }
+        [JsonProperty("bpm")]
+        private float bpm { get; set; }
         [JsonProperty("diff")]
         public string difficulty { get; set; }
         [JsonProperty("scores")]
@@ -65,6 +65,19 @@ namespace SyncSaberService.Data
         public float stars { get; set; }
         [JsonProperty("image")]
         public string image { get; set; }
+
+        public SongInfo ToSongInfo()
+        {
+            SongInfo song = new SongInfo() {
+                songName = name,
+                songSubName = songSubName,
+                authorName = author,
+                bpm = bpm,
+                hash = md5Hash
+            };
+            return song;
+        }
+
 
         [JsonIgnore]
         public SongInfo Song
