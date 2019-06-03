@@ -170,6 +170,7 @@ namespace SyncSaberService.Data
                     _enhancedSongInfo = new SongInfoEnhanced();
                 return _enhancedSongInfo;
             }
+            set { _enhancedSongInfo = value; }
         }
 
         private ScoreSaberSong _scoreSaberInfo;
@@ -181,6 +182,7 @@ namespace SyncSaberService.Data
                     _scoreSaberInfo = new ScoreSaberSong();
                 return _scoreSaberInfo;
             }
+            set { _scoreSaberInfo = value; }
         }
 
         public SongInfo() { }
@@ -196,7 +198,7 @@ namespace SyncSaberService.Data
         {
 
         }
-
+        /*
         public static bool TryParseBeatSaver(JToken token, out SongInfo song)
         {
             string songIndex = token["key"]?.Value<string>();
@@ -219,7 +221,7 @@ namespace SyncSaberService.Data
             }
             return successful;
         }
-
+        */
         public override string ToString()
         {
             StringBuilder retStr = new StringBuilder();

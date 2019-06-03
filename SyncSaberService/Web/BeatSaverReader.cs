@@ -270,7 +270,7 @@ namespace SyncSaberService.Web
                 string author = song["uploader"]?.Value<string>();
                 string songUrl = "https://beatsaver.com/download/" + songIndex;
 
-                if (SongInfo.TryParseBeatSaver(song, out SongInfo newSong))
+                if (SongInfoEnhanced.TryParseBeatSaver(song, out SongInfo newSong))
                 {
                     //newSong.Feed = "followings"; // TODO: What?
                     songs.Add(newSong);
