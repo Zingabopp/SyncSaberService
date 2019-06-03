@@ -16,7 +16,7 @@ using System.Threading.Tasks.Dataflow;
 using System.Net.Http;
 using SyncSaberService.Data;
 using static SyncSaberService.Utilities;
-using static SyncSaberService.Web.HttpClientWrapper;
+using static SyncSaberService.Web.WebUtils;
 
 namespace SyncSaberService.Web
 {
@@ -181,7 +181,7 @@ namespace SyncSaberService.Web
             List<SongInfo> songs = new List<SongInfo>();
             SongInfo tempSong;
             //sssongs.AsParallel().WithDegreeOfParallelism(Config.MaxConcurrentPageChecks).ForAll(s => s.PopulateFields());
-            Parallel.ForEach(sssongs, new ParallelOptions { MaxDegreeOfParallelism = Config.MaxConcurrentPageChecks }, s => s.PopulateFields());
+            //Parallel.ForEach(sssongs, new ParallelOptions { MaxDegreeOfParallelism = Config.MaxConcurrentPageChecks }, s => s.PopulateFields());
             foreach (var song in sssongs)
             {
                 tempSong = song.Song;
@@ -191,7 +191,7 @@ namespace SyncSaberService.Web
                 }
                 else
                 {
-                    Logger.Warning($"Could not convert song {song.name} with hash {song.md5Hash} to a SongInfo, skipping...");
+                    Logger.Warning($"Could not convert song {song.Song.songName} with hash {song.md5Hash} to a SongInfo, skipping...");
                 }
             }
 
@@ -225,8 +225,8 @@ namespace SyncSaberService.Web
                 string songName = song["name"]?.Value<string>();
                 string author = song["author"]?.Value<string>();
                 //string songUrl = "https://beatsaver.com/download/" + songIndex;
-
-                if (ScoreSaberSong.TryParseScoreSaberSong(song, out ScoreSaberSong newSong))
+                ScoreSaberSong newSong = null;
+                if (ScoreSaberSong.TryParseScoreSaberSong(song, ref newSong))
                 {
                     //newSong.Feed = "followings";
                     songs.Add(newSong);

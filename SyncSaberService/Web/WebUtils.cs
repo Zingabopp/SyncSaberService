@@ -9,7 +9,7 @@ using System.Net;
 
 namespace SyncSaberService.Web
 {
-    public static class HttpClientWrapper
+    public static class WebUtils
     {
         private static bool _initialized = false;
         private static object lockObject = new object();
@@ -84,7 +84,7 @@ namespace SyncSaberService.Web
         public static async Task<string> GetPageTextAsync(string url)
         {
             //lock (lockObject)
-            
+
             string pageText = await httpClient.GetStringAsync(url);
             //Logger.Debug(pageText.Result);
             //Logger.Debug($"Got page text for {url}");
@@ -93,7 +93,7 @@ namespace SyncSaberService.Web
 
         public static void AddCookies(CookieContainer newCookies, Uri uri)
         {
-            lock(httpClientHandler)
+            lock (httpClientHandler)
             {
                 if (httpClientHandler.CookieContainer == null)
                     httpClientHandler.CookieContainer = newCookies;
@@ -105,6 +105,26 @@ namespace SyncSaberService.Web
         public static void AddCookies(CookieContainer newCookies, string url)
         {
             AddCookies(newCookies, new Uri(url));
+        }
+
+        public async static Task DownloadFileAsync(string downloadUrl, string path, bool overwrite = true)
+        {
+            var downloadTask = WebUtils.httpClient.GetAsync(downloadUrl).ContinueWith((requestTask) => {
+                HttpResponseMessage response = requestTask.Result;
+                response.EnsureSuccessStatusCode();
+                response.Content.ReadAsFileAsync(path, overwrite);
+            });
+            await downloadTask;
+        }
+
+        public async static Task<string> TryGetStringAsync(string url)
+        {
+            HttpResponseMessage response = await httpClient.GetAsync(url);
+            if(response.IsSuccessStatusCode)
+            {
+                return await response.Content.ReadAsStringAsync();
+            }
+            return string.Empty;
         }
     }
 

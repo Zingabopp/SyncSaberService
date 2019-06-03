@@ -9,7 +9,7 @@ namespace SyncSaberService.Web
         string Source { get; } // Name of the site
         bool Ready { get; }
         void PrepareReader();
-        List<SongInfo> GetSongsFromPage(string pageText);
+        //List<SongInfo> GetSongsFromPage(string pageText);
         //Dictionary<int, FeedInfo> Feeds { get; }
         Dictionary<int, SongInfo> GetSongsFromFeed(IFeedSettings settings);
         Playlist[] PlaylistsForFeed(int feedIndex);

@@ -10,6 +10,7 @@ using System.Net.Http;
 using System.Net;
 using System.Reflection;
 using System.Runtime.Serialization;
+using SyncSaberService.Web;
 
 namespace SyncSaberService.Data
 {
@@ -18,44 +19,11 @@ namespace SyncSaberService.Data
     /// </summary>
     public class SongInfoEnhanced
     {
-        private static readonly string SONG_DETAILS_URL_BASE = "https://beatsaver.com/api/songs/detail/";
-        private static readonly string SONG_BY_HASH_URL_BASE = "https://beatsaver.com/api/songs/search/hash/";
-        private static object lockObject = new object();
-        private static HttpClientHandler _httpClientHandler;
-        public static HttpClientHandler httpClientHandler
-        {
-            get
-            {
-                if (_httpClientHandler == null)
-                {
-                    _httpClientHandler = new HttpClientHandler();
-                    httpClientHandler.MaxConnectionsPerServer = 10;
-                    httpClientHandler.UseCookies = true;
-                }
-                return _httpClientHandler;
-            }
-        }
-        private static HttpClient _httpClient;
-        public static HttpClient httpClient
-        {
-            get
-            {
-                lock (lockObject)
-                {
-                    if (_httpClient == null)
-                    {
-                        _httpClient = new HttpClient(httpClientHandler);
-                        lock (_httpClient)
-                        {
-                            _httpClient.Timeout = new TimeSpan(0, 0, 10);
-                        }
-                    }
-                }
-                return _httpClient;
-            }
-        }
-        private bool _songInfoPopulated = false;
-        public bool SongInfoPopulated { get { return _songInfoPopulated; } }
+        private const string SONG_DETAILS_URL_BASE = "https://beatsaver.com/api/songs/detail/";
+        private const string SONG_BY_HASH_URL_BASE = "https://beatsaver.com/api/songs/search/hash/";
+
+        [JsonIgnore]
+        public bool Populated { get; private set; }
         private static readonly Regex _digitRegex = new Regex("^[0-9]+$", RegexOptions.Compiled);
         private static readonly Regex _beatSaverRegex = new Regex("^[0-9]+-[0-9]+$", RegexOptions.Compiled);
 
@@ -95,7 +63,7 @@ namespace SyncSaberService.Data
         /// <returns></returns>
         public static bool PopulateFields(SongInfoEnhanced song)
         {
-            if (song.SongInfoPopulated)
+            if (song.Populated)
                 return true;
             bool successful = true;
             SongGetMethod searchMethod;
@@ -114,7 +82,7 @@ namespace SyncSaberService.Data
                 return false;
             Task<string> pageReadTask;
             //lock (lockObject)
-            pageReadTask = httpClient.GetStringAsync(url);
+            pageReadTask = WebUtils.httpClient.GetStringAsync(url);
             pageReadTask.Wait();
             string pageText = pageReadTask.Result;
             JObject result = new JObject();
@@ -132,7 +100,7 @@ namespace SyncSaberService.Data
             else if (searchMethod == SongGetMethod.Hash)
                 JsonConvert.PopulateObject(result["songs"].First.ToString(), song);
 
-            song._songInfoPopulated = successful;
+            song.Populated = successful;
             return successful;
         }
 
@@ -154,7 +122,7 @@ namespace SyncSaberService.Data
         /// <returns></returns>
         public async Task<bool> PopulateFieldsAsync()
         {
-            if (SongInfoPopulated)
+            if (Populated)
                 return true;
             SongGetMethod searchMethod;
             string url;
@@ -176,7 +144,7 @@ namespace SyncSaberService.Data
             string pageText = "";
             try
             {
-                pageText = await httpClient.GetStringAsync(url);
+                pageText = await WebUtils.httpClient.GetStringAsync(url);
             }
             catch (TaskCanceledException)
             {
@@ -205,14 +173,14 @@ namespace SyncSaberService.Data
                     JsonConvert.PopulateObject(result["songs"].First.ToString(), this);
             }
             Logger.Debug($"Finished PopulateFieldsAsync for {key}");
-            _songInfoPopulated = successful;
+            Populated = successful;
             return successful;
         }
 
 
-        public SongInfoEnhanced()
+        public SongInfoEnhanced(SongInfo parent = null)
         {
-
+            _songInfo = parent;
         }
 
         public SongInfoEnhanced(string songIndex, string songName, string songUrl, string _authorName, string feedName = "")
@@ -228,10 +196,34 @@ namespace SyncSaberService.Data
         protected void OnDeserialized(StreamingContext context)
         {
             //if (!(this is ScoreSaberSong))
-            if(!this.GetType().IsSubclassOf(typeof(SongInfo)))
+            //if(!this.GetType().IsSubclassOf(typeof(SongInfo)))
+            //{
+            //    //Logger.Warning("SongInfo OnDeserialized");
+            Populated = true;
+            if (_songInfo == null)
             {
-                //Logger.Warning("SongInfo OnDeserialized");
-                _songInfoPopulated = true;
+                if (_beatSaverRegex.IsMatch(key))
+                    _songInfo = ScrapedDataProvider.GetSongByKey(key, false);
+                if (_songInfo == null)
+                    _songInfo = ScrapedDataProvider.GetSongByHash(hashMd5, false);
+
+                if (_songInfo == null)
+                {
+                    Logger.Info($"Couldn't find song {key} - {name} by {authorName}, generating new song info...");
+                    _songInfo = new SongInfo() {
+                        key = key,
+                        songName = songName,
+                        songSubName = songSubName,
+                        authorName = authorName,
+                        bpm = bpm,
+                        playedCount = playedCount,
+                        upVotes = upVotes,
+                        downVotes = downVotes,
+                        hash = hashMd5,
+                    };
+                    _songInfo.EnhancedInfo = this;
+                    ScrapedDataProvider.TryAddToScrapedData(_songInfo);
+                }
             }
         }
 
@@ -263,23 +255,43 @@ namespace SyncSaberService.Data
 
         public SongInfo ToSongInfo()
         {
-            SongInfo song = new SongInfo() {
-                key = this.key,
-                songName = songName,
-                songSubName = songSubName,
-                authorName = authorName,
-                bpm = bpm,
-                playedCount = playedCount,
-                upVotes = upVotes,
-                downVotes = downVotes,
-                hash = hashMd5,
-                
-                
-            };
-            return song;
+            if (!Populated)
+            {
+                Logger.Warning("Trying to create SongInfo from an unpopulated SongInfoEnhanced");
+                return null;
+            }
+            if (_songInfo == null)
+            {
+                if (_beatSaverRegex.IsMatch(key))
+                    _songInfo = ScrapedDataProvider.GetSongByKey(key, false);
+                if (_songInfo == null)
+                    _songInfo = ScrapedDataProvider.GetSongByHash(hashMd5, false);
+
+                if (_songInfo == null)
+                {
+                    Logger.Info($"Couldn't find song {key} - {name} by {authorName}, generating new song info...");
+                    _songInfo = new SongInfo() {
+                        key = key,
+                        songName = songName,
+                        songSubName = songSubName,
+                        authorName = authorName,
+                        bpm = bpm,
+                        playedCount = playedCount,
+                        upVotes = upVotes,
+                        downVotes = downVotes,
+                        hash = hashMd5,
+                    };
+                    _songInfo.EnhancedInfo = this;
+                    ScrapedDataProvider.TryAddToScrapedData(_songInfo);
+                    return _songInfo;
+                }
+                _songInfo.EnhancedInfo = this;
+            }
+            return _songInfo;
         }
 
-
+        [JsonIgnore]
+        private SongInfo _songInfo { get; set; }
         [JsonIgnore]
         public string Feed;
         [JsonIgnore]
@@ -457,7 +469,7 @@ namespace SyncSaberService.Data
             List<Task> populateTasks = new List<Task>();
             for (int i = 0; i < songs.Count(); i++)
             {
-                if (!songs.ElementAt(i).SongInfoPopulated)
+                if (!songs.ElementAt(i).Populated)
                     populateTasks.Add(songs.ElementAt(i).PopulateFieldsAsync());
             }
 
@@ -469,7 +481,7 @@ namespace SyncSaberService.Data
             List<Task> populateTasks = new List<Task>();
             for (int i = 0; i < songs.Count(); i++)
             {
-                if (!songs.ElementAt(i).SongInfoPopulated)
+                if (!songs.ElementAt(i).Populated)
                     populateTasks.Add(songs.ElementAt(i).PopulateFieldsAsync());
             }
 

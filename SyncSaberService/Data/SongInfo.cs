@@ -18,7 +18,9 @@ namespace SyncSaberService.Data
         // Link: https://raw.githubusercontent.com/andruzzzhka/BeatSaberScrappedData/master/combinedScrappedData.json
         private static readonly Regex _digitRegex = new Regex("^[0-9]+$", RegexOptions.Compiled);
         private static readonly Regex _beatSaverRegex = new Regex("^[0-9]+-[0-9]+$", RegexOptions.Compiled);
+        public const char IDENTIFIER_DELIMITER = (char) 0x220E;
         private const string DOWNLOAD_URL_BASE = "http://beatsaver.com/download/";
+        public bool Populated { get; private set; }
 
         [JsonIgnore]
         private int _id = 0;
@@ -50,6 +52,37 @@ namespace SyncSaberService.Data
         public string url;
         [JsonIgnore]
         private string _key;
+
+        [JsonIgnore]
+        private string _identifier;
+        [JsonIgnore]
+        public string Identifier
+        {
+            get
+            {
+                if(string.IsNullOrEmpty(_identifier))
+                {
+                    if (string.IsNullOrEmpty(hash))
+                        return string.Empty;
+                        if (string.IsNullOrEmpty(songName))
+                        return string.Empty;
+                    if (string.IsNullOrEmpty(songSubName))
+                        return string.Empty;
+                    if (string.IsNullOrEmpty(authorName))
+                        return string.Empty;
+                    if (bpm <= 0)
+                        return string.Empty;
+                    _identifier = string.Join(IDENTIFIER_DELIMITER.ToString(), new string[] {
+                        hash,
+                        songName,
+                        songSubName,
+                        authorName,
+                        bpm.ToString()
+                    });
+                }
+                return _identifier;
+            }
+        }
 
         #region Scraped Data
         [JsonProperty("key")]
@@ -167,7 +200,7 @@ namespace SyncSaberService.Data
             get
             {
                 if (_enhancedSongInfo == null)
-                    _enhancedSongInfo = new SongInfoEnhanced();
+                    _enhancedSongInfo = new SongInfoEnhanced(this);
                 return _enhancedSongInfo;
             }
             set { _enhancedSongInfo = value; }
@@ -257,6 +290,17 @@ namespace SyncSaberService.Data
                 Type myType = typeof(SongInfo);
                 PropertyInfo myPropInfo = myType.GetProperty(propertyName);
                 myPropInfo.SetValue(this, value, null);
+            }
+        }
+
+        [OnDeserialized]
+        protected void OnDeserialized(StreamingContext context)
+        {
+            //if (!(this is ScoreSaberSong))
+            if (!this.GetType().IsSubclassOf(typeof(SongInfo)))
+            {
+                //Logger.Warning("SongInfo OnDeserialized");
+                Populated = true;
             }
         }
     }

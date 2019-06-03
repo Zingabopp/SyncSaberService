@@ -12,12 +12,15 @@ namespace SyncSaberService.Data
 {
     public class ScoreSaberSong
     {
+        [JsonIgnore]
+        public bool Populated { get; private set; }
+
         public ScoreSaberSong()
         {
 
         }
 
-        public static bool TryParseScoreSaberSong(JToken token, out ScoreSaberSong song)
+        public static bool TryParseScoreSaberSong(JToken token, ref ScoreSaberSong song)
         {
             string songName = token["name"]?.Value<string>();
             if (songName == null)
@@ -68,13 +71,25 @@ namespace SyncSaberService.Data
 
         public SongInfo ToSongInfo()
         {
-            SongInfo song = new SongInfo() {
-                songName = name,
-                songSubName = songSubName,
-                authorName = author,
-                bpm = bpm,
-                hash = md5Hash
-            };
+            if (!Populated)
+            {
+                Logger.Warning("Trying to create SongInfo from an unpopulated ScoreSaberSong");
+                return null;
+            }
+            SongInfo song = ScrapedDataProvider.GetSongByHash(md5Hash, true);
+
+            if (song == null)
+            {
+                Logger.Info($"Couldn't find song {name} by {author}, generating new song info...");
+                song = new SongInfo() {
+                    songName = name,
+                    songSubName = songSubName,
+                    authorName = author,
+                    bpm = bpm,
+                    hash = md5Hash
+                };
+            }
+            song.ScoreSaberInfo = this;
             return song;
         }
 
@@ -84,11 +99,20 @@ namespace SyncSaberService.Data
         {
             get
             {
-                throw new NotImplementedException();
                 //this.PopulateFields();
                 //return this as SongInfoEnhanced;
-                return new SongInfo();
+                return ToSongInfo();
             }
+        }
+
+        [OnDeserialized]
+        protected void OnDeserialized(StreamingContext context)
+        {
+            //if (!(this is ScoreSaberSong))
+            //if (!this.GetType().IsSubclassOf(typeof(SongInfo)))
+            //{
+                //Logger.Warning("SongInfo OnDeserialized");
+                Populated = true;
         }
         /*
         public SongInfo GetSongInfo()

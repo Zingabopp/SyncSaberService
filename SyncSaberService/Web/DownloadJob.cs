@@ -104,20 +104,9 @@ namespace SyncSaberService.Web
 
             return successful;
         }
-        private System.Timers.Timer webTimer;
+
         private CancellationTokenSource _tokenSource;
 
-        private void WebTimer_Elapsed(object sender, ElapsedEventArgs e)
-        {
-            Logger.Debug($"WebTimer Elapsed for job {Song.key}, canceling download...");
-            _tokenSource.Cancel();
-        }
-        public void OnDownloadProgressChanged(object sender, DownloadProgressChangedEventArgs e)
-        {
-            Logger.Debug($"                 DownloadProgressChanged for {Song.key}, reseting Timeout");
-            //webTimer.Stop();
-            //webTimer.Start();
-        }
 
         public async Task<bool> DownloadFile(string url, string path)
         {
@@ -129,14 +118,7 @@ namespace SyncSaberService.Web
 
             var token = _tokenSource.Token;
 
-            webTimer = new System.Timers.Timer(Config.DownloadTimeout * 1000);
-            webTimer.Elapsed += WebTimer_Elapsed;
-
-            var downloadAsync = HttpClientWrapper.httpClient.GetAsync(url).ContinueWith((requestTask) => {
-                HttpResponseMessage response = requestTask.Result;
-                response.EnsureSuccessStatusCode();
-                response.Content.ReadAsFileAsync(path, true);
-            });
+            Task downloadAsync = WebUtils.DownloadFileAsync(url, path, true);
             await downloadAsync;
             if (downloadAsync.IsFaulted || !File.Exists(path))
             {
