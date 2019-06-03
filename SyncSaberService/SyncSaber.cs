@@ -184,14 +184,14 @@ namespace SyncSaberService
             }
             int totalSongs = songs.Count;
             Logger.Debug($"Finished checking pages, found {totalSongs} songs");
-            List<SongInfo> matchedSongs = DownloadSongs(songs, out int skippedSongs, _settings.UseSongKeyAsOutputFolder);
+            List<SongInfo> matchedSongs = DownloadSongs(songs, out (int exists, int history) skippedSongs, _settings.UseSongKeyAsOutputFolder);
             Logger.Debug("Jobs finished, Processing downloads...");
             int downloadCount = SuccessfulDownloads.Count;
             int failedCount = FailedDownloads.Count;
             ProcessDownloads(playlists);
             var timeElapsed = (DateTime.Now - startTime);
             Logger.Info($"Downloaded {downloadCount} songs from {reader.Source}'s {_settings.FeedName} feed in {FormatTimeSpan(timeElapsed)}. " +
-                $"Skipped {skippedSongs} songs that are in history or already exist{(failedCount > 0 ? $", failed to download {failedCount} songs." : "")}.");
+                $"Skipped {skippedSongs.exists} songs that already exist and {skippedSongs.history} that are in history{(failedCount > 0 ? $", failed to download {failedCount} songs." : "")}.");
 
         }
 
@@ -237,13 +237,14 @@ namespace SyncSaberService
         /// <param name="skippedsongs"></param>
         /// <param name="useSongKeyAsOutputFolder"></param>
         /// <returns></returns>
-        public List<SongInfo> DownloadSongs(Dictionary<int, SongInfo> queuedSongs, out int skippedsongs, bool useSongKeyAsOutputFolder)
+        public List<SongInfo> DownloadSongs(Dictionary<int, SongInfo> queuedSongs, out (int exists, int history) skipped, bool useSongKeyAsOutputFolder)
         {
             //var existingSongs = Directory.GetDirectories(CustomSongsPath);
             string tempPath = "";
             string outputPath = "";
             List<SongInfo> matchedSongs = new List<SongInfo>();
-            skippedsongs = 0;
+            
+            skipped.exists = skipped.history = 0;
             DownloadBatch jobs = new DownloadBatch();
             jobs.JobCompleted += OnJobFinished;
             foreach (var song in queuedSongs.Values)
@@ -261,7 +262,10 @@ namespace SyncSaberService
                 }
                 if (songExists || songInHistory)
                 {
-                    skippedsongs++;
+                    if (songExists)
+                        skipped.exists++;
+                    else
+                        skipped.history++;
                     //Logger.Debug($"Skipping song - SongExists: {songExists}, SongInHistory: {songInHistory}");
                     continue; // We already have the song or don't want it, skip
                 }
