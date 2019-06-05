@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 using SyncSaberService.Data;
+using System.Linq;
 
 namespace SyncSaberService.Web
 {
@@ -19,8 +21,11 @@ namespace SyncSaberService.Web
     {
         string FeedName { get; }
         int FeedIndex { get; }
+        int MaxSongs { get; set; }
+        bool searchOnline { get; set; }
         bool UseSongKeyAsOutputFolder { get; set; }
     }
+
     public struct FeedInfo
     {
         public FeedInfo(string _name, string _baseUrl)

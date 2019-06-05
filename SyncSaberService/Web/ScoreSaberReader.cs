@@ -77,12 +77,46 @@ namespace SyncSaberService.Web
             if (!(_settings is ScoreSaberFeedSettings settings))
                 throw new InvalidCastException(INVALID_FEED_SETTINGS_MESSAGE);
             List<SongInfo> songs = new List<SongInfo>();
-
-            switch (settings.FeedIndex)
+            int maxSongs = settings.MaxSongs > 0 ? settings.MaxSongs : settings.MaxSongs * settings.SongsPerPage;
+            switch ((ScoreSaberFeeds) settings.FeedIndex)
             {
-                // Author
-                case 0:
-                    songs.AddRange(GetTopPPSongs(settings));
+                case ScoreSaberFeeds.TRENDING:
+
+                    if (!settings.searchOnline)
+                    {
+                        if (maxSongs <= 0)
+                            throw new ArgumentException("You must specify a value greater than 0 for MaxPages or MaxSongs.");
+                        songs.AddRange(ScrapedDataProvider.SyncSaberScrape.Where(s => s.ScoreSaberInfo.Count > 0).OrderByDescending(s =>
+                        s.ScoreSaberInfo.Values.Select(ss => ss.hr24).Aggregate((a, b) => a + b)).Take(maxSongs));
+                    }
+                    break;
+                case ScoreSaberFeeds.LATEST_RANKED:
+                    if (!settings.searchOnline)
+                    {
+                        if (maxSongs <= 0)
+                            throw new ArgumentException("You must specify a value greater than 0 for MaxPages or MaxSongs.");
+                        songs.AddRange(ScrapedDataProvider.SyncSaberScrape.Where(s => s.RankedDifficulties.Count > 0).OrderByDescending(ss =>
+                        ss.ScoreSaberInfo.Keys.Max()).Take(maxSongs));
+                    }
+                    break;
+                case ScoreSaberFeeds.TOP_PLAYED:
+                    if (!settings.searchOnline)
+                    {
+                        if (maxSongs <= 0)
+                            throw new ArgumentException("You must specify a value greater than 0 for MaxPages or MaxSongs.");
+                        songs.AddRange(ScrapedDataProvider.SyncSaberScrape.Where(s => s.ScoreSaberInfo.Count > 0).OrderByDescending(s =>
+                        s.ScoreSaberInfo.Values.Select(ss => ss.scores).Aggregate((a, b) => a + b)).Take(maxSongs));
+                    }
+                    break;
+                case ScoreSaberFeeds.TOP_RANKED:
+                    if (!settings.searchOnline)
+                    {
+                        if (maxSongs <= 0)
+                            throw new ArgumentException("You must specify a value greater than 0 for MaxPages or MaxSongs.");
+                        songs.AddRange(ScrapedDataProvider.SyncSaberScrape.OrderByDescending(s => s.RankedDifficulties.Max(d => d.Value)).Take(maxSongs));
+                    }
+                    else
+                        songs.AddRange(GetTopPPSongs(settings));
                     break;
                 default:
                     break;
@@ -123,7 +157,15 @@ namespace SyncSaberService.Web
             int songsPerPage = 1000;
             int pageNum = 1;
             bool useMaxPages = settings.MaxPages != 0;
+            int maxSongs = settings.MaxSongs > 0 ? settings.MaxSongs : settings.MaxSongs * settings.SongsPerPage;
             List<SongInfo> songs = new List<SongInfo>();
+            if (!settings.searchOnline)
+            {
+                if (maxSongs <= 0)
+                    throw new ArgumentException("You must specify a value greater than 0 for MaxPages or MaxSongs.");
+                songs.AddRange(ScrapedDataProvider.SyncSaberScrape.OrderBy(s => s.RankedDifficulties.Max(d => d.Value)).Take(maxSongs));
+                return songs;
+            }
             StringBuilder url = new StringBuilder(Feeds[settings.Feed].BaseUrl);
             Dictionary<string, string> urlReplacements = new Dictionary<string, string>() {
                 {LIMITKEY, songsPerPage.ToString() },
@@ -184,10 +226,10 @@ namespace SyncSaberService.Web
             //Parallel.ForEach(sssongs, new ParallelOptions { MaxDegreeOfParallelism = Config.MaxConcurrentPageChecks }, s => s.PopulateFields());
             foreach (var song in sssongs)
             {
-                tempSong = ScrapedDataProvider.GetSong(song);
+                tempSong = ScrapedDataProvider.GetSong(song, false);
                 if (tempSong != null && !string.IsNullOrEmpty(tempSong.key))
                 {
-                    tempSong.ScoreSaberInfo.AddOrUpdate(song.uid, song);
+                    //tempSong.ScoreSaberInfo.AddOrUpdate(song.uid, song);
                     songs.Add(tempSong);
                 }
                 else
@@ -270,13 +312,15 @@ namespace SyncSaberService.Web
 
         }
 
-        public static List<SongInfo> ScrapeScoreSaber(int requestDelay, int songsPerPage, int maxPages = 0)
+        public static List<SongInfo> ScrapeScoreSaber(int requestDelay, int songsPerPage, bool rankedOnly, int maxPages = 0)
         {
             bool useMaxPages = maxPages != 0;
             List<SongInfo> songs = new List<SongInfo>();
-            string rankVal = "1";
+
+            string rankVal = rankedOnly ? "1" : "0";
             int songCount = 0;
             int pageNum = 1;
+
             StringBuilder url = new StringBuilder();
 
             bool continueLooping = true;
@@ -288,8 +332,8 @@ namespace SyncSaberService.Web
                 url.Replace(LIMITKEY, songsPerPage.ToString());
                 url.Replace(PAGENUMKEY, pageNum.ToString());
                 Thread.Sleep(requestDelay);
-                if (pageNum % 10 == 0)
-                    Logger.Info($"On page {pageNum}");
+
+                Logger.Info($"On page {pageNum}");
 
                 //Logger.Debug($"Creating task for {url}");
                 string pageText = GetPageText(url.ToString());
@@ -297,6 +341,10 @@ namespace SyncSaberService.Web
                 if (songs.Count == songCount)
                     continueLooping = false;
                 songCount = songs.Count;
+                if (pageText.ToLower().Contains("rate limit"))
+                {
+                    Logger.Warning("Rate limit exceeded?");
+                }
                 pageNum++;
                 if (useMaxPages && (pageNum > maxPages))
                     continueLooping = false;
@@ -312,13 +360,17 @@ namespace SyncSaberService.Web
 
     public class ScoreSaberFeedSettings : IFeedSettings
     {
+        public int SongsPerPage = 100;
         public string FeedName { get { return ScoreSaberReader.Feeds[Feed].Name; } }
         public ScoreSaberFeeds Feed { get { return (ScoreSaberFeeds) FeedIndex; } set { FeedIndex = (int) value; } }
         public int FeedIndex { get; set; }
         public bool UseSongKeyAsOutputFolder { get; set; }
+        public bool searchOnline { get; set; }
         public int MaxPages;
+        public int MaxSongs { get; set; }
         public ScoreSaberFeedSettings(int feedIndex)
         {
+            searchOnline = false;
             FeedIndex = feedIndex;
             UseSongKeyAsOutputFolder = true;
         }

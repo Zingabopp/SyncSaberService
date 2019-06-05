@@ -306,7 +306,7 @@ namespace SyncSaberService.Data
                 downVotes = downVotes,
                 hash = hashMd5,
             };
-            newSong.EnhancedInfo = this;
+            //newSong.EnhancedInfo = this;
             return newSong;
         }
 

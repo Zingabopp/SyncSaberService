@@ -226,10 +226,10 @@ namespace SyncSaberService.Data
             {
                 Type myType = typeof(SongInfo);
                 object retVal;
-                FieldInfo test = myType.GetField(propertyName);
-                if (test != null)
+                FieldInfo field = myType.GetField(propertyName);
+                if (field != null)
                 {
-                    retVal = test.GetValue(this);
+                    retVal = field.GetValue(this);
                 }
                 else
                 {

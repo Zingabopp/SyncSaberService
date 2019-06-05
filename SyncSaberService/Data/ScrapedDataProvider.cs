@@ -13,6 +13,7 @@ namespace SyncSaberService.Data
 {
     public static class ScrapedDataProvider
     {
+        private static bool _initialized = false;
         private const string SCRAPED_DATA_URL = "https://raw.githubusercontent.com/andruzzzhka/BeatSaberScrappedData/master/combinedScrappedData.json";
         public static readonly string ASSEMBLY_PATH = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
         public static readonly DirectoryInfo DATA_DIRECTORY = new DirectoryInfo(Path.Combine(ASSEMBLY_PATH, "ScrapedData"));
@@ -35,6 +36,8 @@ namespace SyncSaberService.Data
         {
             get
             {
+                if (!_initialized)
+                    throw new ApplicationException("ScrapedDataProvider is not initialized.");
                 if (_syncSaberScrape == null)
                     _syncSaberScrape = new List<SongInfo>();
                 return _syncSaberScrape;
@@ -44,6 +47,7 @@ namespace SyncSaberService.Data
         public static void Initialize()
         {
             _syncSaberScrape = ReadScrapedFile(SYNCSABER_SCRAPE_PATH.FullName);
+            _initialized = true;
         }
 
         public static List<SongInfo> ReadScrapedFile(string filePath)
@@ -159,7 +163,7 @@ namespace SyncSaberService.Data
 
         /// <summary>
         /// Attempts to find a SongInfo matching the provided SongInfoEnhanced.
-        /// It creates a new SongInfo and adds it to the ScrapedData if no match is found.
+        /// It creates a new SongInfo, attaches the provided SongInfoEnhanced, and adds it to the ScrapedData if no match is found.
         /// </summary>
         /// <param name="song"></param>
         /// <param name="searchOnline"></param>
@@ -172,6 +176,7 @@ namespace SyncSaberService.Data
                 songInfo = song.GenerateSongInfo();
                 TryAddToScrapedData(songInfo);
             }
+            songInfo.EnhancedInfo = song;
             return songInfo;
         }
 
@@ -183,12 +188,15 @@ namespace SyncSaberService.Data
                 songInfo = song.GenerateSongInfo();
                 SyncSaberScrape.Add(songInfo);
             }
+            songInfo.ScoreSaberInfo.AddOrUpdate(song.uid, song);
             return songInfo;
         }
 
         public static SongInfo GetSong(ScoreSaberSong song, bool searchOnline = true)
         {
             bool foundOnline = TryGetSongByHash(song.md5Hash, out SongInfo songInfo, searchOnline);
+            if (songInfo != null)
+                songInfo.ScoreSaberInfo.AddOrUpdate(song.uid, song);
             return songInfo;
         }
 

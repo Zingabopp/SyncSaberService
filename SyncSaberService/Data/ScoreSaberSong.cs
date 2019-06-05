@@ -112,10 +112,10 @@ namespace SyncSaberService.Data
             //{
             //Logger.Warning("SongInfo OnDeserialized");
             Populated = true;
-            var song = ScrapedDataProvider.SyncSaberScrape.Where(s => s.hash == md5Hash).FirstOrDefault();
-            if (song != null)
-                if (song.ScoreSaberInfo.AddOrUpdate(uid, this))
-                    Logger.Warning($"Adding the same ScoreSaberInfo {uid}-{difficulty} to song {name}");
+            //var song = ScrapedDataProvider.SyncSaberScrape.Where(s => s.hash == md5Hash).FirstOrDefault();
+            //if (song != null)
+            //    if (song.ScoreSaberInfo.AddOrUpdate(uid, this))
+            //        Logger.Warning($"Adding the same ScoreSaberInfo {uid}-{difficulty} to song {name}");
         }
 
         public SongInfo GenerateSongInfo()
@@ -126,7 +126,7 @@ namespace SyncSaberService.Data
                 authorName = author,
                 bpm = bpm
             };
-            newSong.ScoreSaberInfo.Add(uid, this);
+            //newSong.ScoreSaberInfo.Add(uid, this);
             return newSong;
         }
 

@@ -29,6 +29,7 @@ namespace SyncSaberService.Web
         private static readonly string PAGENUMKEY = "{PAGENUM}";
         private const string DefaultLoginUri = "https://bsaber.com/wp-login.php?jetpack-sso-show-default-form=1";
         private static readonly Uri FeedRootUri = new Uri("https://bsaber.com");
+        public const int SONGS_PER_PAGE = 50;
         #endregion
 
         public string Name { get { return NameKey; } }
@@ -89,7 +90,7 @@ namespace SyncSaberService.Web
                 Cookies = GetBSaberCookies(_username, _password);
                 AddCookies(Cookies, FeedRootUri);
                 for (int i = 0; i < Feeds.Keys.Count; i++)
-                    _earliestEmptyPage.AddOrUpdate((int)Feeds.Keys.ElementAt(i), 9999);
+                    _earliestEmptyPage.AddOrUpdate((int) Feeds.Keys.ElementAt(i), 9999);
                 Ready = true;
             }
         }
@@ -205,6 +206,7 @@ namespace SyncSaberService.Web
             }
 
             //Task.WaitAll(populateTasks.ToArray());
+            Logger.Info($"{songsOnPage.Count} songs on the page");
             return songsOnPage;
         }
 
@@ -217,7 +219,7 @@ namespace SyncSaberService.Web
 
         public string GetPageUrl(int feedIndex, int page)
         {
-            return GetPageUrl(Feeds[(BeastSaberFeeds)feedIndex].BaseUrl, page);
+            return GetPageUrl(Feeds[(BeastSaberFeeds) feedIndex].BaseUrl, page);
         }
 
         private static string GetMapperFromBsaber(string innerText)
@@ -374,9 +376,13 @@ namespace SyncSaberService.Web
         public int FeedIndex { get; set; }
         public BeastSaberFeeds Feed { get { return (BeastSaberFeeds) FeedIndex; } set { FeedIndex = (int) value; } }
         public bool UseSongKeyAsOutputFolder { get; set; }
+        public bool searchOnline { get; set; }
         public int MaxPages;
+        public int MaxSongs { get; set; }
         public BeastSaberFeedSettings(int feedIndex, int _maxPages = 0)
         {
+            MaxSongs = BeastSaberReader.SONGS_PER_PAGE * _maxPages;
+            searchOnline = true;
             FeedIndex = feedIndex;
             MaxPages = _maxPages;
             UseSongKeyAsOutputFolder = true;

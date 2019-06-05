@@ -46,7 +46,7 @@ namespace SyncSaberService.Web
                 {
                     _feeds = new Dictionary<BeatSaverFeeds, FeedInfo>()
                     {
-                        { (BeatSaverFeeds)0, new FeedInfo("author", "https://beatsaver.com/api/songs/byuser/" +  AUTHORIDKEY + "/" + PAGEKEY) },
+                        { (BeatSaverFeeds)0, new FeedInfo("author", "https://beatsaver.com/api/songs/byuser/" +  AUTHORIDKEY + "/" + PAGEKEY)},
                         { (BeatSaverFeeds)1, new FeedInfo("newest", "https://beatsaver.com/api/songs/new/" + PAGEKEY) },
                         { (BeatSaverFeeds)2, new FeedInfo("top", "https://beatsaver.com/api/songs/top/" + PAGEKEY) },
                         { (BeatSaverFeeds)98, new FeedInfo("search", $"https://beatsaver.com/api/songs/search/{SEARCHTYPEKEY}/{SEARCHKEY}") },
@@ -89,21 +89,16 @@ namespace SyncSaberService.Web
             return url.Replace(PAGEKEY, (pageIndex * SONGSPERUSERPAGE).ToString()).ToString();
         }
 
-        public static List<SongInfo> ScrapeBeatSaver(int requestDelay, int maxPages = 0)
+        public static List<SongInfo> ScrapeBeatSaver(int requestDelay, bool onlyGetNew, int maxPages = 0)
         {
-            int feedIndex = (int)BeatSaverFeeds.NEWEST;
+            int feedIndex = (int) BeatSaverFeeds.NEWEST;
             bool useMaxPages = maxPages != 0;
+            int latestVersion = ScrapedDataProvider.SyncSaberScrape.Max(s => s.SongVersion);
             List<SongInfo> songs = new List<SongInfo>();
             string pageText = GetPageText(GetPageUrl(feedIndex));
             JObject result = new JObject();
-            try
-            {
-                result = JObject.Parse(pageText);
-            }
-            catch (Exception ex)
-            {
-                Logger.Exception("Unable to parse JSON from text", ex);
-            }
+            try { result = JObject.Parse(pageText); }
+            catch (Exception ex) { Logger.Exception("Unable to parse JSON from text", ex); }
             string mapperId = string.Empty;
             int? numSongs = result["total"]?.Value<int>();
             if (numSongs == null || numSongs == 0) return songs;
@@ -112,6 +107,7 @@ namespace SyncSaberService.Web
             int songCount = 0;
             int pageNum = 0;
             string url = "";
+            List<SongInfo> newSongs;
             bool continueLooping = true;
             do
             {
@@ -120,9 +116,12 @@ namespace SyncSaberService.Web
                     Logger.Info($"On page {pageNum} / {totalPages}");
                 songCount = songs.Count;
                 url = GetPageUrl(feedIndex, pageNum);
-                //Logger.Debug($"Creating task for {url}");
-                songs.AddRange(GetSongsFromPage(url));
+
+                newSongs = GetSongsFromPage(url);
+                songs.AddRange(newSongs);
                 pageNum++;
+                if (newSongs.Min(s => s.SongVersion) <= latestVersion)
+                    continueLooping = false;
                 if ((pageNum * SONGSPERUSERPAGE >= numSongs))
                     continueLooping = false;
                 if (useMaxPages && (pageNum >= maxPages))
@@ -144,21 +143,34 @@ namespace SyncSaberService.Web
                 throw new InvalidCastException(INVALIDFEEDSETTINGSMESSAGE);
             List<SongInfo> songs = new List<SongInfo>();
 
-            switch (settings.FeedIndex)
+            switch ((BeatSaverFeeds) settings.FeedIndex)
             {
                 // Author
-                case 0:
+                case BeatSaverFeeds.AUTHOR:
+                    List<SongInfo> newSongs = null;
+                    string songSource = string.Empty;
                     foreach (var author in settings.Authors)
                     {
-                        songs.AddRange(GetSongsByAuthor(author));
+                        if (!settings.searchOnline)
+                        {
+                            newSongs = ScrapedDataProvider.SyncSaberScrape.Where(s => s.EnhancedInfo.uploader.ToLower() == author.ToLower()).ToList();
+                            songSource = "scraped data";
+                        }
+                        if (newSongs == null || newSongs.Count == 0)
+                        {
+                            newSongs = GetSongsByAuthor(author);
+                            songSource = "Beat Saver";
+                        }
+                        songs.AddRange(newSongs);
+                        Logger.Info($"Found {newSongs.Count} songs uploaded by {author} from {songSource}");
                     }
                     break;
                 // Newest
-                case 1:
+                case BeatSaverFeeds.NEWEST:
                     songs.AddRange(GetNewestSongs(settings));
                     break;
                 // Top
-                case 2:
+                case BeatSaverFeeds.TOP:
                     break;
                 default:
                     break;
@@ -268,7 +280,7 @@ namespace SyncSaberService.Web
 
             int? numSongs = result["total"]?.Value<int>();
             if (numSongs == null) numSongs = 0;
-            Logger.Info($"Found {numSongs} songs by {authorId} on Beat Saver");
+            //Logger.Info($"Found {numSongs} songs by {authorId} on Beat Saver");
             int songCount = 0;
             int pageNum = 0;
             List<Task<string>> pageReadTasks = new List<Task<string>>();
@@ -384,6 +396,7 @@ namespace SyncSaberService.Web
 
         public static SongInfo GetSongByKey(string key)
         {
+
             string url = BEATSAVER_DETAILS_BASE_URL + key;
             string pageText = "";
             SongInfoEnhanced song = new SongInfoEnhanced();
@@ -423,7 +436,10 @@ namespace SyncSaberService.Web
 
         public static string GetAuthorID(string authorName)
         {
-            string mapperId = _authors.GetOrAdd(authorName, (a) => {
+            string mapperId = ScrapedDataProvider.SyncSaberScrape.Where(s => s.EnhancedInfo.uploader.ToLower() == authorName.ToLower()).FirstOrDefault()?.EnhancedInfo.uploaderId.ToString();
+            if (!string.IsNullOrEmpty(mapperId))
+                return mapperId;
+            mapperId = _authors.GetOrAdd(authorName, (a) => {
                 int page = 0;
                 int? totalResults;
                 string searchURL, pageText;
@@ -465,8 +481,12 @@ namespace SyncSaberService.Web
 
         public static List<string> GetAuthorNamesByID(string mapperId)
         {
+            int id = int.Parse(mapperId);
+            List<string> authorNames = ScrapedDataProvider.SyncSaberScrape.Where(s => s.EnhancedInfo.uploaderId == id).Select(s => s.EnhancedInfo.authorName).Distinct().ToList();
+            if (authorNames.Count > 0)
+                return authorNames;
             List<SongInfo> songs = GetSongsByUploaderId(mapperId);
-            List<string> authorNames = songs.Select(s => s.authorName).Distinct().ToList();
+            authorNames = songs.Select(s => s.authorName).Distinct().ToList();
             authorNames.ForEach(n => Logger.Warning($"Found authorName: {n}"));
             return authorNames;
         }
@@ -482,9 +502,12 @@ namespace SyncSaberService.Web
         public BeatSaverFeeds Feed { get { return (BeatSaverFeeds) FeedIndex; } set { _feedIndex = (int) value; } }
         public int FeedIndex { get { return _feedIndex; } }
         public bool UseSongKeyAsOutputFolder { get; set; }
+        public bool searchOnline { get; set; }
+        public int MaxSongs { get; set; }
 
         public BeatSaverFeedSettings(int feedIndex)
         {
+            searchOnline = false;
             _feedIndex = feedIndex;
             UseSongKeyAsOutputFolder = true;
         }
