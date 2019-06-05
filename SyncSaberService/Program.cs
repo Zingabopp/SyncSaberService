@@ -21,6 +21,10 @@ namespace SyncSaberService
             //ScrapedDataProvider.Initialize();
             var thing = new SongInfo();
             Web.WebUtils.Initialize(5);
+
+            var test = new SyncSaberScrape();
+            test.Initialize();
+
             var trending = ScrapedDataProvider.SyncSaberScrape.Where(s => s.ScoreSaberInfo.Count > 0).OrderByDescending(s => s.ScoreSaberInfo.Values.Select(ss => ss.scores).Aggregate((a, b) => a + b)).Take(100);
             var detTrending = trending.Select(s => (s.ScoreSaberInfo.Values.Select(ss => ss.scores).Aggregate((a, b) => a + b), s)).ToList();
 
@@ -63,7 +67,7 @@ namespace SyncSaberService
                     Logger.Exception("Error initializing Config", ex);
                 }
                 ScrapedDataProvider.Initialize();
-                //Tests();
+                Tests();
                 try
                 {
                     if (args.Length > 0)

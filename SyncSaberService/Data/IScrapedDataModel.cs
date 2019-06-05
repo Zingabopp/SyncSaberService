@@ -1,0 +1,37 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.IO;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+
+namespace SyncSaberService.Data
+{
+    public abstract class IScrapedDataModel<T, DataType> 
+        where T : IEnumerable<DataType>, new()
+    {
+        T Data { get; }
+        bool ReadOnly { get; }
+        string DefaultPath { get; }
+        FileInfo CurrentFile { get; }
+
+        public virtual JToken ReadScrapedFile(string filePath)
+        {
+            JToken results = null;
+
+            if (File.Exists(filePath))
+                using (StreamReader file = File.OpenText(filePath))
+                {
+                    JsonSerializer serializer = new JsonSerializer();
+                    //results = (JObject)serializer.Deserialize(file, typeof(JObject));
+                    results = JToken.Parse(file.ReadToEnd());
+                }
+            return results;
+        }
+        public abstract void WriteFile(string filePath);
+        public abstract void Initialize(string filePath);
+        
+    }
+}
