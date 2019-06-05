@@ -137,11 +137,14 @@ namespace SyncSaberService.Data
                     _rankedDiffs = new Dictionary<string, float>();
                     foreach (var key in ScoreSaberInfo.Keys)
                     {
-                        if (hash.ToUpper() == ScoreSaberInfo[key].md5Hash.ToUpper())
-                            _rankedDiffs.AddOrUpdate(ScoreSaberInfo[key].difficulty, ScoreSaberInfo[key].stars);
-                        else
-                            Logger.Debug($"Ranked version of {key} - {songName} is outdated.\n" +
-                                $"   {hash.ToUpper()} != {ScoreSaberInfo[key].md5Hash.ToUpper()}");
+                        if (ScoreSaberInfo[key].ranked)
+                        {
+                            if (hash.ToUpper() == ScoreSaberInfo[key].md5Hash.ToUpper())
+                                _rankedDiffs.AddOrUpdate(ScoreSaberInfo[key].difficulty, ScoreSaberInfo[key].stars);
+                            else
+                                Logger.Debug($"Ranked version of {key} - {songName} is outdated.\n" +
+                                    $"   {hash.ToUpper()} != {ScoreSaberInfo[key].md5Hash.ToUpper()}");
+                        }
                     }
                 }
                 return _rankedDiffs;

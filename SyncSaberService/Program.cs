@@ -185,8 +185,9 @@ namespace SyncSaberService
                         try
                         {
                             //ss.DownloadBeastSaberFeed(2, Web.BeastSaberReader.GetMaxBeastSaberPages(2));
-                            ss.DownloadSongsFromFeed(ScoreSaberReader.NameKey, new ScoreSaberFeedSettings((int)ScoreSaberFeeds.TOP_RANKED) {
-                                MaxPages = Config.MaxScoreSaberPages
+                            ss.DownloadSongsFromFeed(ScoreSaberReader.NameKey, new ScoreSaberFeedSettings((int) ScoreSaberFeeds.TOP_RANKED) {
+                                MaxPages = Config.MaxScoreSaberPages,
+                                searchOnline = false
                             });
                         }
                         catch (Exception ex)

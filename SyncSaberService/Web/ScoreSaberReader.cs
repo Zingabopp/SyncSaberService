@@ -77,7 +77,7 @@ namespace SyncSaberService.Web
             if (!(_settings is ScoreSaberFeedSettings settings))
                 throw new InvalidCastException(INVALID_FEED_SETTINGS_MESSAGE);
             List<SongInfo> songs = new List<SongInfo>();
-            int maxSongs = settings.MaxSongs > 0 ? settings.MaxSongs : settings.MaxSongs * settings.SongsPerPage;
+            int maxSongs = settings.MaxSongs > 0 ? settings.MaxSongs : settings.SongsPerPage * settings.SongsPerPage;
             switch ((ScoreSaberFeeds) settings.FeedIndex)
             {
                 case ScoreSaberFeeds.TRENDING:
@@ -133,7 +133,7 @@ namespace SyncSaberService.Web
                         retDict[song.id] = song;
                     }
                     else if (retDict[song.id].SongVersion == song.SongVersion)
-                        Logger.Debug($"Tried to add a song we already got");
+                        Logger.Debug($"Tried to add a song we already have");
                     else
                         Logger.Debug($"Song with ID {song.id} is already the newest version");
                 }
@@ -157,15 +157,8 @@ namespace SyncSaberService.Web
             int songsPerPage = 1000;
             int pageNum = 1;
             bool useMaxPages = settings.MaxPages != 0;
-            int maxSongs = settings.MaxSongs > 0 ? settings.MaxSongs : settings.MaxSongs * settings.SongsPerPage;
             List<SongInfo> songs = new List<SongInfo>();
-            if (!settings.searchOnline)
-            {
-                if (maxSongs <= 0)
-                    throw new ArgumentException("You must specify a value greater than 0 for MaxPages or MaxSongs.");
-                songs.AddRange(ScrapedDataProvider.SyncSaberScrape.OrderBy(s => s.RankedDifficulties.Max(d => d.Value)).Take(maxSongs));
-                return songs;
-            }
+
             StringBuilder url = new StringBuilder(Feeds[settings.Feed].BaseUrl);
             Dictionary<string, string> urlReplacements = new Dictionary<string, string>() {
                 {LIMITKEY, songsPerPage.ToString() },
