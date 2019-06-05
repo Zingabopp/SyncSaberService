@@ -36,9 +36,14 @@ namespace SyncSaberService.Data
             get
             {
                 if (_syncSaberScrape == null)
-                    _syncSaberScrape = ReadScrapedFile(SYNCSABER_SCRAPE_PATH.FullName);
+                    _syncSaberScrape = new List<SongInfo>();
                 return _syncSaberScrape;
             }
+        }
+
+        public static void Initialize()
+        {
+            _syncSaberScrape = ReadScrapedFile(SYNCSABER_SCRAPE_PATH.FullName);
         }
 
         public static List<SongInfo> ReadScrapedFile(string filePath)
@@ -79,28 +84,45 @@ namespace SyncSaberService.Data
 
         }
 
-        public static SongInfo GetSongByHash(string hash, bool searchOnline = true)
+        /// <summary>
+        /// Attempts to find a song with the provided hash. If there's no matching
+        /// song in the ScrapedData and searchOnline is true, it searches Beat Saver. If a match is found
+        /// online, it adds the SongInfo to the ScrapedData. Returns true if a SongInfo is found.
+        /// </summary>
+        /// <param name="hash"></param>
+        /// <param name="song"></param>
+        /// <param name="searchOnline"></param>
+        /// <returns></returns>
+        public static bool TryGetSongByHash(string hash, out SongInfo song, bool searchOnline = true)
         {
-            SongInfo song = SyncSaberScrape.Where(s => s.hash.ToUpper() == hash.ToUpper()).FirstOrDefault();
+            song = SyncSaberScrape.Where(s => s.hash.ToUpper() == hash.ToUpper()).FirstOrDefault();
             if (song == null && searchOnline)
             {
                 Logger.Info($"Song with hash: {hash}, not in scraped data, searching Beat Saver...");
                 song = BeatSaverReader.Search(hash, BeatSaverReader.SearchType.hash).FirstOrDefault();
-                if(song != null)
+                if (song != null)
                 {
-                    lock(SyncSaberScrape)
-                    {
-                        SyncSaberScrape.Add(song);
-                    }
+                    TryAddToScrapedData(song);
                 }
+                else
+                    Logger.Warning($"Unable to find song with hash {hash} on Beat Saver, skipping.");
             }
 
-            return song;
+            return song != null;
         }
 
-        public static SongInfo GetSongByKey(string key, bool searchOnline = true)
+        /// <summary>
+        /// Attempts to find a song with the provided Beat Saver song ID. If there's no matching
+        /// song in the ScrapedData and searchOnline is true, it searches Beat Saver. If a match is found
+        /// online, it adds the SongInfo to the ScrapedData. Returns true if a SongInfo is found.
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="song"></param>
+        /// <param name="searchOnline"></param>
+        /// <returns></returns>
+        public static bool TryGetSongByKey(string key, out SongInfo song, bool searchOnline = true)
         {
-            SongInfo song = SyncSaberScrape.Where(s => s.key == key).FirstOrDefault();
+            song = SyncSaberScrape.Where(s => s.key == key).FirstOrDefault();
             if (song == null && searchOnline)
             {
                 Logger.Info($"Song with key: {key}, not in scraped data, searching Beat Saver...");
@@ -109,22 +131,65 @@ namespace SyncSaberService.Data
                 {
                     TryAddToScrapedData(song);
                 }
+                else
+                    Logger.Warning($"Unable to find song with key {key} on Beat Saver, skipping.");
             }
 
-            return song;
+            return song != null;
         }
 
-        public static void TryAddToScrapedData(SongInfo song)
+        /// <summary>
+        /// Adds the provided SongInfo to the ScrapedData if song isn't already in there.
+        /// </summary>
+        /// <param name="song"></param>
+        /// <returns></returns>
+        public static bool TryAddToScrapedData(SongInfo song)
         {
             if (SyncSaberScrape.Where(s => s.hash.ToLower() == song.hash.ToLower()).Count() == 0)
             {
-                Logger.Debug($"Adding song {song.key} - {song.songName} by {song.authorName} to ScrapedData");
-                lock (ScrapedDataProvider.SyncSaberScrape)
+                //Logger.Debug($"Adding song {song.key} - {song.songName} by {song.authorName} to ScrapedData");
+                lock (SyncSaberScrape)
                 {
-
-                    ScrapedDataProvider.SyncSaberScrape.Add(song);
+                    SyncSaberScrape.Add(song);
                 }
+                return true;
             }
+            return false;
+        }
+
+        /// <summary>
+        /// Attempts to find a SongInfo matching the provided SongInfoEnhanced.
+        /// It creates a new SongInfo and adds it to the ScrapedData if no match is found.
+        /// </summary>
+        /// <param name="song"></param>
+        /// <param name="searchOnline"></param>
+        /// <returns></returns>
+        public static SongInfo GetOrCreateSong(SongInfoEnhanced song, bool searchOnline = true)
+        {
+            bool foundOnline = TryGetSongByHash(song.hashMd5, out SongInfo songInfo, searchOnline);
+            if (songInfo == null)
+            {
+                songInfo = song.GenerateSongInfo();
+                TryAddToScrapedData(songInfo);
+            }
+            return songInfo;
+        }
+
+        public static SongInfo GetOrCreateSong(ScoreSaberSong song, bool searchOnline = true)
+        {
+            bool foundOnline = TryGetSongByHash(song.md5Hash, out SongInfo songInfo, searchOnline);
+            if (songInfo == null)
+            {
+                songInfo = song.GenerateSongInfo();
+                SyncSaberScrape.Add(songInfo);
+            }
+            return songInfo;
+        }
+
+        public static SongInfo GetSong(ScoreSaberSong song, bool searchOnline = true)
+        {
+            bool foundOnline = TryGetSongByHash(song.md5Hash, out SongInfo songInfo, searchOnline);
+            return songInfo;
         }
 
     }

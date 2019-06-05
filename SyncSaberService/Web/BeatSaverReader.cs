@@ -107,13 +107,17 @@ namespace SyncSaberService.Web
             string mapperId = string.Empty;
             int? numSongs = result["total"]?.Value<int>();
             if (numSongs == null || numSongs == 0) return songs;
-            Logger.Info($"{numSongs} songs available");
+            var totalPages = numSongs / SONGSPERUSERPAGE;
+            Logger.Info($"{numSongs} songs available on {totalPages} pages");
             int songCount = 0;
             int pageNum = 0;
             string url = "";
             bool continueLooping = true;
             do
             {
+                Thread.Sleep(requestDelay);
+                if (pageNum % 10 == 0)
+                    Logger.Info($"On page {pageNum} / {totalPages}");
                 songCount = songs.Count;
                 url = GetPageUrl(feedIndex, pageNum);
                 //Logger.Debug($"Creating task for {url}");
@@ -324,10 +328,12 @@ namespace SyncSaberService.Web
                 string author = song["uploader"]?.Value<string>();
                 string songUrl = "https://beatsaver.com/download/" + songIndex;
 
-                if (SongInfoEnhanced.TryParseBeatSaver(song, out SongInfo newSong))
+                if (SongInfoEnhanced.TryParseBeatSaver(song, out SongInfoEnhanced newSong))
                 {
                     //newSong.Feed = "followings"; // TODO: What?
-                    songs.Add(newSong);
+                    SongInfo songInfo = ScrapedDataProvider.GetOrCreateSong(newSong, false);
+                    songInfo.EnhancedInfo = newSong;
+                    songs.Add(songInfo);
                 }
                 else
                 {
@@ -412,7 +418,7 @@ namespace SyncSaberService.Web
             }
 
             JsonConvert.PopulateObject(result["song"].ToString(), song);
-            return song.ToSongInfo();
+            return ScrapedDataProvider.GetOrCreateSong(song);
         }
 
         public static string GetAuthorID(string authorName)

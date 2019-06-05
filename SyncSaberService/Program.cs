@@ -18,16 +18,27 @@ namespace SyncSaberService
     {
         private static void Tests()
         {
+            ScrapedDataProvider.Initialize();
             var thing = new SongInfo();
             Web.WebUtils.Initialize(5);
             var reader = new BeatSaverReader();
-            var ssongs = ScrapedDataProvider.SyncSaberScrape;
-            var scrapeSongs = BeatSaverReader.ScrapeBeatSaver(0, 2);
+            var ssongs = ScrapedDataProvider.SyncSaberScrape.OrderByDescending(s => s.id).ToList();
+            var beatSaverTop = BeatSaverReader.GetSongsFromPage("https://beatsaver.com/api/songs/top/");
+            var believer = ScrapedDataProvider.SyncSaberScrape.Where(s => s.songName.ToLower().Contains("believer"));
+            //var SSReader = new ScoreSaberReader();
+            //ScoreSaberReader.ScrapeScoreSaber(3000, 500);
+            var diffs = ssongs.Where(s => s.RankedDifficulties.Count > 0).OrderByDescending(s => s.RankedDifficulties.Max(d => d.Value)).Select(s => s.hash).ToList();
+            //var maybe = diffs.Where(s => s.id == 6602).ToList();
+            var ranked = ssongs.Where(s => s.ScoreSaberInfo.Values.Where(ss => ss.ranked == true).Count() > 0).Select(s => s.hash).ToList();
+            var difference = ranked.Where(r => !diffs.Contains(r)).ToList();
+            var difSongs = ssongs.Where(s => difference.Contains(s.hash)).ToList();
+            //var scoreSaberSongs = SSReader.GetTopPPSongs(new ScoreSaberFeedSettings(0) { MaxPages = 1 });
+            //var scrapeSongs = BeatSaverReader.ScrapeBeatSaver(500, 0);
             ScrapedDataProvider.UpdateScrapedFile();
             var newSongs = reader.GetNewestSongs(new BeatSaverFeedSettings((int) BeatSaverFeeds.NEWEST) { MaxPages = 2 });
             var authors = BeatSaverReader.GetAuthorNamesByID("1089");
-            var testSong = ScrapedDataProvider.GetSongByHash("ea6b61e0af09755d77b8c9c2f006bd39");
-            testSong = ScrapedDataProvider.GetSongByHash("ea6b61e0af09755d77b8c9c2f006bd39");
+            ScrapedDataProvider.TryGetSongByHash("ea6b61e0af09755d77b8c9c2f006bd39", out SongInfo testSong);
+            ScrapedDataProvider.TryGetSongByHash("ea6b61e0af09755d77b8c9c2f006bd39", out testSong);
             Stopwatch timer = new Stopwatch();
             Thread.Sleep(500);
             timer.Start();
@@ -50,12 +61,12 @@ namespace SyncSaberService
             testTask.Wait();
             var searchTest = BeatSaverReader.Search("6A097D39A5FA94F3B736E6EEF5A519A2", BeatSaverReader.SearchType.hash);
             var testReader = new ScoreSaberReader();
-            var sssongs = testReader.GetSSSongsFromPage(WebUtils.GetPageText("https://scoresaber.com/api.php?function=get-leaderboards&cat=3&limit=5&page=39&ranked=1"));
+            var sssongs = ScoreSaberReader.GetSSSongsFromPage(WebUtils.GetPageText("https://scoresaber.com/api.php?function=get-leaderboards&cat=3&limit=5&page=39&ranked=1"));
             foreach (var sssong in sssongs)
             {
                 //sssong.PopulateFields();
             }
-            var songs = testReader.GetSongsFromFeed(new ScoreSaberFeedSettings(0) {
+            var songs = testReader.GetSongsFromFeed(new ScoreSaberFeedSettings((int)ScoreSaberFeeds.TOP_RANKED) {
                 MaxPages = 10
             });
 
@@ -204,7 +215,7 @@ namespace SyncSaberService
                         try
                         {
                             //ss.DownloadBeastSaberFeed(2, Web.BeastSaberReader.GetMaxBeastSaberPages(2));
-                            ss.DownloadSongsFromFeed(ScoreSaberReader.NameKey, new ScoreSaberFeedSettings(0) {
+                            ss.DownloadSongsFromFeed(ScoreSaberReader.NameKey, new ScoreSaberFeedSettings((int)ScoreSaberFeeds.TOP_RANKED) {
                                 MaxPages = Config.MaxScoreSaberPages
                             });
                         }

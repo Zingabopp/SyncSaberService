@@ -42,24 +42,29 @@ namespace SyncSaberService.Data
             }
             return successful;
         }
-
-
         [JsonProperty("uid")]
-        public string uid { get; set; }
+        public int uid { get; set; }
         [JsonProperty("id")]
         public string md5Hash { get; set; }
         [JsonProperty("name")]
-        private string name { get; set; }
+        public string name { get; set; }
         [JsonProperty("songSubName")]
-        private string songSubName { get; set; }
+        public string songSubName { get; set; }
         [JsonProperty("author")]
-        private string author { get; set; }
+        public string author { get; set; }
         [JsonProperty("bpm")]
-        private float bpm { get; set; }
+        public float bpm { get; set; }
+        [JsonIgnore]
+        private string _diff;
         [JsonProperty("diff")]
-        public string difficulty { get; set; }
+        public string difficulty
+        {
+            get { return _diff; }
+            set { _diff = ConvertDiff(value); }
+        }
         [JsonProperty("scores")]
-        public string scores { get; set; }
+        [JsonConverter(typeof(IntegerWithCommasConverter))]
+        public int scores { get; set; }
         [JsonProperty("24hr")]
         public int hr24 { get; set; }
         [JsonProperty("ranked")]
@@ -68,7 +73,7 @@ namespace SyncSaberService.Data
         public float stars { get; set; }
         [JsonProperty("image")]
         public string image { get; set; }
-
+        /*
         public SongInfo ToSongInfo()
         {
             if (!Populated)
@@ -76,12 +81,14 @@ namespace SyncSaberService.Data
                 Logger.Warning("Trying to create SongInfo from an unpopulated ScoreSaberSong");
                 return null;
             }
-            SongInfo song = ScrapedDataProvider.GetSongByHash(md5Hash, true);
+            if (Song == null)
+                Song = ScrapedDataProvider.GetSongByHash(md5Hash, true);
 
-            if (song == null)
+
+            if (Song == null)
             {
                 Logger.Info($"Couldn't find song {name} by {author}, generating new song info...");
-                song = new SongInfo() {
+                Song = new SongInfo() {
                     songName = name,
                     songSubName = songSubName,
                     authorName = author,
@@ -89,31 +96,67 @@ namespace SyncSaberService.Data
                     hash = md5Hash
                 };
             }
-            song.ScoreSaberInfo = this;
-            return song;
-        }
-
-
-        [JsonIgnore]
-        public SongInfo Song
-        {
-            get
+            int intUid = int.Parse(uid);
+            if (!(Song.ScoreSaberInfo.ContainsKey(intUid) && Song.ScoreSaberInfo[intUid] != this))
             {
-                //this.PopulateFields();
-                //return this as SongInfoEnhanced;
-                return ToSongInfo();
+                Song.ScoreSaberInfo.AddOrUpdate(intUid, this);
             }
+            return Song;
         }
-
+        */
         [OnDeserialized]
         protected void OnDeserialized(StreamingContext context)
         {
             //if (!(this is ScoreSaberSong))
             //if (!this.GetType().IsSubclassOf(typeof(SongInfo)))
             //{
-                //Logger.Warning("SongInfo OnDeserialized");
-                Populated = true;
+            //Logger.Warning("SongInfo OnDeserialized");
+            Populated = true;
+            var song = ScrapedDataProvider.SyncSaberScrape.Where(s => s.hash == md5Hash).FirstOrDefault();
+            if (song != null)
+                if (song.ScoreSaberInfo.AddOrUpdate(uid, this))
+                    Logger.Warning($"Adding the same ScoreSaberInfo {uid}-{difficulty} to song {name}");
         }
+
+        public SongInfo GenerateSongInfo()
+        {
+            var newSong = new SongInfo() {
+                songName = name,
+                songSubName = songSubName,
+                authorName = author,
+                bpm = bpm
+            };
+            newSong.ScoreSaberInfo.Add(uid, this);
+            return newSong;
+        }
+
+        private const string EASYKEY = "_easy_solostandard";
+        private const string NORMALKEY = "_normal_solostandard";
+        private const string HARDKEY = "_hard_solostandard";
+        private const string EXPERTKEY = "_expert_solostandard";
+        private const string EXPERTPLUSKEY = "_expertplus_solostandard";
+        public static string ConvertDiff(string diffString)
+        {
+            diffString = diffString.ToLower();
+            if (!diffString.Contains("solostandard"))
+                return diffString;
+            switch (diffString)
+            {
+                case EXPERTPLUSKEY:
+                    return "ExpertPlus";
+                case EXPERTKEY:
+                    return "Expert";
+                case HARDKEY:
+                    return "Hard";
+                case NORMALKEY:
+                    return "Normal";
+                case EASYKEY:
+                    return "Easy";
+                default:
+                    return diffString;
+            }
+        }
+
         /*
         public SongInfo GetSongInfo()
         {
@@ -130,7 +173,7 @@ namespace SyncSaberService.Data
     }
 }
 
-/// 198	
+
 //uid	8497
 //id	"44C9544A577E5B8DC3876F9F696A7F92"
 //name	"Redo"

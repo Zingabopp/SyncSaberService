@@ -12,6 +12,7 @@ using System.Reflection;
 using System.Runtime.Serialization;
 using SyncSaberService.Web;
 
+
 namespace SyncSaberService.Data
 {
     /// <summary>
@@ -177,11 +178,7 @@ namespace SyncSaberService.Data
             return successful;
         }
 
-
-        public SongInfoEnhanced(SongInfo parent = null)
-        {
-            _songInfo = parent;
-        }
+        public SongInfoEnhanced() { }
 
         public SongInfoEnhanced(string songIndex, string songName, string songUrl, string _authorName, string feedName = "")
         {
@@ -200,6 +197,7 @@ namespace SyncSaberService.Data
             //{
             //    //Logger.Warning("SongInfo OnDeserialized");
             Populated = true;
+            /*
             if (_songInfo == null)
             {
                 if (_beatSaverRegex.IsMatch(key))
@@ -209,7 +207,7 @@ namespace SyncSaberService.Data
 
                 if (_songInfo == null)
                 {
-                    Logger.Info($"Couldn't find song {key} - {name} by {authorName}, generating new song info...");
+                    //Logger.Info($"Couldn't find song {key} - {name} by {authorName}, generating new song info...");
                     _songInfo = new SongInfo() {
                         key = key,
                         songName = songName,
@@ -225,9 +223,12 @@ namespace SyncSaberService.Data
                     ScrapedDataProvider.TryAddToScrapedData(_songInfo);
                 }
             }
+            */
         }
 
-        public static bool TryParseBeatSaver(JToken token, out SongInfo song)
+
+
+        public static bool TryParseBeatSaver(JToken token, out SongInfoEnhanced song)
         {
             string songIndex = token["key"]?.Value<string>();
             if (songIndex == null)
@@ -240,8 +241,9 @@ namespace SyncSaberService.Data
                     NullValueHandling = NullValueHandling.Ignore,
                     MissingMemberHandling = MissingMemberHandling.Ignore
                 });
-                song = enhancedSong.ToSongInfo();
-                song.EnhancedInfo = enhancedSong;
+
+                song = enhancedSong;
+                //song.EnhancedInfo = enhancedSong;
                 //Logger.Debug(song.ToString());
             }
             catch (Exception ex)
@@ -252,7 +254,7 @@ namespace SyncSaberService.Data
             }
             return successful;
         }
-
+        /*
         public SongInfo ToSongInfo()
         {
             if (!Populated)
@@ -289,9 +291,27 @@ namespace SyncSaberService.Data
             }
             return _songInfo;
         }
+        */
 
-        [JsonIgnore]
-        private SongInfo _songInfo { get; set; }
+        public SongInfo GenerateSongInfo()
+        {
+            var newSong = new SongInfo() {
+                key = key,
+                songName = songName,
+                songSubName = songSubName,
+                authorName = authorName,
+                bpm = bpm,
+                playedCount = playedCount,
+                upVotes = upVotes,
+                downVotes = downVotes,
+                hash = hashMd5,
+            };
+            newSong.EnhancedInfo = this;
+            return newSong;
+        }
+
+        //[JsonIgnore]
+        //private SongInfo _songInfo { get; set; }
         [JsonIgnore]
         public string Feed;
         [JsonIgnore]
@@ -418,49 +438,7 @@ namespace SyncSaberService.Data
         [JsonProperty("timezone")]
         public string timezone;
     }
-
-    public class EmptyArrayOrDictionaryConverter : JsonConverter
-    {
-        public override bool CanConvert(Type objectType)
-        {
-            return objectType.IsAssignableFrom(typeof(Dictionary<string, object>));
-        }
-
-        public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
-        {
-            JToken token = JToken.Load(reader);
-            if (token.Type == JTokenType.Object)
-            {
-                return token.ToObject(objectType);
-            }
-            else if (token.Type == JTokenType.Array)
-            {
-                if (!token.HasValues)
-                {
-                    // create empty dictionary
-                    return Activator.CreateInstance(objectType);
-                }
-                // Handles case where Beat Saver gives the slashstat in the form of an array.
-                if (objectType == typeof(Dictionary<string, int>))
-                {
-                    var retDict = new Dictionary<string, int>();
-                    for (int i = 0; i < token.Count(); i++)
-                    {
-                        retDict.Add(i.ToString(), (int) token.ElementAt(i));
-                    }
-                    return retDict;
-                }
-            }
-            //throw new JsonSerializationException($"{objectType.ToString()} or empty array expected, received a {token.Type.ToString()}");
-            Logger.Warning($"{objectType.ToString()} or empty array expected, received a {token.Type.ToString()}");
-            return Activator.CreateInstance(objectType);
-        }
-
-        public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
-        {
-            serializer.Serialize(writer, value);
-        }
-    }
+    
 
     public static class SongInfoEnhancedExtensions
     {

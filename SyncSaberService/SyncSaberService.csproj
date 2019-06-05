@@ -51,6 +51,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Config.cs" />
+    <Compile Include="Data\JsonConverters.cs" />
     <Compile Include="Data\ScoreSaberSong.cs" />
     <Compile Include="Data\ScrapedDataProvider.cs" />
     <Compile Include="Data\SongInfo.cs" />

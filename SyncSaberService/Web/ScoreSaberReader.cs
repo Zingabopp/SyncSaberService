@@ -47,7 +47,7 @@ namespace SyncSaberService.Web
         private const string TOP_PLAYED_KEY = "Top Played";
         private const string LATEST_RANKED_KEY = "Latest Ranked";
         #endregion
-        
+
         public string Name { get { return NameKey; } }
         public string Source { get { return SourceKey; } }
         public bool Ready { get; private set; }
@@ -61,10 +61,10 @@ namespace SyncSaberService.Web
                 {
                     _feeds = new Dictionary<ScoreSaberFeeds, FeedInfo>()
                     {
-                        { (ScoreSaberFeeds)0, new FeedInfo(TOP_RANKED_KEY, $"https://scoresaber.com/api.php?function=get-leaderboards&cat=3&limit={LIMITKEY}&page={PAGENUMKEY}&ranked={RANKEDKEY}") },
-                        { (ScoreSaberFeeds)1, new FeedInfo(TRENDING_KEY, $"https://scoresaber.com/api.php?function=get-leaderboards&cat=0&limit={LIMITKEY}&page={PAGENUMKEY}&ranked={RANKEDKEY}") },
+                        { (ScoreSaberFeeds)0, new FeedInfo(TRENDING_KEY, $"https://scoresaber.com/api.php?function=get-leaderboards&cat=0&limit={LIMITKEY}&page={PAGENUMKEY}&ranked={RANKEDKEY}") },
+                        { (ScoreSaberFeeds)1, new FeedInfo(LATEST_RANKED_KEY, $"https://scoresaber.com/api.php?function=get-leaderboards&cat=1&limit={LIMITKEY}&page={PAGENUMKEY}&ranked={RANKEDKEY}") },
                         { (ScoreSaberFeeds)2, new FeedInfo(TOP_PLAYED_KEY, $"https://scoresaber.com/api.php?function=get-leaderboards&cat=2&limit={LIMITKEY}&page={PAGENUMKEY}&ranked={RANKEDKEY}") },
-                        { (ScoreSaberFeeds)3, new FeedInfo(LATEST_RANKED_KEY, $"https://scoresaber.com/api.php?function=get-leaderboards&cat=1&limit={LIMITKEY}&page={PAGENUMKEY}&ranked={RANKEDKEY}") }
+                        { (ScoreSaberFeeds)3, new FeedInfo(TOP_RANKED_KEY, $"https://scoresaber.com/api.php?function=get-leaderboards&cat=3&limit={LIMITKEY}&page={PAGENUMKEY}&ranked={RANKEDKEY}") }
                     };
                 }
                 return _feeds;
@@ -120,7 +120,7 @@ namespace SyncSaberService.Web
         public List<SongInfo> GetTopPPSongs(ScoreSaberFeedSettings settings)
         {
             // "https://scoresaber.com/api.php?function=get-leaderboards&cat={CATKEY}&limit={LIMITKEY}&page={PAGENUMKEY}&ranked={RANKEDKEY}"
-            int songsPerPage = 40;
+            int songsPerPage = 1000;
             int pageNum = 1;
             bool useMaxPages = settings.MaxPages != 0;
             List<SongInfo> songs = new List<SongInfo>();
@@ -174,7 +174,7 @@ namespace SyncSaberService.Web
             List<SongInfo> songs = GetSongsFromPage(pageText);
             return songs;
         }
-        public List<SongInfo> GetSongsFromPage(string pageText)
+        public static List<SongInfo> GetSongsFromPage(string pageText)
         {
             var sssongs = GetSSSongsFromPage(pageText);
 
@@ -184,21 +184,22 @@ namespace SyncSaberService.Web
             //Parallel.ForEach(sssongs, new ParallelOptions { MaxDegreeOfParallelism = Config.MaxConcurrentPageChecks }, s => s.PopulateFields());
             foreach (var song in sssongs)
             {
-                tempSong = song.Song;
+                tempSong = ScrapedDataProvider.GetSong(song);
                 if (tempSong != null && !string.IsNullOrEmpty(tempSong.key))
                 {
+                    tempSong.ScoreSaberInfo.AddOrUpdate(song.uid, song);
                     songs.Add(tempSong);
                 }
                 else
                 {
-                    Logger.Warning($"Could not convert song {song.Song.songName} with hash {song.md5Hash} to a SongInfo, skipping...");
+                    Logger.Warning($"Could not find song {song.name} with hash {song.md5Hash} on Beat Saver, skipping...");
                 }
             }
 
             return songs;
         }
 
-        public List<ScoreSaberSong> GetSSSongsFromPage(string pageText)
+        public static List<ScoreSaberSong> GetSSSongsFromPage(string pageText)
         {
             JObject result = new JObject();
             try
@@ -248,7 +249,7 @@ namespace SyncSaberService.Web
 
         public Playlist[] PlaylistsForFeed(int feedIndex)
         {
-            switch ((ScoreSaberFeeds)feedIndex)
+            switch ((ScoreSaberFeeds) feedIndex)
             {
                 case ScoreSaberFeeds.TOP_RANKED:
                     return new Playlist[] { _topRanked };
@@ -267,6 +268,40 @@ namespace SyncSaberService.Web
         public void PrepareReader()
         {
 
+        }
+
+        public static List<SongInfo> ScrapeScoreSaber(int requestDelay, int songsPerPage, int maxPages = 0)
+        {
+            bool useMaxPages = maxPages != 0;
+            List<SongInfo> songs = new List<SongInfo>();
+            string rankVal = "1";
+            int songCount = 0;
+            int pageNum = 1;
+            StringBuilder url = new StringBuilder();
+
+            bool continueLooping = true;
+            do
+            {
+                url.Clear();
+                url.Append(Feeds[ScoreSaberFeeds.TOP_PLAYED].BaseUrl);
+                url.Replace(RANKEDKEY, rankVal);
+                url.Replace(LIMITKEY, songsPerPage.ToString());
+                url.Replace(PAGENUMKEY, pageNum.ToString());
+                Thread.Sleep(requestDelay);
+                if (pageNum % 10 == 0)
+                    Logger.Info($"On page {pageNum}");
+
+                //Logger.Debug($"Creating task for {url}");
+                string pageText = GetPageText(url.ToString());
+                songs.AddRange(GetSongsFromPage(pageText));
+                if (songs.Count == songCount)
+                    continueLooping = false;
+                songCount = songs.Count;
+                pageNum++;
+                if (useMaxPages && (pageNum > maxPages))
+                    continueLooping = false;
+            } while (continueLooping);
+            return songs;
         }
 
         private readonly Playlist _topRanked = new Playlist("ScoreSaberTopRanked", "ScoreSaber Top Ranked", "SyncSaber", "1");
@@ -291,9 +326,9 @@ namespace SyncSaberService.Web
 
     public enum ScoreSaberFeeds
     {
-        TOP_RANKED = 0,
-        TRENDING = 1,
+        TRENDING = 0,
+        LATEST_RANKED = 1,
         TOP_PLAYED = 2,
-        LATEST_RANKED = 3
+        TOP_RANKED = 3,
     }
 }
