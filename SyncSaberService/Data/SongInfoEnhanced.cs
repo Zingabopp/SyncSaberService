@@ -429,7 +429,7 @@ namespace SyncSaberService.Data
         public int obstacles;
     }
 
-    public struct CreationTime
+    public class CreationTime
     {
         [JsonProperty("date")]
         public DateTime date;

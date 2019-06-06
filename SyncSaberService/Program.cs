@@ -23,7 +23,10 @@ namespace SyncSaberService
             Web.WebUtils.Initialize(5);
 
             var test = new SyncSaberScrape();
+
             test.Initialize();
+            //test.Data.AddRange(ScrapedDataProvider.SyncSaberScrape.Take(20));
+            test.WriteFile(Path.Combine(SyncSaberScrape.DATA_DIRECTORY.FullName, "newScrap.json"));
 
             var trending = ScrapedDataProvider.SyncSaberScrape.Where(s => s.ScoreSaberInfo.Count > 0).OrderByDescending(s => s.ScoreSaberInfo.Values.Select(ss => ss.scores).Aggregate((a, b) => a + b)).Take(100);
             var detTrending = trending.Select(s => (s.ScoreSaberInfo.Values.Select(ss => ss.scores).Aggregate((a, b) => a + b), s)).ToList();
@@ -66,7 +69,7 @@ namespace SyncSaberService
                 {
                     Logger.Exception("Error initializing Config", ex);
                 }
-                ScrapedDataProvider.Initialize();
+                //ScrapedDataProvider.Initialize();
                 Tests();
                 try
                 {

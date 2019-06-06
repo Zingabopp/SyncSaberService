@@ -14,9 +14,11 @@ namespace SyncSaberService.Data
     public class SyncSaberScrape : IScrapedDataModel<List<SongInfo>, SongInfo>
     {
         private static readonly string ASSEMBLY_PATH = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-        private static readonly DirectoryInfo DATA_DIRECTORY = new DirectoryInfo(Path.Combine(ASSEMBLY_PATH, "ScrapedData"));
+        public static readonly DirectoryInfo DATA_DIRECTORY = new DirectoryInfo(Path.Combine(ASSEMBLY_PATH, "ScrapedData"));
         [JsonIgnore]
         private bool _initialized;
+
+        [JsonProperty("Data")]
         public List<SongInfo> Data { get; private set; }
 
         [JsonIgnore]
@@ -32,14 +34,25 @@ namespace SyncSaberService.Data
         {
             if (string.IsNullOrEmpty(filePath))
                 filePath = DefaultPath;
-            var test = ReadScrapedFile(filePath);
+            Data = new List<SongInfo>();
+            //(filePath).Populate(this);
+            ReadScrapedFile(filePath).Populate(this);
+            //JsonSerializer serializer = new JsonSerializer();
+            //if (test.Type == Newtonsoft.Json.Linq.JTokenType.Array)
+            //    Data = test.ToObject<List<SongInfo>>();
             _initialized = true;
         }
 
 
-        public override void WriteFile(string filePath)
+        public override void WriteFile(string filePath = "")
         {
-            throw new NotImplementedException();
+            if (string.IsNullOrEmpty(filePath))
+                filePath = DefaultPath;
+            using (StreamWriter file = File.CreateText(filePath))
+            {
+                JsonSerializer serializer = new JsonSerializer();
+                serializer.Serialize(file, this);
+            }
         }
     }
 }

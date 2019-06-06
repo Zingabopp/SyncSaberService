@@ -20,7 +20,7 @@ namespace SyncSaberService.Data
         public static readonly FileInfo BEATSAVER_SCRAPE_PATH =
             new FileInfo(Path.Combine(ASSEMBLY_PATH, DATA_DIRECTORY.FullName, "combinedScrappedData.json"));
         public static readonly FileInfo SYNCSABER_SCRAPE_PATH =
-            new FileInfo(Path.Combine(ASSEMBLY_PATH, DATA_DIRECTORY.FullName, "SyncSaberScrapedData.json"));
+            new FileInfo(Path.Combine(ASSEMBLY_PATH, DATA_DIRECTORY.FullName, "SyncSaberScrapedData-old.json"));
         private static List<SongInfo> _beatSaverScrape;
         public static List<SongInfo> BeatSaverScrape
         {
