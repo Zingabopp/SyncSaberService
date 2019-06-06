@@ -52,6 +52,7 @@
   <ItemGroup>
     <Compile Include="Config.cs" />
     <Compile Include="Data\JsonConverters.cs" />
+    <Compile Include="Data\PlayerDataModel.cs" />
     <Compile Include="Data\ScoreSaberSong.cs" />
     <Compile Include="Data\IScrapedDataModel.cs" />
     <Compile Include="Data\ScrapedDataProvider.cs" />
