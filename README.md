@@ -13,3 +13,4 @@ This is currently a standalone application you can run to automatically download
 
 # Frequenty Asked Question(s)
 <p><b>Why is SyncSaberService skipping songs and not downloading them?</b> When songs are skipped, it's either because SyncSaberService found the songs in your CustomSongs folder or the songs were listed in the SyncSaberHistory.txt located in your Beat Saber UserData folder. The history exists so that SyncSaberService doesn't redownload a song you've previously deleted.</p>
+<p><b>Why is SyncSaberService showing "Exception downloading BeastSaberFeed (1) - System.Net.WebException-The remote server returned an error: (401) Unauthorized."</b> Check your BeastSaberUserName and BeastSaberPassword settings. This error should only happen if SyncSaberService fails to log into BeastSaber.</p>
