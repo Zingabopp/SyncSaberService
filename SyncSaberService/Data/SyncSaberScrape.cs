@@ -19,21 +19,20 @@ namespace SyncSaberService.Data
         private bool _initialized;
 
         [JsonProperty("Data")]
-        public List<SongInfo> Data { get; private set; }
+        public override List<SongInfo> Data { get; protected set; }
 
-        [JsonIgnore]
-        public bool ReadOnly => throw new NotImplementedException();
 
-        [JsonIgnore]
-        public string DefaultPath => Path.Combine(ASSEMBLY_PATH, DATA_DIRECTORY.FullName, "SyncSaberScrapedData.json");
-
-        [JsonIgnore]
-        public FileInfo CurrentFile => throw new NotImplementedException();
+        public SyncSaberScrape()
+        {
+            DefaultPath = Path.Combine(ASSEMBLY_PATH, DATA_DIRECTORY.FullName, "SyncSaberScrapedData.json");
+            ReadOnly = false;
+        }
 
         public override void Initialize(string filePath = "")
         {
             if (string.IsNullOrEmpty(filePath))
                 filePath = DefaultPath;
+
             Data = new List<SongInfo>();
             //(filePath).Populate(this);
             ReadScrapedFile(filePath).Populate(this);
