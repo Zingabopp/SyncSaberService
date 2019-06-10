@@ -12,10 +12,13 @@ namespace SyncSaberService.Data
     public abstract class IScrapedDataModel<T, DataType> 
         where T : IEnumerable<DataType>, new()
     {
-        T Data { get; }
-        bool ReadOnly { get; }
-        string DefaultPath { get; }
-        FileInfo CurrentFile { get; }
+        public virtual T Data { get; protected set; }
+        [JsonIgnore]
+        public bool ReadOnly { get; protected set; }
+        [JsonIgnore]
+        public string DefaultPath { get; protected set; }
+        [JsonIgnore]
+        public FileInfo CurrentFile { get; protected set; }
 
         public virtual JToken ReadScrapedFile(string filePath)
         {

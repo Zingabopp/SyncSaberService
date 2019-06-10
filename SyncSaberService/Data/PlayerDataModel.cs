@@ -3,15 +3,27 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace SyncSaberService.Data
 {
     public class PlayerDataModel : IScrapedDataModel<List<LevelStatsData>, LevelStatsData>
     {
+        [JsonProperty("version")]
         public string version;
+        [JsonProperty("localPlayers")]
         public List<PlayerData> localPlayers;
         // public List<PlayerData> guestPlayers; //?
         public int lastSelectedBeatmapDifficulty;
+
+        [JsonIgnore]
+        public override List<LevelStatsData> Data { get { return localPlayers?.FirstOrDefault()?.levelsStatsData; } }
+
+        public PlayerDataModel()
+        {
+            ReadOnly = true;
+        }
 
         public override void Initialize(string filePath)
         {
@@ -37,7 +49,7 @@ namespace SyncSaberService.Data
         // public List<MissionStatsData> missionStatsData;
         // public List<Something> showedMissionHelpIds;
         // public AchievementData achievementsData;
-        
+
     }
 
     public class LevelStatsData
