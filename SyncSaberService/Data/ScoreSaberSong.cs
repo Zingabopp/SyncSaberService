@@ -73,37 +73,7 @@ namespace SyncSaberService.Data
         public float stars { get; set; }
         [JsonProperty("image")]
         public string image { get; set; }
-        /*
-        public SongInfo ToSongInfo()
-        {
-            if (!Populated)
-            {
-                Logger.Warning("Trying to create SongInfo from an unpopulated ScoreSaberSong");
-                return null;
-            }
-            if (Song == null)
-                Song = ScrapedDataProvider.GetSongByHash(md5Hash, true);
 
-
-            if (Song == null)
-            {
-                Logger.Info($"Couldn't find song {name} by {author}, generating new song info...");
-                Song = new SongInfo() {
-                    songName = name,
-                    songSubName = songSubName,
-                    authorName = author,
-                    bpm = bpm,
-                    hash = md5Hash
-                };
-            }
-            int intUid = int.Parse(uid);
-            if (!(Song.ScoreSaberInfo.ContainsKey(intUid) && Song.ScoreSaberInfo[intUid] != this))
-            {
-                Song.ScoreSaberInfo.AddOrUpdate(intUid, this);
-            }
-            return Song;
-        }
-        */
         [OnDeserialized]
         protected void OnDeserialized(StreamingContext context)
         {
@@ -156,20 +126,6 @@ namespace SyncSaberService.Data
                     return diffString;
             }
         }
-
-        /*
-        public SongInfo GetSongInfo()
-        {
-            try
-            {
-                song = BeatSaverReader.Search(md5Hash, BeatSaverReader.SearchType.hash).FirstOrDefault();
-            } catch (JsonException ex)
-            {
-                Logger.Exception("Error trying to get SongInfo from Beat Saver.", ex);
-            }
-            return song;
-        }
-        */
     }
 }
 

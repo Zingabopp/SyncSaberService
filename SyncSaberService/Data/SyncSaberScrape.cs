@@ -28,7 +28,7 @@ namespace SyncSaberService.Data
         public string DefaultPath => Path.Combine(ASSEMBLY_PATH, DATA_DIRECTORY.FullName, "SyncSaberScrapedData.json");
 
         [JsonIgnore]
-        public FileInfo CurrentFile => throw new NotImplementedException();
+        public FileInfo CurrentFile { get; private set; }
 
         public override void Initialize(string filePath = "")
         {
@@ -41,13 +41,14 @@ namespace SyncSaberService.Data
             //if (test.Type == Newtonsoft.Json.Linq.JTokenType.Array)
             //    Data = test.ToObject<List<SongInfo>>();
             _initialized = true;
+            CurrentFile = new FileInfo(filePath);
         }
 
 
         public override void WriteFile(string filePath = "")
         {
             if (string.IsNullOrEmpty(filePath))
-                filePath = DefaultPath;
+                filePath = CurrentFile.FullName;
             using (StreamWriter file = File.CreateText(filePath))
             {
                 JsonSerializer serializer = new JsonSerializer();
