@@ -71,7 +71,7 @@ namespace SyncSaberService.Web
             }
         }
 
-        public Dictionary<int, SongInfo> GetSongsFromFeed(IFeedSettings _settings)
+        public Dictionary<string, SongInfo> GetSongsFromFeed(IFeedSettings _settings)
         {
             PrepareReader();
             if (!(_settings is ScoreSaberFeedSettings settings))
@@ -88,7 +88,7 @@ namespace SyncSaberService.Web
                     break;
             }
 
-            Dictionary<int, SongInfo> retDict = new Dictionary<int, SongInfo>();
+            Dictionary<string, SongInfo> retDict = new Dictionary<string, SongInfo>();
             foreach (var song in songs)
             {
                 if (retDict.ContainsKey(song.id))

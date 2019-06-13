@@ -170,7 +170,7 @@ namespace SyncSaberService
             }
             var reader = FeedReaders[feedType];
             DateTime startTime = DateTime.Now;
-            Dictionary<int, SongInfo> songs;
+            Dictionary<string, SongInfo> songs;
             List<Playlist> playlists = new List<Playlist>();
             playlists.Add(_syncSaberSongs);
             playlists.AddRange(reader.PlaylistsForFeed(_settings.FeedIndex));
@@ -238,7 +238,7 @@ namespace SyncSaberService
         /// <param name="skippedsongs"></param>
         /// <param name="useSongKeyAsOutputFolder"></param>
         /// <returns></returns>
-        public List<SongInfo> DownloadSongs(Dictionary<int, SongInfo> queuedSongs, out int skippedsongs, bool useSongKeyAsOutputFolder)
+        public List<SongInfo> DownloadSongs(Dictionary<string, SongInfo> queuedSongs, out int skippedsongs, bool useSongKeyAsOutputFolder)
         {
             //var existingSongs = Directory.GetDirectories(CustomSongsPath);
             string tempPath = "";

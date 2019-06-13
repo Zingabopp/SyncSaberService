@@ -11,7 +11,7 @@ namespace SyncSaberService.Web
         void PrepareReader();
         List<SongInfo> GetSongsFromPage(string pageText);
         //Dictionary<int, FeedInfo> Feeds { get; }
-        Dictionary<int, SongInfo> GetSongsFromFeed(IFeedSettings settings);
+        Dictionary<string, SongInfo> GetSongsFromFeed(IFeedSettings settings);
         Playlist[] PlaylistsForFeed(int feedIndex);
     }
 

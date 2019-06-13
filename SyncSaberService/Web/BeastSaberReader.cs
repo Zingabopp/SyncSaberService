@@ -248,7 +248,7 @@ namespace SyncSaberService.Web
         /// <param name="settings"></param>
         /// <exception cref="InvalidCastException">Thrown when the passed IFeedSettings isn't a BeastSaberFeedSettings</exception>
         /// <returns></returns>
-        public Dictionary<int, SongInfo> GetSongsFromFeed(IFeedSettings settings)
+        public Dictionary<string, SongInfo> GetSongsFromFeed(IFeedSettings settings)
         {
             PrepareReader();
             BeastSaberFeedSettings _settings = settings as BeastSaberFeedSettings;
@@ -257,7 +257,7 @@ namespace SyncSaberService.Web
             if (_settings.FeedIndex != 2 && _username == string.Empty)
             {
                 Logger.Error($"Can't access feed without a valid username and password in the config file");
-                return new Dictionary<int, SongInfo>();
+                return new Dictionary<string, SongInfo>();
             }
             int pageIndex = 0;
             ConcurrentQueue<SongInfo> songList = new ConcurrentQueue<SongInfo>();
@@ -324,7 +324,7 @@ namespace SyncSaberService.Web
             actionBlock.Completion.Wait();
 
             Logger.Info($"Finished checking pages, found {songList.Count} songs");
-            Dictionary<int, SongInfo> retDict = new Dictionary<int, SongInfo>();
+            Dictionary<string, SongInfo> retDict = new Dictionary<string, SongInfo>();
             foreach (var song in songList)
             {
                 if (retDict.ContainsKey(song.id))

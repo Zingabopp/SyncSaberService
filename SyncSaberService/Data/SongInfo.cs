@@ -270,15 +270,14 @@ namespace SyncSaberService.Data
             }
         }
         [JsonProperty("id")]
-        private int _id;
         [JsonIgnore]
-        public int id
+        public string id
         {
             get
             {
-                if (!(_id > 0))
-                    if (key != null && _beatSaverRegex.IsMatch(key))
-                        _id = int.Parse(key.Substring(0, key.IndexOf('-')));
+                if (_id == null)
+                    if (key != null)
+                        _id = key;
                 return _id;
             }
             set { _id = value; }
