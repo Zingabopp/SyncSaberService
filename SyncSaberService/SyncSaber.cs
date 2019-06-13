@@ -105,7 +105,8 @@ namespace SyncSaberService
                 return;
             }
             string[] customSongDirectories = Directory.GetDirectories(CustomSongsPath);
-            string id = songIndex.Substring(0, songIndex.IndexOf("-"));
+            //string id = songIndex.Substring(0, songIndex.IndexOf("-"));
+            string id = songIndex;
             string version = songIndex.Substring(songIndex.IndexOf("-") + 1);
             foreach (string directory in customSongDirectories)
             {

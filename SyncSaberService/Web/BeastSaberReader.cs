@@ -194,6 +194,10 @@ namespace SyncSaberService.Web
                         string songIndex = innerText.Substring(innerText.LastIndexOf('/') + 1);
                         string mapper = GetMapperFromBsaber(node.InnerText);
                         string songUrl = "https://beatsaver.com/download/" + songIndex;
+
+                        songIndex = node["SongKey"].InnerText;
+                        songUrl = "https://beatsaver.com/api/download/key/" + songIndex;
+
                         SongInfo currentSong = new SongInfo(songIndex, songName, songUrl, mapper);
                         //string currentSongDirectory = Path.Combine(Config.BeatSaberPath, "CustomSongs", songIndex);
                         //bool downloadFailed = false;

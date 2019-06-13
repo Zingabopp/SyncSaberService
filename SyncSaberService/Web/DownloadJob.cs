@@ -18,7 +18,8 @@ namespace SyncSaberService.Web
     public class DownloadJob
     {
         public const string NOTFOUNDERROR = "The remote server returned an error: (404) Not Found.";
-        public const string BEATSAVER_DOWNLOAD_URL_BASE = "https://beatsaver.com/download/";
+        // public const string BEATSAVER_DOWNLOAD_URL_BASE = "https://beatsaver.com/download/";
+        public const string BEATSAVER_DOWNLOAD_URL_BASE = " https://beatsaver.com/api/download/key/";
         private const string TIMEOUTERROR = "The request was aborted: The request was canceled.";
 
         public enum JobResult
