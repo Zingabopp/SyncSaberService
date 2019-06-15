@@ -170,7 +170,7 @@ namespace SyncSaberService.Data
         /// <returns></returns>
         public static SongInfo GetOrCreateSong(SongInfoEnhanced song, bool searchOnline = true)
         {
-            bool foundOnline = TryGetSongByHash(song.hashMd5, out SongInfo songInfo, searchOnline);
+            bool foundOnline = TryGetSongByHash(song.hash, out SongInfo songInfo, searchOnline);
             if (songInfo == null)
             {
                 songInfo = song.GenerateSongInfo();

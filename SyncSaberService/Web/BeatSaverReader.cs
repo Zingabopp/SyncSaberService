@@ -153,7 +153,7 @@ namespace SyncSaberService.Web
                     {
                         if (!settings.searchOnline)
                         {
-                            newSongs = ScrapedDataProvider.SyncSaberScrape.Where(s => s.EnhancedInfo.uploader.ToLower() == author.ToLower()).ToList();
+                            newSongs = ScrapedDataProvider.SyncSaberScrape.Where(s => s.EnhancedInfo.uploader.username.ToLower() == author.ToLower()).ToList();
                             songSource = "scraped data";
                         }
                         if (newSongs == null || newSongs.Count == 0)
@@ -436,7 +436,7 @@ namespace SyncSaberService.Web
 
         public static string GetAuthorID(string authorName)
         {
-            string mapperId = ScrapedDataProvider.SyncSaberScrape.Where(s => s.EnhancedInfo.uploader.ToLower() == authorName.ToLower()).FirstOrDefault()?.EnhancedInfo.uploaderId.ToString();
+            string mapperId = ScrapedDataProvider.SyncSaberScrape.Where(s => s.EnhancedInfo.uploader.username.ToLower() == authorName.ToLower()).FirstOrDefault()?.EnhancedInfo.uploader.id;
             if (!string.IsNullOrEmpty(mapperId))
                 return mapperId;
             mapperId = _authors.GetOrAdd(authorName, (a) => {
@@ -481,8 +481,7 @@ namespace SyncSaberService.Web
 
         public static List<string> GetAuthorNamesByID(string mapperId)
         {
-            int id = int.Parse(mapperId);
-            List<string> authorNames = ScrapedDataProvider.SyncSaberScrape.Where(s => s.EnhancedInfo.uploaderId == id).Select(s => s.EnhancedInfo.authorName).Distinct().ToList();
+            List<string> authorNames = ScrapedDataProvider.SyncSaberScrape.Where(s => s.EnhancedInfo.uploader.id == mapperId).Select(s => s.EnhancedInfo.uploader.username).Distinct().ToList();
             if (authorNames.Count > 0)
                 return authorNames;
             List<SongInfo> songs = GetSongsByUploaderId(mapperId);

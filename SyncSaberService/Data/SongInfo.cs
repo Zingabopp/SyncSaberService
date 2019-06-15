@@ -56,36 +56,7 @@ namespace SyncSaberService.Data
         [JsonIgnore]
         private string _key;
 
-        [JsonIgnore]
-        private string _identifier;
-        [JsonIgnore]
-        public string Identifier
-        {
-            get
-            {
-                if (string.IsNullOrEmpty(_identifier))
-                {
-                    if (string.IsNullOrEmpty(hash))
-                        return string.Empty;
-                    if (string.IsNullOrEmpty(songName))
-                        return string.Empty;
-                    if (string.IsNullOrEmpty(songSubName))
-                        return string.Empty;
-                    if (string.IsNullOrEmpty(authorName))
-                        return string.Empty;
-                    if (bpm <= 0)
-                        return string.Empty;
-                    _identifier = string.Join(IDENTIFIER_DELIMITER.ToString(), new string[] {
-                        hash,
-                        songName,
-                        songSubName,
-                        authorName,
-                        bpm.ToString()
-                    });
-                }
-                return _identifier;
-            }
-        }
+        
 
         #region Scraped Data
         [JsonProperty("key")]
@@ -174,6 +145,37 @@ namespace SyncSaberService.Data
                 return _scoreSaberInfo;
             }
             set { _scoreSaberInfo = value; }
+        }
+
+        [JsonIgnore]
+        private string _identifier;
+        [JsonIgnore]
+        public string Identifier
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(_identifier))
+                {
+                    if (string.IsNullOrEmpty(hash))
+                        return string.Empty;
+                    if (string.IsNullOrEmpty(songName))
+                        return string.Empty;
+                    if (string.IsNullOrEmpty(songSubName))
+                        return string.Empty;
+                    if (string.IsNullOrEmpty(authorName))
+                        return string.Empty;
+                    if (bpm <= 0)
+                        return string.Empty;
+                    _identifier = string.Join(IDENTIFIER_DELIMITER.ToString(), new string[] {
+                        hash,
+                        songName,
+                        songSubName,
+                        authorName,
+                        bpm.ToString()
+                    });
+                }
+                return _identifier;
+            }
         }
 
         public SongInfo() { }

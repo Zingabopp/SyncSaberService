@@ -74,9 +74,9 @@ namespace SyncSaberService.Data
                 url = SONG_DETAILS_URL_BASE + song.key;
                 searchMethod = SongGetMethod.SongIndex;
             }
-            else if (!string.IsNullOrEmpty(song.hashMd5))
+            else if (!string.IsNullOrEmpty(song.hash))
             {
-                url = SONG_BY_HASH_URL_BASE + song.hashMd5;
+                url = SONG_BY_HASH_URL_BASE + song.hash;
                 searchMethod = SongGetMethod.Hash;
             }
             else
@@ -132,9 +132,9 @@ namespace SyncSaberService.Data
                 url = SONG_DETAILS_URL_BASE + key;
                 searchMethod = SongGetMethod.SongIndex;
             }
-            else if (!string.IsNullOrEmpty(hashMd5))
+            else if (!string.IsNullOrEmpty(hash))
             {
-                url = SONG_BY_HASH_URL_BASE + hashMd5;
+                url = SONG_BY_HASH_URL_BASE + hash;
                 searchMethod = SongGetMethod.Hash;
             }
             else
@@ -180,13 +180,12 @@ namespace SyncSaberService.Data
 
         public SongInfoEnhanced() { }
 
-        public SongInfoEnhanced(string songIndex, string songName, string songUrl, string _authorName, string feedName = "")
+        public SongInfoEnhanced(string songIndex, string songName, string songUrl, string _authorName)
         {
             key = songIndex;
             name = songName;
-            authorName = _authorName;
-            downloadUrl = songUrl;
-            Feed = feedName;
+            metadata.levelAuthorName = _authorName;
+            downloadURL = songUrl;
         }
 
         [OnDeserialized]
@@ -297,23 +296,32 @@ namespace SyncSaberService.Data
         {
             var newSong = new SongInfo() {
                 key = key,
-                songName = songName,
-                songSubName = songSubName,
-                authorName = authorName,
-                bpm = bpm,
-                playedCount = playedCount,
-                upVotes = upVotes,
-                downVotes = downVotes,
-                hash = hashMd5,
+                songName = metadata.songName,
+                songSubName = metadata.songSubName,
+                authorName = metadata.levelAuthorName,
+                bpm = metadata.bpm,
+                playedCount = stats.plays,
+                upVotes = stats.upVotes,
+                downVotes = stats.downVotes,
+                hash = hash,
             };
             //newSong.EnhancedInfo = this;
             return newSong;
         }
 
+        public override string ToString()
+        {
+            StringBuilder retStr = new StringBuilder();
+            retStr.Append("SongInfo:");
+            retStr.AppendLine("   Index: " + key);
+            retStr.AppendLine("   Name: " + name);
+            retStr.AppendLine("   Author: " + metadata.levelAuthorName);
+            retStr.AppendLine("   URL: " + downloadURL);
+            return retStr.ToString();
+        }
+
         //[JsonIgnore]
         //private SongInfo _songInfo { get; set; }
-        [JsonIgnore]
-        public string Feed;
         [JsonIgnore]
         public int SongVersion
         {
@@ -323,6 +331,7 @@ namespace SyncSaberService.Data
                 return success ? result : 0;
             }
         }
+        /*
         [JsonProperty("id")]
         private int _id;
         [JsonIgnore]
@@ -337,108 +346,88 @@ namespace SyncSaberService.Data
             }
             set { _id = value; }
         }
+        */
+        [JsonProperty("metadata")]
+        public SongMetadata metadata;
+        [JsonProperty("stats")]
+        public SongStats stats;
 
-        [JsonProperty("key")]
-        public string key; // in Scraped
-        [JsonProperty("name")]
-        public string name;
         [JsonProperty("description")]
         public string description;
+
+        [JsonProperty("deletedAt")]
+        public DateTime deletedAt;
+        [JsonProperty("_id")]
+        public string _id;
+        [JsonProperty("key")]
+        public string key;
+        [JsonProperty("name")]
+        public string name;
         [JsonProperty("uploader")]
-        public string uploader;
-        [JsonProperty("uploaderId")]
-        public int uploaderId;
-        [JsonProperty("songName")]
-        public string songName; // in Scraped
-        [JsonProperty("songSubName")]
-        public string songSubName; // in Scraped
-        [JsonProperty("authorName")]
-        public string authorName; // in Scraped
-        [JsonProperty("bpm")]
-        public float bpm; // in Scraped
+        public SongUploader uploader;
+        [JsonProperty("uploaded")]
+        public DateTime uploaded;
+        [JsonProperty("hash")]
+        public string hash;
+        [JsonProperty("downloadURL")]
+        public string downloadURL;
+        [JsonProperty("coverURL")]
+        public string coverURL;
+
+
+
+
+        
+    }
+
+    public class SongMetadata
+    {
         [JsonProperty("difficulties")]
-        public Dictionary<string, BeatSaverSongDifficulty> difficulties;
-        [JsonProperty("downloadCount")]
-        public int downloadCount;
-        [JsonProperty("playedCount")]
-        public int playedCount; // in Scraped
-        [JsonProperty("upVotes")]
-        public int upVotes; // in Scraped
-        [JsonProperty("upVotesTotal")]
-        public int upVotesTotal;
+        public Dictionary<string, bool> difficulties;
+
+        [JsonProperty("characteristics")]
+        public List<string> characteristics;
+
+        [JsonProperty("songName")]
+        public string songName;
+
+        [JsonProperty("songSubName")]
+        public string songSubName;
+
+        [JsonProperty("songAuthorName")]
+        public string songAuthorName;
+
+        [JsonProperty("levelAuthorName")]
+        public string levelAuthorName;
+
+        [JsonProperty("bpm")]
+        public float bpm;
+    }
+
+    public class SongStats
+    {
+        [JsonProperty("downloads")]
+        public int downloads;
+        [JsonProperty("plays")]
+        public int plays;
         [JsonProperty("downVotes")]
-        public int downVotes; // in Scraped
-        [JsonProperty("downVotesTotal")]
-        public int downVotesTotal;
+        public int downVotes;
+        [JsonProperty("upVotes")]
+        public int upVotes;
+        [JsonProperty("heat")]
+        public float heat;
         [JsonProperty("rating")]
         public float rating;
-        [JsonProperty("version")]
-        public string version;
-        [JsonProperty("createdAt")]
-        public CreationTime createdAt;
-        [JsonProperty("linkUrl")]
-        public string linkUrl;
-        [JsonProperty("downloadUrl")]
-        public string downloadUrl;
-        [JsonProperty("coverUrl")]
-        public string coverUrl;
-        [JsonProperty("hashMd5")]
-        public string hashMd5;
-        [JsonProperty("hashSha1")]
-        public string hashSha1;
-
-        public override string ToString()
-        {
-            StringBuilder retStr = new StringBuilder();
-            retStr.Append("SongInfo:");
-            retStr.AppendLine("   Index: " + key);
-            retStr.AppendLine("   Name: " + name);
-            retStr.AppendLine("   Author: " + authorName);
-            retStr.AppendLine("   URL: " + downloadUrl);
-            retStr.AppendLine("   Feed: " + Feed);
-            return retStr.ToString();
-        }
     }
 
-    public class BeatSaverSongDifficulty
+    public class SongUploader
     {
-        [JsonProperty("difficulty")]
-        public string difficulty;
-        [JsonProperty("rank")]
-        public int rank;
-        [JsonProperty("audioPath")]
-        public string audioPath;
-        [JsonProperty("jsonPath")]
-        public string jsonPath;
-        [JsonProperty("stats")]
-        BeatSaverSongDifficultyStats stats { get; set; }
+        [JsonProperty("_id")]
+        public string id;
+        [JsonProperty("username")]
+        public string username;
     }
 
-    public class BeatSaverSongDifficultyStats
-    {
-        [JsonProperty("time")]
-        public double time;
-        [JsonProperty("slashstat")]
-        [JsonConverter(typeof(EmptyArrayOrDictionaryConverter))]
-        public Dictionary<string, int> slashstat;
-        [JsonProperty("events")]
-        public int events;
-        [JsonProperty("notes")]
-        public int notes;
-        [JsonProperty("obstacles")]
-        public int obstacles;
-    }
-
-    public class CreationTime
-    {
-        [JsonProperty("date")]
-        public DateTime date;
-        [JsonProperty("timezone_type")]
-        public int timezone_type;
-        [JsonProperty("timezone")]
-        public string timezone;
-    }
-    
 
     public static class SongInfoEnhancedExtensions
     {
