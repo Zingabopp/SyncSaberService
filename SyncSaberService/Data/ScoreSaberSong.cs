@@ -1,12 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using System;
 using System.Runtime.Serialization;
-using SyncSaberService.Web;
 
 namespace SyncSaberService.Data
 {
@@ -50,23 +45,26 @@ namespace SyncSaberService.Data
         public string name { get; set; }
         [JsonProperty("songSubName")]
         public string songSubName { get; set; }
-        [JsonProperty("author")]
-        public string author { get; set; }
+        [JsonProperty("songAuthorName")]
+        public string songAuthorName { get; set; }
+        [JsonProperty("levelAuthorName")]
+        public string levelAuthorName { get; set; }
+
         [JsonProperty("bpm")]
         public float bpm { get; set; }
-        [JsonIgnore]
-        private string _diff;
+        
         [JsonProperty("diff")]
+        private string diff { get; set; }
+        [JsonIgnore]
         public string difficulty
         {
-            get { return _diff; }
-            set { _diff = ConvertDiff(value); }
+            get { return ConvertDiff(diff); }
         }
         [JsonProperty("scores")]
         [JsonConverter(typeof(IntegerWithCommasConverter))]
         public int scores { get; set; }
-        [JsonProperty("24hr")]
-        public int hr24 { get; set; }
+        [JsonProperty("scores_day")]
+        public int scores_day { get; set; }
         [JsonProperty("ranked")]
         public bool ranked { get; set; }
         [JsonProperty("stars")]
@@ -93,7 +91,7 @@ namespace SyncSaberService.Data
             var newSong = new SongInfo() {
                 songName = name,
                 songSubName = songSubName,
-                authorName = author,
+                authorName = levelAuthorName,
                 bpm = bpm
             };
             //newSong.ScoreSaberInfo.Add(uid, this);

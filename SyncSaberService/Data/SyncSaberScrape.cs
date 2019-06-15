@@ -36,7 +36,8 @@ namespace SyncSaberService.Data
                 filePath = DefaultPath;
             Data = new List<SongInfo>();
             //(filePath).Populate(this);
-            ReadScrapedFile(filePath).Populate(this);
+            if(File.Exists(filePath))
+                ReadScrapedFile(filePath).Populate(this);
             //JsonSerializer serializer = new JsonSerializer();
             //if (test.Type == Newtonsoft.Json.Linq.JTokenType.Array)
             //    Data = test.ToObject<List<SongInfo>>();

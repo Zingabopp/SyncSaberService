@@ -22,11 +22,18 @@ namespace SyncSaberService
             var thing = new SongInfo();
             Web.WebUtils.Initialize(5);
 
-            var test = new SyncSaberScrape();
+            //var test = new SyncSaberScrape();
 
-            test.Initialize();
+            //test.Initialize();
+            ScrapedDataProvider.Initialize();
+            var pageText = File.ReadAllText("test_multiplesongs_page.txt");
+            var multiSongs = BeatSaverReader.ParseSongsFromPage(pageText);
+            pageText = File.ReadAllText("test_detail_page.txt");
+            var singleSong = BeatSaverReader.ParseSongsFromPage(pageText);
+            //var newSongs = BeatSaverReader.ScrapeBeatSaver(500, true, 0);
+            //ScrapedDataProvider.UpdateScrapedFile();
             //test.Data.AddRange(ScrapedDataProvider.SyncSaberScrape.Take(20));
-            test.WriteFile(Path.Combine(SyncSaberScrape.DATA_DIRECTORY.FullName, "newScrap.json"));
+            //test.WriteFile(Path.Combine(SyncSaberScrape.DATA_DIRECTORY.FullName, "newScrap.json"));
 
             var trending = ScrapedDataProvider.SyncSaberScrape.Where(s => s.ScoreSaberInfo.Count > 0).OrderByDescending(s => s.ScoreSaberInfo.Values.Select(ss => ss.scores).Aggregate((a, b) => a + b)).Take(100);
             var detTrending = trending.Select(s => (s.ScoreSaberInfo.Values.Select(ss => ss.scores).Aggregate((a, b) => a + b), s)).ToList();
@@ -50,7 +57,7 @@ namespace SyncSaberService
             //var scoreSaberSongs = SSReader.GetTopPPSongs(new ScoreSaberFeedSettings(0) { MaxPages = 1 });
             
             
-            var newSongs = reader.GetNewestSongs(new BeatSaverFeedSettings((int) BeatSaverFeeds.NEWEST) { MaxPages = 2 });          
+            //var newSongs = reader.GetNewestSongs(new BeatSaverFeedSettings((int) BeatSaverFeeds.LATEST) { MaxPages = 2 });          
         }
 
         static void Main(string[] args)

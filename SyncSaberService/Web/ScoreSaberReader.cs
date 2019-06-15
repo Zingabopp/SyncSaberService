@@ -87,7 +87,7 @@ namespace SyncSaberService.Web
                         if (maxSongs <= 0)
                             throw new ArgumentException("You must specify a value greater than 0 for MaxPages or MaxSongs.");
                         songs.AddRange(ScrapedDataProvider.SyncSaberScrape.Where(s => s.ScoreSaberInfo.Count > 0).OrderByDescending(s =>
-                        s.ScoreSaberInfo.Values.Select(ss => ss.hr24).Aggregate((a, b) => a + b)).Take(maxSongs));
+                        s.ScoreSaberInfo.Values.Select(ss => ss.scores_day).Aggregate((a, b) => a + b)).Take(maxSongs));
                     }
                     break;
                 case ScoreSaberFeeds.LATEST_RANKED:

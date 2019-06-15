@@ -46,7 +46,11 @@ namespace SyncSaberService.Data
 
         public static void Initialize()
         {
-            _syncSaberScrape = ReadScrapedFile(SYNCSABER_SCRAPE_PATH.FullName);
+            if (!DATA_DIRECTORY.Exists)
+                DATA_DIRECTORY.Create();
+            DATA_DIRECTORY.Refresh();
+            if(File.Exists(SYNCSABER_SCRAPE_PATH.FullName))
+                _syncSaberScrape = ReadScrapedFile(SYNCSABER_SCRAPE_PATH.FullName);
             _initialized = true;
         }
 

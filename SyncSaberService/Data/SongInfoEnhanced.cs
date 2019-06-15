@@ -25,8 +25,8 @@ namespace SyncSaberService.Data
 
         [JsonIgnore]
         public bool Populated { get; private set; }
-        private static readonly Regex _digitRegex = new Regex("^[0-9]+$", RegexOptions.Compiled);
-        private static readonly Regex _beatSaverRegex = new Regex("^[0-9]+-[0-9]+$", RegexOptions.Compiled);
+        private static readonly Regex _digitRegex = new Regex("^(?:0[xX])?([0-9a-fA-F]+)$", RegexOptions.Compiled);
+        private static readonly Regex _oldBeatSaverRegex = new Regex("^[0-9]+-[0-9]+$", RegexOptions.Compiled);
 
         public object this[string propertyName]
         {
@@ -178,9 +178,15 @@ namespace SyncSaberService.Data
             return successful;
         }
 
-        public SongInfoEnhanced() { }
+        public SongInfoEnhanced()
+        {
+            metadata = new SongMetadata();
+            stats = new SongStats();
+            uploader = new SongUploader();
+        }
 
         public SongInfoEnhanced(string songIndex, string songName, string songUrl, string _authorName)
+            : this()
         {
             key = songIndex;
             name = songName;
@@ -323,12 +329,12 @@ namespace SyncSaberService.Data
         //[JsonIgnore]
         //private SongInfo _songInfo { get; set; }
         [JsonIgnore]
-        public int SongVersion
+        public int KeyAsInt
         {
             get
             {
-                bool success = int.TryParse(key.Substring(key.IndexOf('-') + 1), out int result);
-                return success ? result : 0;
+                var match = _digitRegex.Match(key);
+                return match.Success ? int.Parse(match.Groups[1].Value, System.Globalization.NumberStyles.HexNumber) : 0;
             }
         }
         /*
@@ -348,36 +354,44 @@ namespace SyncSaberService.Data
         }
         */
         [JsonProperty("metadata")]
-        public SongMetadata metadata;
+        public SongMetadata metadata { get; }
         [JsonProperty("stats")]
-        public SongStats stats;
+        public SongStats stats { get; }
 
         [JsonProperty("description")]
-        public string description;
+        public string description { get; set; }
 
         [JsonProperty("deletedAt")]
-        public DateTime deletedAt;
+        public DateTime deletedAt { get; set; }
         [JsonProperty("_id")]
-        public string _id;
+        public string _id { get; set; }
         [JsonProperty("key")]
-        public string key;
+        public string key { get; set; }
         [JsonProperty("name")]
-        public string name;
+        public string name { get; set; }
         [JsonProperty("uploader")]
-        public SongUploader uploader;
+        public SongUploader uploader { get; }
         [JsonProperty("uploaded")]
-        public DateTime uploaded;
+        public DateTime uploaded { get; set; }
         [JsonProperty("hash")]
-        public string hash;
+        public string hash { get; set; }
         [JsonProperty("downloadURL")]
-        public string downloadURL;
+        public string downloadURL { get; set; }
         [JsonProperty("coverURL")]
-        public string coverURL;
+        public string coverURL { get; set; }
+
+        [JsonProperty("ScrapedAt")]
+        public DateTime ScrapedAt { get; set; }
+        /*
+        [JsonIgnore]
+        private SongMetadata _metadata;
+        [JsonIgnore]
+        private SongStats _stats;
+        [JsonIgnore]
+        private SongUploader _uploader;
+*/
 
 
-
-
-        
     }
 
     public class SongMetadata
