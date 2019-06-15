@@ -26,11 +26,11 @@ namespace SyncSaberService
 
             //test.Initialize();
             ScrapedDataProvider.Initialize();
-            var pageText = File.ReadAllText("test_multiplesongs_page.txt");
-            var multiSongs = BeatSaverReader.ParseSongsFromPage(pageText);
-            pageText = File.ReadAllText("test_detail_page.txt");
-            var singleSong = BeatSaverReader.ParseSongsFromPage(pageText);
-            //var newSongs = BeatSaverReader.ScrapeBeatSaver(500, true, 0);
+            //var pageText = File.ReadAllText("test_multiplesongs_page.txt");
+            //var multiSongs = BeatSaverReader.ParseSongsFromPage(pageText);
+            //pageText = File.ReadAllText("test_detail_page.txt");
+            //var singleSong = BeatSaverReader.ParseSongsFromPage(pageText);
+            var newSongs = BeatSaverReader.ScrapeBeatSaver(500, true, 1);
             //ScrapedDataProvider.UpdateScrapedFile();
             //test.Data.AddRange(ScrapedDataProvider.SyncSaberScrape.Take(20));
             //test.WriteFile(Path.Combine(SyncSaberScrape.DATA_DIRECTORY.FullName, "newScrap.json"));

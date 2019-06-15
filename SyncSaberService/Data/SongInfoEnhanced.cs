@@ -429,9 +429,9 @@ namespace SyncSaberService.Data
         [JsonProperty("upVotes")]
         public int upVotes;
         [JsonProperty("heat")]
-        public float heat;
+        public double heat;
         [JsonProperty("rating")]
-        public float rating;
+        public double rating;
     }
 
     public class SongUploader
