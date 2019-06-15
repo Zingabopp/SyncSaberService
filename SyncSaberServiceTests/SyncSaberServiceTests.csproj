@@ -63,9 +63,9 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\SyncSaberService\SyncSaberService.csproj">
-      <Project>{47E9E695-C638-4E4F-AD3D-6E8F6ABD983F}</Project>
-      <Name>SyncSaberService</Name>
+    <ProjectReference Include="..\SyncSaberLib\SyncSaberLib.csproj">
+      <Project>{47e9e695-c638-4e4f-ad3d-6e8f6abd983f}</Project>
+      <Name>SyncSaberLib</Name>
     </ProjectReference>
   </ItemGroup>
   <Choose>

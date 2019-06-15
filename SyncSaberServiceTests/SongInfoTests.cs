@@ -1,13 +1,13 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using SyncSaberService;
+using SyncSaberLib;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using SyncSaberService.Data;
+using SyncSaberLib.Data;
 
-namespace SyncSaberService.Tests
+namespace SyncSaberLib.Tests
 {
     [TestClass()]
     public class SongInfoTests
