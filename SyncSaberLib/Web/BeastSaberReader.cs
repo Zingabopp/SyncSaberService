@@ -87,26 +87,32 @@ namespace SyncSaberLib.Web
         {
             if (!Ready)
             {
-                Cookies = GetBSaberCookies(_username, _password);
-                AddCookies(Cookies, FeedRootUri);
+                //Cookies = GetBSaberCookies(_username, _password);
+                //AddCookies(Cookies, FeedRootUri);
                 for (int i = 0; i < Feeds.Keys.Count; i++)
                     _earliestEmptyPage.AddOrUpdate((int) Feeds.Keys.ElementAt(i), 9999);
                 Ready = true;
             }
         }
 
-        public BeastSaberReader(string username, string password, int maxConcurrency, string loginUri = DefaultLoginUri)
+        public BeastSaberReader(int maxConcurrency)
         {
             Ready = false;
-            _username = username;
-            _password = password;
-            _loginUri = loginUri;
-
             if (maxConcurrency > 0)
                 _maxConcurrency = maxConcurrency;
             else
                 _maxConcurrency = 5;
             _earliestEmptyPage = new Dictionary<int, int>();
+        }
+
+        [Obsolete("Login info is no longer required for Bookmarks and Followings.")]
+        public BeastSaberReader(string username, string password, int maxConcurrency, string loginUri = DefaultLoginUri)
+            : this(maxConcurrency)
+        {
+            _username = username;
+            _password = password;
+            _loginUri = loginUri;
+
             _cookieLock = new object();
         }
 

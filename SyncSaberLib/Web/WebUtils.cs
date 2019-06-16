@@ -23,6 +23,7 @@ namespace SyncSaberLib.Web
                     _httpClientHandler = new HttpClientHandler();
                     httpClientHandler.MaxConnectionsPerServer = 10;
                     httpClientHandler.UseCookies = true;
+                    httpClientHandler.AllowAutoRedirect = true; // Needs to be false to detect Beat Saver song download rate limit
                 }
                 return _httpClientHandler;
             }
@@ -47,6 +48,27 @@ namespace SyncSaberLib.Web
             }
         }
 
+        public static DateTime UnixTimeStampToDateTime(double unixTimeStamp)
+        {
+            // Unix timestamp is seconds past epoch
+            System.DateTime dtDateTime = new DateTime(1970, 1, 1, 0, 0, 0, 0, System.DateTimeKind.Utc);
+            dtDateTime = dtDateTime.AddSeconds(unixTimeStamp).ToLocalTime();
+            return dtDateTime;
+        }
+        private const string RATE_LIMIT_REMAINING_KEY = "Rate-Limit-Remaining";
+        private const string RATE_LIMIT_RESET_KEY = "Rate-Limit-Reset";
+        private const string RATE_LIMIT_TOTAL_KEY = "Rate-Limit-Total";
+        private const string RATE_LIMIT_PREFIX = "Rate-Limit";
+
+        public static RateLimit ParseRateLimit(Dictionary<string, string> headers)
+        {
+            return new RateLimit() {
+                CallsRemaining = int.Parse(headers[RATE_LIMIT_REMAINING_KEY]),
+                TimeToReset = UnixTimeStampToDateTime(double.Parse(headers[RATE_LIMIT_RESET_KEY])) - DateTime.Now,
+                CallsPerReset = int.Parse(headers[RATE_LIMIT_TOTAL_KEY])
+            };
+        }
+
         public static void Initialize(int maxConnectionsPerServer)
         {
             if (_initialized == false)
@@ -57,6 +79,8 @@ namespace SyncSaberLib.Web
                 _httpClient = new HttpClient(httpClientHandler);
             }
         }
+
+
 
         /// <summary>
         /// Downloads the page and returns it as a string.
@@ -126,6 +150,13 @@ namespace SyncSaberLib.Web
             }
             return string.Empty;
         }
+    }
+
+    public class RateLimit
+    {
+        public int CallsRemaining;
+        public TimeSpan TimeToReset;
+        public int CallsPerReset;
     }
 
     // From https://stackoverflow.com/questions/45711428/download-file-with-webclient-or-httpclient

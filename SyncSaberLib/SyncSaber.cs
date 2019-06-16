@@ -53,7 +53,7 @@ namespace SyncSaberLib
 
             FeedReaders = new Dictionary<string, IFeedReader> {
                 {BeatSaverReader.NameKey, new BeatSaverReader() },
-                {BeastSaberReader.NameKey, new BeastSaberReader(Config.BeastSaberUsername, Config.BeastSaberPassword, Config.MaxConcurrentPageChecks) },
+                {BeastSaberReader.NameKey, new BeastSaberReader(Config.MaxConcurrentPageChecks) },
                 {ScoreSaberReader.NameKey, new ScoreSaberReader() }
             };
         }

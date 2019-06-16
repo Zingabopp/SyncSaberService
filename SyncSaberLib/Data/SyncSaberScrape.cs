@@ -11,25 +11,19 @@ using SyncSaberLib.Web;
 
 namespace SyncSaberLib.Data
 {
+    [Obsolete("Replacing with separate classes for Beat Saver and ScoreSaber data")]
     public class SyncSaberScrape : IScrapedDataModel<List<SongInfo>, SongInfo>
     {
         private static readonly string ASSEMBLY_PATH = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-        public static readonly DirectoryInfo DATA_DIRECTORY = new DirectoryInfo(Path.Combine(ASSEMBLY_PATH, "ScrapedData"));
+
         [JsonIgnore]
         private bool _initialized;
 
-        [JsonProperty("Data")]
-        public List<SongInfo> Data { get; private set; }
-
-        [JsonIgnore]
-        public bool ReadOnly => throw new NotImplementedException();
-
-        [JsonIgnore]
-        public string DefaultPath => Path.Combine(ASSEMBLY_PATH, DATA_DIRECTORY.FullName, "SyncSaberScrapedData.json");
-
-        [JsonIgnore]
-        public FileInfo CurrentFile { get; private set; }
-
+        public SyncSaberScrape()
+        {
+            Data = new List<SongInfo>();
+            DefaultPath = Path.Combine(DATA_DIRECTORY.FullName, "SyncSaberScrapedData.json");
+        }
         public override void Initialize(string filePath = "")
         {
             if (string.IsNullOrEmpty(filePath))

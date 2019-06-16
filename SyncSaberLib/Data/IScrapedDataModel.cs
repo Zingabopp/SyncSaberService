@@ -6,12 +6,16 @@ using System.Threading.Tasks;
 using System.IO;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using System.Reflection;
 
 namespace SyncSaberLib.Data
 {
     public abstract class IScrapedDataModel<T, DataType> 
         where T : IEnumerable<DataType>, new()
     {
+        private static readonly string ASSEMBLY_PATH = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+        public static readonly DirectoryInfo DATA_DIRECTORY = new DirectoryInfo(Path.Combine(ASSEMBLY_PATH, "ScrapedData"));
+
         public virtual T Data { get; protected set; }
         [JsonIgnore]
         public bool ReadOnly { get; protected set; }
@@ -33,8 +37,17 @@ namespace SyncSaberLib.Data
                 }
             return results;
         }
-        public abstract void WriteFile(string filePath);
-        public abstract void Initialize(string filePath);
+        public virtual void WriteFile(string filePath = "")
+        {
+            if (string.IsNullOrEmpty(filePath))
+                filePath = CurrentFile.FullName;
+            using (StreamWriter file = File.CreateText(filePath))
+            {
+                JsonSerializer serializer = new JsonSerializer();
+                serializer.Serialize(file, this);
+            }
+        }
+        public abstract void Initialize(string filePath = "");
         
     }
 

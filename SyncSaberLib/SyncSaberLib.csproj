@@ -52,8 +52,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Config.cs" />
+    <Compile Include="Data\BeatSaverScrape.cs" />
     <Compile Include="Data\JsonConverters.cs" />
-    <Compile Include="Data\PlayerDataModel.cs" />
     <Compile Include="Data\ScoreSaberSong.cs" />
     <Compile Include="Data\IScrapedDataModel.cs" />
     <Compile Include="Data\ScrapedDataProvider.cs" />
@@ -62,7 +62,6 @@
     <Compile Include="SimpleJson.cs" />
     <Compile Include="Web\BeatSaverReader.cs" />
     <Compile Include="Web\DownloadBatch.cs" />
-    <Compile Include="Web\AsyncCookieCache.cs" />
     <Compile Include="Web\BeastSaberReader.cs" />
     <Compile Include="Web\DownloadJob.cs" />
     <Compile Include="Web\IFeedReader.cs" />
