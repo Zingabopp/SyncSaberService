@@ -5,7 +5,7 @@ using System.Runtime.Serialization;
 
 namespace SyncSaberLib.Data
 {
-    public class ScoreSaberSong
+    public class ScoreSaberSong : IEquatable<ScoreSaberSong>
     {
         [JsonIgnore]
         public bool Populated { get; private set; }
@@ -40,7 +40,7 @@ namespace SyncSaberLib.Data
         [JsonProperty("uid")]
         public int uid { get; set; }
         [JsonProperty("id")]
-        public string md5Hash { get; set; }
+        public string hash { get; set; }
         [JsonProperty("name")]
         public string name { get; set; }
         [JsonProperty("songSubName")]
@@ -90,12 +90,15 @@ namespace SyncSaberLib.Data
 
         public SongInfo GenerateSongInfo()
         {
+            var newSong = new SongInfo(hash);
+            /*
             var newSong = new SongInfo() {
                 songName = name,
                 songSubName = songSubName,
                 authorName = levelAuthorName,
                 bpm = bpm
             };
+            */
             //newSong.ScoreSaberInfo.Add(uid, this);
             return newSong;
         }
@@ -125,6 +128,11 @@ namespace SyncSaberLib.Data
                 default:
                     return diffString;
             }
+        }
+
+        public bool Equals(ScoreSaberSong other)
+        {
+            return uid == other.uid;
         }
     }
 }

@@ -86,7 +86,7 @@ namespace SyncSaberLib.Web
                     {
                         if (maxSongs <= 0)
                             throw new ArgumentException("You must specify a value greater than 0 for MaxPages or MaxSongs.");
-                        songs.AddRange(ScrapedDataProvider.SyncSaberScrape.Where(s => s.ScoreSaberInfo.Count > 0).OrderByDescending(s =>
+                        songs.AddRange(ScrapedDataProvider.Songs.Values.Where(s => s.ScoreSaberInfo.Count > 0).OrderByDescending(s =>
                         s.ScoreSaberInfo.Values.Select(ss => ss.scores_day).Aggregate((a, b) => a + b)).Take(maxSongs));
                     }
                     break;
@@ -95,7 +95,7 @@ namespace SyncSaberLib.Web
                     {
                         if (maxSongs <= 0)
                             throw new ArgumentException("You must specify a value greater than 0 for MaxPages or MaxSongs.");
-                        songs.AddRange(ScrapedDataProvider.SyncSaberScrape.Where(s => s.RankedDifficulties.Count > 0).OrderByDescending(ss =>
+                        songs.AddRange(ScrapedDataProvider.Songs.Values.Where(s => s.RankedDifficulties.Count > 0).OrderByDescending(ss =>
                         ss.ScoreSaberInfo.Keys.Max()).Take(maxSongs));
                     }
                     break;
@@ -104,7 +104,7 @@ namespace SyncSaberLib.Web
                     {
                         if (maxSongs <= 0)
                             throw new ArgumentException("You must specify a value greater than 0 for MaxPages or MaxSongs.");
-                        songs.AddRange(ScrapedDataProvider.SyncSaberScrape.Where(s => s.ScoreSaberInfo.Count > 0).OrderByDescending(s =>
+                        songs.AddRange(ScrapedDataProvider.Songs.Values.Where(s => s.ScoreSaberInfo.Count > 0).OrderByDescending(s =>
                         s.ScoreSaberInfo.Values.Select(ss => ss.scores).Aggregate((a, b) => a + b)).Take(maxSongs));
                     }
                     break;
@@ -113,7 +113,7 @@ namespace SyncSaberLib.Web
                     {
                         if (maxSongs <= 0)
                             throw new ArgumentException("You must specify a value greater than 0 for MaxPages or MaxSongs.");
-                        songs.AddRange(ScrapedDataProvider.SyncSaberScrape.OrderByDescending(s => s.RankedDifficulties.Max(d => d.Value)).Take(maxSongs));
+                        songs.AddRange(ScrapedDataProvider.Songs.Values.Where(s => s.RankedDifficulties.Count > 0).OrderByDescending(s => s.RankedDifficulties.Max(d => d.Value)).Take(maxSongs));
                     }
                     else
                         songs.AddRange(GetTopPPSongs(settings));
@@ -125,20 +125,10 @@ namespace SyncSaberLib.Web
             Dictionary<int, SongInfo> retDict = new Dictionary<int, SongInfo>();
             foreach (var song in songs)
             {
-                if (retDict.ContainsKey(song.id))
+                if (!retDict.ContainsKey(song.keyAsInt))
                 {
-                    if (retDict[song.id].SongVersion < song.SongVersion)
-                    {
-                        Logger.Debug($"Song with ID {song.id} already exists, updating");
-                        retDict[song.id] = song;
-                    }
-                    else if (retDict[song.id].SongVersion == song.SongVersion)
-                        Logger.Debug($"Tried to add a song we already have");
-                    else
-                        Logger.Debug($"Song with ID {song.id} is already the newest version");
+                    retDict.Add(song.keyAsInt, song);
                 }
-                else
-                    retDict.Add(song.id, song);
             }
             return retDict;
         }
@@ -231,7 +221,7 @@ namespace SyncSaberLib.Web
                 }
                 else
                 {
-                    Logger.Warning($"Could not find song {song.name} with hash {song.md5Hash} on Beat Saver, skipping...");
+                    Logger.Warning($"Could not find song {song.name} with hash {song.hash} on Beat Saver, skipping...");
                 }
             }
 

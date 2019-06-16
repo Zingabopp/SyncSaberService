@@ -18,7 +18,7 @@ namespace SyncSaberLib.Data
     /// <summary>
     /// TODO: Make Scrapped song the base with separate objects (using Lazy<>) for Beat Saver and Score Saber data.
     /// </summary>
-    public class SongInfoEnhanced
+    public class BeatSaverSong : IEquatable<BeatSaverSong>
     {
         private const string SONG_DETAILS_URL_BASE = "https://beatsaver.com/api/songs/detail/";
         private const string SONG_BY_HASH_URL_BASE = "https://beatsaver.com/api/songs/search/hash/";
@@ -62,7 +62,7 @@ namespace SyncSaberLib.Data
         /// <param name="url"></param>
         /// <exception cref="HttpRequestException"></exception>
         /// <returns></returns>
-        public static bool PopulateFields(SongInfoEnhanced song)
+        public static bool PopulateFields(BeatSaverSong song)
         {
             if (song.Populated)
                 return true;
@@ -107,7 +107,7 @@ namespace SyncSaberLib.Data
 
         public bool PopulateFields()
         {
-            return SongInfoEnhanced.PopulateFields(this);
+            return BeatSaverSong.PopulateFields(this);
         }
 
         enum SongGetMethod
@@ -178,14 +178,14 @@ namespace SyncSaberLib.Data
             return successful;
         }
 
-        public SongInfoEnhanced()
+        public BeatSaverSong()
         {
             metadata = new SongMetadata();
             stats = new SongStats();
             uploader = new SongUploader();
         }
 
-        public SongInfoEnhanced(string songIndex, string songName, string songUrl, string _authorName)
+        public BeatSaverSong(string songIndex, string songName, string songUrl, string _authorName)
             : this()
         {
             key = songIndex;
@@ -233,16 +233,16 @@ namespace SyncSaberLib.Data
 
 
 
-        public static bool TryParseBeatSaver(JToken token, out SongInfoEnhanced song)
+        public static bool TryParseBeatSaver(JToken token, out BeatSaverSong song)
         {
             string songIndex = token["key"]?.Value<string>();
             if (songIndex == null)
                 songIndex = "";
             bool successful = true;
-            SongInfoEnhanced enhancedSong;
+            BeatSaverSong enhancedSong;
             try
             {
-                enhancedSong = token.ToObject<SongInfoEnhanced>(new JsonSerializer() {
+                enhancedSong = token.ToObject<BeatSaverSong>(new JsonSerializer() {
                     NullValueHandling = NullValueHandling.Ignore,
                     MissingMemberHandling = MissingMemberHandling.Ignore
                 });
@@ -297,9 +297,11 @@ namespace SyncSaberLib.Data
             return _songInfo;
         }
         */
-
+        [Obsolete("Shouldn't use this anymore")]
         public SongInfo GenerateSongInfo()
         {
+            var newSong = new SongInfo(hash);
+            /*
             var newSong = new SongInfo() {
                 key = key,
                 songName = metadata.songName,
@@ -311,6 +313,7 @@ namespace SyncSaberLib.Data
                 downVotes = stats.downVotes,
                 hash = hash,
             };
+            */
             //newSong.EnhancedInfo = this;
             return newSong;
         }
@@ -324,6 +327,11 @@ namespace SyncSaberLib.Data
             retStr.AppendLine("   Author: " + metadata.levelAuthorName);
             retStr.AppendLine("   URL: " + downloadURL);
             return retStr.ToString();
+        }
+
+        public bool Equals(BeatSaverSong other)
+        {
+            return hash.ToUpper() == other.hash.ToUpper();
         }
 
         //[JsonIgnore]
@@ -445,7 +453,7 @@ namespace SyncSaberLib.Data
 
     public static class SongInfoEnhancedExtensions
     {
-        public static void PopulateFromBeatSaver(this IEnumerable<SongInfoEnhanced> songs)
+        public static void PopulateFromBeatSaver(this IEnumerable<BeatSaverSong> songs)
         {
             List<Task> populateTasks = new List<Task>();
             for (int i = 0; i < songs.Count(); i++)
@@ -457,7 +465,7 @@ namespace SyncSaberLib.Data
             Task.WaitAll(populateTasks.ToArray());
         }
 
-        public static async Task PopulateFromBeatSaverAsync(this IEnumerable<SongInfoEnhanced> songs)
+        public static async Task PopulateFromBeatSaverAsync(this IEnumerable<BeatSaverSong> songs)
         {
             List<Task> populateTasks = new List<Task>();
             for (int i = 0; i < songs.Count(); i++)

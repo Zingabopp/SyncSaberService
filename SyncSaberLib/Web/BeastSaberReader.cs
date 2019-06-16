@@ -28,6 +28,7 @@ namespace SyncSaberLib.Web
         private static readonly string USERNAMEKEY = "{USERNAME}";
         private static readonly string PAGENUMKEY = "{PAGENUM}";
         private const string DefaultLoginUri = "https://bsaber.com/wp-login.php?jetpack-sso-show-default-form=1";
+        private const string BeatSaverDownloadURL_Base = "https://beatsaver.com/api/download/key/";
         private static readonly Uri FeedRootUri = new Uri("https://bsaber.com");
         public const int SONGS_PER_PAGE = 50;
         #endregion
@@ -200,13 +201,16 @@ namespace SyncSaberLib.Web
                     {
                         string songIndex = innerText.Substring(innerText.LastIndexOf('/') + 1);
                         string mapper = GetMapperFromBsaber(node.InnerText);
-                        string songUrl = "https://beatsaver.com/download/" + songIndex;
-                        SongInfo currentSong = new SongInfo(songIndex, songName, songUrl, mapper);
+                        string songUrl = BeatSaverDownloadURL_Base + songIndex;
+
+                        // TODO: Get song from the scrape, if not maybe scrape beat saver for the song.
+                        //SongInfo currentSong = new SongInfo(songIndex, songName, songUrl, mapper);
                         //string currentSongDirectory = Path.Combine(Config.BeatSaberPath, "CustomSongs", songIndex);
                         //bool downloadFailed = false;
                         //populateTasks.Add(currentSong.PopulateFieldsAsync());
                         //SongInfo.PopulateFields(currentSong);
-                        songsOnPage.Add(currentSong);
+                        if(ScrapedDataProvider.TryGetSongByKey(songIndex, out SongInfo currentSong))
+                            songsOnPage.Add(currentSong);
                     }
                 }
             }
@@ -331,21 +335,22 @@ namespace SyncSaberLib.Web
             Dictionary<int, SongInfo> retDict = new Dictionary<int, SongInfo>();
             foreach (var song in songList)
             {
-                if (retDict.ContainsKey(song.id))
+                if (retDict.ContainsKey(song.keyAsInt))
                 {
-                    if (retDict[song.id].SongVersion < song.SongVersion)
+                    /*
+                    if (retDict[song.keyAsInt].SongVersion < song.SongVersion)
                     {
-                        Logger.Debug($"Song with ID {song.id} already exists, updating");
-                        retDict[song.id] = song;
+                        Logger.Debug($"Song with ID {song.keyAsInt} already exists, updating");
+                        retDict[song.keyAsInt] = song;
                     }
                     else
                     {
-                        Logger.Debug($"Song with ID {song.id} is already the newest version");
-                    }
+                        Logger.Debug($"Song with ID {song.keyAsInt} is already the newest version");
+                    }*/
                 }
                 else
                 {
-                    retDict.Add(song.id, song);
+                    retDict.Add(song.keyAsInt, song);
                 }
             }
             return retDict;

@@ -18,7 +18,7 @@ namespace SyncSaberLib.Web
     public class DownloadJob
     {
         public const string NOTFOUNDERROR = "The remote server returned an error: (404) Not Found.";
-        public const string BEATSAVER_DOWNLOAD_URL_BASE = "https://beatsaver.com/download/";
+        public const string BEATSAVER_DOWNLOAD_URL_BASE = "https://beatsaver.com/api/download/key/";
         private const string TIMEOUTERROR = "The request was aborted: The request was canceled.";
 
         public enum JobResult
@@ -119,13 +119,17 @@ namespace SyncSaberLib.Web
             var token = _tokenSource.Token;
 
             Task downloadAsync = WebUtils.DownloadFileAsync(url, path, true);
-            await downloadAsync;
+            try
+            {
+                await downloadAsync;
+            }
+            catch (Exception) { }
             if (downloadAsync.IsFaulted || !File.Exists(path))
             {
                 successful = false;
                 if (downloadAsync.Exception != null)
                 {
-                    if (downloadAsync.Exception.InnerException.Message == NOTFOUNDERROR)
+                    if (downloadAsync.Exception.InnerException.Message.Contains("404"))
                     {
                         Logger.Error($"{url} was not found on Beat Saver.");
                         Result = JobResult.NOTFOUND;
@@ -165,7 +169,7 @@ namespace SyncSaberLib.Web
                 {
                     Logger.Warning("File is in use and can't be deleted");
                 }
-                
+
                 successful = false;
             }
             return successful;

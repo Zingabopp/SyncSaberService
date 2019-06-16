@@ -24,6 +24,7 @@ namespace SyncSaberLib.Data
             Data = new List<SongInfo>();
             DefaultPath = Path.Combine(DATA_DIRECTORY.FullName, "SyncSaberScrapedData.json");
         }
+
         public override void Initialize(string filePath = "")
         {
             if (string.IsNullOrEmpty(filePath))

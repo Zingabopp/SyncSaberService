@@ -42,9 +42,11 @@ namespace SyncSaberLib
             {
                 _songDownloadHistory = File.ReadAllLines(_historyPath).ToList<string>();
             }
+            else
+                File.Create(_historyPath); // TODO: Check if this works
             if (Directory.Exists(Config.BeatSaberPath))
             {
-                CustomSongsPath = Path.Combine(Config.BeatSaberPath, "CustomSongs");
+                CustomSongsPath = Path.Combine(Config.BeatSaberPath, @"Beat Saber_Data\CustomLevels");
                 if (!Directory.Exists(CustomSongsPath))
                 {
                     Directory.CreateDirectory(CustomSongsPath);
@@ -98,8 +100,10 @@ namespace SyncSaberLib
             }
         }
 
+        [Obsolete("Does not work anymore, returns immediately")]
         private void RemoveOldVersions(string songIndex)
         {
+            return;
             if (!Config.DeleteOldVersions)
             {
                 return;
@@ -251,7 +255,7 @@ namespace SyncSaberLib
             {
                 tempPath = Path.Combine(Path.GetTempPath(), song.key + zipExtension);
                 if (useSongKeyAsOutputFolder)
-                    outputPath = Path.Combine(CustomSongsPath, song.key);
+                    outputPath = Path.Combine(CustomSongsPath, $"{song.key} ({MakeSafeFilename(song.songName)})");
                 else
                     outputPath = CustomSongsPath;
                 bool songExists = Directory.Exists(outputPath);

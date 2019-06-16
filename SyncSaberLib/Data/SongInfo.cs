@@ -14,7 +14,7 @@ using System.Runtime.Serialization;
 
 namespace SyncSaberLib.Data
 {
-    public class SongInfo
+    public class SongInfo : IEquatable<SongInfo>
     {
         // Link: https://raw.githubusercontent.com/andruzzzhka/BeatSaberScrappedData/master/combinedScrappedData.json
         private static readonly Regex _digitRegex = new Regex("^[0-9]+$", RegexOptions.Compiled);
@@ -22,78 +22,7 @@ namespace SyncSaberLib.Data
         public const char IDENTIFIER_DELIMITER = (char) 0x220E;
         private const string DOWNLOAD_URL_BASE = "http://beatsaver.com/download/";
 
-        [JsonIgnore]
-        public bool Populated { get; private set; }
 
-        [JsonIgnore]
-        private int _id = 0;
-        [JsonIgnore]
-        public int id
-        {
-            get
-            {
-                if (_id <= 0 && _beatSaverRegex.IsMatch(key))
-                    _id = int.Parse(key.Substring(0, key.IndexOf('-')));
-                return _id;
-            }
-        }
-
-        private int _version = 0;
-        [JsonIgnore]
-        public int SongVersion
-        {
-            get
-            {
-                if (_version <= 0 && _beatSaverRegex.IsMatch(key))
-                    try { _version = int.Parse(key.Substring(key.IndexOf('-') + 1)); }
-                    catch (Exception) { }
-                return _version;
-            }
-        }
-
-        [JsonIgnore]
-        public string url;
-        [JsonIgnore]
-        private string _key;
-
-        
-
-        #region Scraped Data
-        [JsonProperty("key")]
-        public string key
-        {
-            get { return _key; }
-            set
-            {
-                if (string.IsNullOrEmpty(url) && _beatSaverRegex.IsMatch(value))
-                {
-                    url = DOWNLOAD_URL_BASE + value;
-                    _id = int.Parse(value.Substring(0, value.IndexOf('-')));
-                    try { _version = int.Parse(value.Substring(value.IndexOf('-') + 1)); }
-                    catch (Exception) { }
-                }
-                _key = value;
-            }
-        }
-        [JsonProperty("songName")]
-        public string songName { get; set; }
-        [JsonProperty("songSubName")]
-        public string songSubName { get; set; }
-        [JsonProperty("authorName")]
-        public string authorName { get; set; }
-        [JsonProperty("bpm")]
-        public float bpm { get; set; }
-        [JsonProperty("playedCount")]
-        public int playedCount { get; set; }
-        [JsonProperty("upVotes")]
-        public int upVotes { get; set; }
-        [JsonProperty("downVotes")]
-        public int downVotes { get; set; }
-        [JsonProperty("hash")]
-        public string hash { get; set; }
-
-
-        #endregion
         [JsonIgnore]
         private Dictionary<string, float> _rankedDiffs;
         [JsonIgnore]
@@ -110,11 +39,11 @@ namespace SyncSaberLib.Data
                     {
                         if (ScoreSaberInfo[key].ranked)
                         {
-                            if (hash.ToUpper() == ScoreSaberInfo[key].md5Hash.ToUpper())
+                            if (hash.ToUpper() == ScoreSaberInfo[key].hash.ToUpper())
                                 _rankedDiffs.AddOrUpdate(ScoreSaberInfo[key].difficulty, ScoreSaberInfo[key].stars);
                             else
-                                Logger.Debug($"Ranked version of {key} - {songName} is outdated.\n" +
-                                    $"   {hash.ToUpper()} != {ScoreSaberInfo[key].md5Hash.ToUpper()}");
+                                Logger.Debug($"Ranked version of {key} is outdated.\n" +
+                                    $"   {hash.ToUpper()} != {ScoreSaberInfo[key].hash.ToUpper()}");
                         }
                     }
                 }
@@ -122,19 +51,8 @@ namespace SyncSaberLib.Data
             }
         }
 
-        [JsonIgnore]
-        private SongInfoEnhanced _enhancedSongInfo;
+        public BeatSaverSong BeatSaverInfo { get; set; }
 
-        public SongInfoEnhanced EnhancedInfo
-        {
-            get
-            {
-                return _enhancedSongInfo;
-            }
-            set { _enhancedSongInfo = value; }
-        }
-
-        [JsonIgnore]
         private Dictionary<int, ScoreSaberSong> _scoreSaberInfo;
         public Dictionary<int, ScoreSaberSong> ScoreSaberInfo
         {
@@ -146,7 +64,87 @@ namespace SyncSaberLib.Data
             }
             set { _scoreSaberInfo = value; }
         }
+        private string _hash;
+        public string hash
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(_hash))
+                {
+                    if (BeatSaverInfo != null)
+                        _hash = BeatSaverInfo.hash.ToUpper();
+                    else
+                    {
+                        var ssSong = ScoreSaberInfo.Values.FirstOrDefault();
+                        if (ssSong != null)
+                            _hash = ssSong.hash.ToUpper();
+                    }
+                }
+                return _hash;
+            }
+        }
 
+        public int keyAsInt
+        {
+            get
+            {
+                if (BeatSaverInfo != null)
+                    return BeatSaverInfo.KeyAsInt;
+                return 0;
+            }
+        }
+
+        public string key
+        {
+            get
+            {
+                if (BeatSaverInfo != null)
+                    return BeatSaverInfo.key;
+                return string.Empty;
+            }
+        }
+
+        public string songName
+        {
+            get
+            {
+                if (BeatSaverInfo != null)
+                    return BeatSaverInfo.name;
+                var ssSong = ScoreSaberInfo.Values.FirstOrDefault();
+                if (ssSong != null)
+                    return ssSong.name;
+                return string.Empty;
+            }
+        }
+
+        public string authorName
+        {
+            get
+            {
+                if (BeatSaverInfo != null)
+                    return BeatSaverInfo.uploader.username;
+                var ssSong = ScoreSaberInfo.Values.FirstOrDefault();
+                if (ssSong != null)
+                    return ssSong.levelAuthorName;
+                return string.Empty;
+            }
+        }
+
+        public float bpm
+        {
+            get
+            {
+                if (BeatSaverInfo != null)
+                    return BeatSaverInfo.metadata.bpm;
+                var ssSong = ScoreSaberInfo.Values.FirstOrDefault();
+                if (ssSong != null)
+                    return ssSong.bpm;
+                return 0;
+            }
+        }
+
+
+        /*
         [JsonIgnore]
         private string _identifier;
         [JsonIgnore]
@@ -177,52 +175,16 @@ namespace SyncSaberLib.Data
                 return _identifier;
             }
         }
-
-        public SongInfo() { }
-        public SongInfo(string _key, string _songName, string _downloadUrl, string _author)
-        {
-            key = _key;
-            songName = _songName;
-            url = _downloadUrl;
-            authorName = _author;
-        }
-
-        public void PopulateFields()
-        {
-
-        }
-        /*
-        public static bool TryParseBeatSaver(JToken token, out SongInfo song)
-        {
-            string songIndex = token["key"]?.Value<string>();
-            if (songIndex == null)
-                songIndex = "";
-            bool successful = true;
-            try
-            {
-                song = token.ToObject<SongInfo>(new JsonSerializer() {
-                    NullValueHandling = NullValueHandling.Ignore,
-                    MissingMemberHandling = MissingMemberHandling.Ignore
-                });
-                //Logger.Debug(song.ToString());
-            }
-            catch (Exception ex)
-            {
-                Logger.Exception($"Unable to create a SongInfo from the JSON for {songIndex}\n", ex);
-                successful = false;
-                song = null;
-            }
-            return successful;
-        }
         */
+        //public SongInfo() { }
+        public SongInfo(string hash)
+        {
+            _hash = hash.ToUpper();
+        }
+
         public override string ToString()
         {
-            StringBuilder retStr = new StringBuilder();
-            retStr.Append("SongInfo:");
-            retStr.AppendLine("   Index: " + key);
-            retStr.AppendLine("   Name: " + songName);
-            retStr.AppendLine("   Author: " + authorName);
-            return retStr.ToString();
+            return hash;
         }
 
         public object this[string propertyName]
@@ -252,21 +214,10 @@ namespace SyncSaberLib.Data
                 myPropInfo.SetValue(this, value, null);
             }
         }
-        [OnDeserializing]
-        private void OnDeserializing(StreamingContext context)
-        {
 
-        }
-
-        [OnDeserialized]
-        protected void OnDeserialized(StreamingContext context)
+        public bool Equals(SongInfo other)
         {
-            //if (!(this is ScoreSaberSong))
-            if (!this.GetType().IsSubclassOf(typeof(SongInfo)))
-            {
-                //Logger.Warning("SongInfo OnDeserialized");
-                Populated = true;
-            }
+            return hash.ToUpper() == other.hash.ToUpper();
         }
     }
 

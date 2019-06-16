@@ -11,26 +11,20 @@ using SyncSaberLib.Web;
 
 namespace SyncSaberLib.Data
 {
-    public class BeatSaverScrape : IScrapedDataModel<List<BeatSaverSong>, BeatSaverSong>
+    public class ScoreSaberScrape : IScrapedDataModel<List<ScoreSaberSong>, ScoreSaberSong>
     {
         private bool _initialized;
-
-        //[JsonProperty("Data")]
-        //public List<SongInfoEnhanced> Data { get; private set; }
-
-        public BeatSaverScrape()
+        public ScoreSaberScrape()
         {
-            DefaultPath = Path.Combine(DATA_DIRECTORY.FullName, "BeatSaverScrape.json");
             _initialized = false;
-            Data = new List<BeatSaverSong>();
-            
+            DefaultPath = Path.Combine(DATA_DIRECTORY.FullName, "ScoreSaberScrape.json");
         }
 
         public override void Initialize(string filePath = "")
         {
             if (string.IsNullOrEmpty(filePath))
                 filePath = DefaultPath;
-            
+            Data = new List<ScoreSaberSong>();
             //(filePath).Populate(this);
             if (File.Exists(filePath))
                 ReadScrapedFile(filePath).Populate(Data);

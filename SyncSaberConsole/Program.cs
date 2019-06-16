@@ -17,17 +17,29 @@ namespace SyncSaberConsole
 {
     class Program
     {
-        
+
 
         private static void Tests()
         {
             //ScrapedDataProvider.Initialize();
-            var thing = new SongInfo();
+
             WebUtils.Initialize(5);
             
+            
+            //ScrapedDataProvider.Initialize();
+            
+           
+            //ScrapedDataProvider.Initialize();
+            var bsScrape = ScrapedDataProvider.BeatSaverSongs;
+            var ssScrape = ScrapedDataProvider.ScoreSaberSongs;
+            ScrapedDataProvider.TryGetSongByHash("501f6b1bddb2af72abda0f1e6b7b89cb1eb3db67", out SongInfo deletedSong);
+            var job = new DownloadJob(deletedSong, "test.zip", @"ScrapedData\test");
+            var jobTask = job.RunJobAsync();
+            jobTask.Wait();
+            bsScrape.AddOrUpdate(null);
             var resp = WebUtils.httpClient.GetAsync("https://beatsaver.com/api/maps/detail/b");
             Task.WaitAll(resp);
-            
+
             var rateHeaders = resp.Result.Headers.Where(h => h.Key.StartsWith("Rate-Limit")).ToDictionary(x => x.Key, x => x.Value.FirstOrDefault());
             var remoteTime = resp.Result.Headers.Date;
             var rateInfo = WebUtils.ParseRateLimit(rateHeaders);
@@ -39,7 +51,7 @@ namespace SyncSaberConsole
             //var test = new SyncSaberScrape();
 
             //test.Initialize();
-            ScrapedDataProvider.Initialize();
+            
             var beatSaverScrape = new BeatSaverScrape();
             beatSaverScrape.Initialize();
             var songs = beatSaverScrape.Data;
@@ -56,7 +68,7 @@ namespace SyncSaberConsole
                 //serializer.Serialize(file, beatSaverSongs);
                 file.Write(JsonConvert.SerializeObject(scoreSaberSongs));
             }
-            var beatSaverSongs = ScrapedDataProvider.SyncSaberScrape.Select(s => s.EnhancedInfo).ToArray();
+            var beatSaverSongs = ScrapedDataProvider.Songs.Values.Select(s => s.BeatSaverInfo).ToArray();
             using (StreamWriter file = File.CreateText(@"ScrapedData\BeatSaverScrape.json"))
             {
                 //JsonSerializer serializer = new JsonSerializer();
@@ -67,7 +79,7 @@ namespace SyncSaberConsole
             //test.Data.AddRange(ScrapedDataProvider.SyncSaberScrape.Take(20));
             //test.WriteFile(Path.Combine(SyncSaberScrape.DATA_DIRECTORY.FullName, "newScrap.json"));
 
-            var trending = ScrapedDataProvider.SyncSaberScrape.Where(s => s.ScoreSaberInfo.Count > 0).OrderByDescending(s => s.ScoreSaberInfo.Values.Select(ss => ss.scores).Aggregate((a, b) => a + b)).Take(100);
+            var trending = ScrapedDataProvider.Songs.Values.Where(s => s.ScoreSaberInfo.Count > 0).OrderByDescending(s => s.ScoreSaberInfo.Values.Select(ss => ss.scores).Aggregate((a, b) => a + b)).Take(100);
             var detTrending = trending.Select(s => (s.ScoreSaberInfo.Values.Select(ss => ss.scores).Aggregate((a, b) => a + b), s)).ToList();
 
             //var scrapeSongs = BeatSaverReader.ScrapeBeatSaver(500, true, 0);
@@ -76,16 +88,14 @@ namespace SyncSaberConsole
             //ScrapedDataProvider.UpdateScrapedFile();
 
             var reader = new BeatSaverReader();
-            var ssongs = ScrapedDataProvider.SyncSaberScrape.OrderByDescending(s => s.id).ToList();
-            var beatSaverTop = BeatSaverReader.GetSongsFromPage("https://beatsaver.com/api/songs/top/");
-            var believer = ScrapedDataProvider.SyncSaberScrape.Where(s => s.songName.ToLower().Contains("believer"));
+
             //var SSReader = new ScoreSaberReader();
 
-            var diffs = ssongs.Where(s => s.RankedDifficulties.Count > 0).OrderByDescending(s => s.RankedDifficulties.Max(d => d.Value)).Select(s => s.hash).ToList();
-            //var maybe = diffs.Where(s => s.id == 6602).ToList();
-            var ranked = ssongs.Where(s => s.ScoreSaberInfo.Values.Where(ss => ss.ranked == true).Count() > 0).Select(s => s.hash).ToList();
-            var difference = ranked.Where(r => !diffs.Contains(r)).ToList();
-            var difSongs = ssongs.Where(s => difference.Contains(s.hash)).ToList();
+            //var diffs = ssongs.Where(s => s.RankedDifficulties.Count > 0).OrderByDescending(s => s.RankedDifficulties.Max(d => d.Value)).Select(s => s.hash).ToList();
+            ////var maybe = diffs.Where(s => s.id == 6602).ToList();
+            //var ranked = ssongs.Where(s => s.ScoreSaberInfo.Values.Where(ss => ss.ranked == true).Count() > 0).Select(s => s.hash).ToList();
+            //var difference = ranked.Where(r => !diffs.Contains(r)).ToList();
+            //var difSongs = ssongs.Where(s => difference.Contains(s.hash)).ToList();
             //var scoreSaberSongs = SSReader.GetTopPPSongs(new ScoreSaberFeedSettings(0) { MaxPages = 1 });
 
 
@@ -108,8 +118,8 @@ namespace SyncSaberConsole
                 {
                     Logger.Exception("Error initializing Config", ex);
                 }
-                //ScrapedDataProvider.Initialize();
-                Tests();
+                ScrapedDataProvider.Initialize();
+                //Tests();
                 try
                 {
                     if (args.Length > 0)

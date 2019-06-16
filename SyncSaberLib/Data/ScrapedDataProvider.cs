@@ -17,40 +17,40 @@ namespace SyncSaberLib.Data
         private const string SCRAPED_DATA_URL = "https://raw.githubusercontent.com/andruzzzhka/BeatSaberScrappedData/master/combinedScrappedData.json";
         public static readonly string ASSEMBLY_PATH = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
         public static readonly DirectoryInfo DATA_DIRECTORY = new DirectoryInfo(Path.Combine(ASSEMBLY_PATH, "ScrapedData"));
-        public static readonly FileInfo BEATSAVER_SCRAPE_PATH =
-            new FileInfo(Path.Combine(ASSEMBLY_PATH, DATA_DIRECTORY.FullName, "combinedScrappedData.json"));
-        public static readonly FileInfo SYNCSABER_SCRAPE_PATH =
-            new FileInfo(Path.Combine(ASSEMBLY_PATH, DATA_DIRECTORY.FullName, "SyncSaberScrapedData-old.json"));
-        private static List<SongInfo> _beatSaverScrape;
-        public static List<SongInfo> BeatSaverScrape
-        {
-            get
-            {
-                if (_beatSaverScrape == null)
-                    _beatSaverScrape = ReadScrapedFile(BEATSAVER_SCRAPE_PATH.FullName);
-                return _beatSaverScrape;
-            }
-        }
-        private static List<SongInfo> _syncSaberScrape;
-        public static List<SongInfo> SyncSaberScrape
-        {
-            get
-            {
-                if (!_initialized)
-                    throw new ApplicationException("ScrapedDataProvider is not initialized.");
-                if (_syncSaberScrape == null)
-                    _syncSaberScrape = new List<SongInfo>();
-                return _syncSaberScrape;
-            }
-        }
 
+        public static BeatSaverScrape BeatSaverSongs { get; set; }
+        public static ScoreSaberScrape ScoreSaberSongs { get; set; }
+        public static Dictionary<string, SongInfo> Songs { get; set; }
         public static void Initialize()
         {
             if (!DATA_DIRECTORY.Exists)
                 DATA_DIRECTORY.Create();
             DATA_DIRECTORY.Refresh();
-            if(File.Exists(SYNCSABER_SCRAPE_PATH.FullName))
-                _syncSaberScrape = ReadScrapedFile(SYNCSABER_SCRAPE_PATH.FullName);
+            BeatSaverSongs = new BeatSaverScrape();
+            BeatSaverSongs.Initialize();
+            ScoreSaberSongs = new ScoreSaberScrape();
+            ScoreSaberSongs.Initialize();
+            Songs = new Dictionary<string, SongInfo>();
+            foreach (var song in BeatSaverSongs.Data)
+            {
+                var newSong = new SongInfo(song.hash);
+                newSong.BeatSaverInfo = song;
+                if (Songs.AddOrUpdate(song.hash.ToUpper(), newSong))
+                    Logger.Warning($"Repeated hash while creating SongInfo Dictionary, this should not happen. {song.name} by {song.metadata.levelAuthorName}");
+            }
+            foreach (var diff in ScoreSaberSongs.Data)
+            {
+                if (diff.hash.Count() < 40)
+                    continue; // Using the old hash, skip
+                if (Songs.ContainsKey(diff.hash))
+                    Songs[diff.hash].ScoreSaberInfo.AddOrUpdate(diff.uid, diff);
+                else
+                {
+                    var newSong = new SongInfo(diff.hash);
+                    newSong.ScoreSaberInfo.AddOrUpdate(diff.uid, diff);
+                    Songs.AddOrUpdate(diff.hash, newSong);
+                }
+            }
             _initialized = true;
         }
 
@@ -68,24 +68,6 @@ namespace SyncSaberLib.Data
             return results;
         }
 
-        public static List<SongInfo> ReadDefaultScraped()
-        {
-            return ReadScrapedFile(BEATSAVER_SCRAPE_PATH.FullName);
-        }
-
-        public static async Task<List<SongInfo>> ReadDefaultScrapedAsync()
-        {
-            return await Task.Run(() => ReadDefaultScraped());
-        }
-
-        public static void UpdateScrapedFile()
-        {
-            using (StreamWriter file = File.CreateText(SYNCSABER_SCRAPE_PATH.FullName))
-            {
-                JsonSerializer serializer = new JsonSerializer();
-                serializer.Serialize(file, SyncSaberScrape);
-            }
-        }
 
         public static void FetchUpdatedScrape()
         {
@@ -103,7 +85,8 @@ namespace SyncSaberLib.Data
         /// <returns></returns>
         public static bool TryGetSongByHash(string hash, out SongInfo song, bool searchOnline = true)
         {
-            song = SyncSaberScrape.Where(s => s.hash.ToUpper() == hash.ToUpper()).FirstOrDefault();
+            hash = hash.ToUpper();
+            song = Songs.ContainsKey(hash) ? Songs[hash] : null;
             if (song == null && searchOnline)
             {
                 Logger.Info($"Song with hash: {hash}, not in scraped data, searching Beat Saver...");
@@ -130,7 +113,7 @@ namespace SyncSaberLib.Data
         /// <returns></returns>
         public static bool TryGetSongByKey(string key, out SongInfo song, bool searchOnline = true)
         {
-            song = SyncSaberScrape.Where(s => s.key == key).FirstOrDefault();
+            song = Songs.Values.Where(s => s.key == key).FirstOrDefault();
             if (song == null && searchOnline)
             {
                 Logger.Info($"Song with key: {key}, not in scraped data, searching Beat Saver...");
@@ -153,12 +136,12 @@ namespace SyncSaberLib.Data
         /// <returns></returns>
         public static bool TryAddToScrapedData(SongInfo song)
         {
-            if (SyncSaberScrape.Where(s => s.hash.ToLower() == song.hash.ToLower()).Count() == 0)
+            if (Songs.Values.Where(s => s.hash.ToLower() == song.hash.ToLower()).Count() == 0)
             {
                 //Logger.Debug($"Adding song {song.key} - {song.songName} by {song.authorName} to ScrapedData");
-                lock (SyncSaberScrape)
+                lock (Songs)
                 {
-                    SyncSaberScrape.Add(song);
+                    Songs.Add(song.hash, song);
                 }
                 return true;
             }
@@ -172,7 +155,7 @@ namespace SyncSaberLib.Data
         /// <param name="song"></param>
         /// <param name="searchOnline"></param>
         /// <returns></returns>
-        public static SongInfo GetOrCreateSong(SongInfoEnhanced song, bool searchOnline = true)
+        public static SongInfo GetOrCreateSong(BeatSaverSong song, bool searchOnline = true)
         {
             bool foundOnline = TryGetSongByHash(song.hash, out SongInfo songInfo, searchOnline);
             if (songInfo == null)
@@ -180,17 +163,17 @@ namespace SyncSaberLib.Data
                 songInfo = song.GenerateSongInfo();
                 TryAddToScrapedData(songInfo);
             }
-            songInfo.EnhancedInfo = song;
+            songInfo.BeatSaverInfo = song;
             return songInfo;
         }
 
         public static SongInfo GetOrCreateSong(ScoreSaberSong song, bool searchOnline = true)
         {
-            bool foundOnline = TryGetSongByHash(song.md5Hash, out SongInfo songInfo, searchOnline);
+            bool foundOnline = TryGetSongByHash(song.hash, out SongInfo songInfo, searchOnline);
             if (songInfo == null)
             {
                 songInfo = song.GenerateSongInfo();
-                SyncSaberScrape.Add(songInfo);
+                TryAddToScrapedData(songInfo);
             }
             songInfo.ScoreSaberInfo.AddOrUpdate(song.uid, song);
             return songInfo;
@@ -198,7 +181,7 @@ namespace SyncSaberLib.Data
 
         public static SongInfo GetSong(ScoreSaberSong song, bool searchOnline = true)
         {
-            bool foundOnline = TryGetSongByHash(song.md5Hash, out SongInfo songInfo, searchOnline);
+            bool foundOnline = TryGetSongByHash(song.hash, out SongInfo songInfo, searchOnline);
             if (songInfo != null)
                 songInfo.ScoreSaberInfo.AddOrUpdate(song.uid, song);
             return songInfo;
