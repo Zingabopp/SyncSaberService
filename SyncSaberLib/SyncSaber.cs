@@ -17,6 +17,7 @@ using static SyncSaberLib.Utilities;
 using SyncSaberLib.Data;
 using SyncSaberLib.Web;
 using System.Reflection;
+using BeatSaber_PlayerDataReader;
 
 namespace SyncSaberLib
 {
@@ -25,14 +26,15 @@ namespace SyncSaberLib
         public static SyncSaber Instance;
         public string CustomSongsPath;
         private static readonly string zipExtension = ".zip";
+        public static SongHashDataModel existingSongs;
 
         public static string VersionCheck()
         {
             string retStr = "";
             var getPage = WebUtils.httpClient.GetAsync("https://raw.githubusercontent.com/Zingabopp/SyncSaberService/master/Status");
             getPage.Wait();
-            
-            if(getPage.Result.StatusCode != HttpStatusCode.OK)
+
+            if (getPage.Result.StatusCode != HttpStatusCode.OK)
             {
                 retStr = "Unable to check version.";
                 Logger.Warning(retStr);
@@ -73,7 +75,9 @@ namespace SyncSaberLib
         {
             Instance = this;
             VersionCheck();
-            
+            existingSongs = new SongHashDataModel();
+            existingSongs.Initialize();
+            Logger.Info($"Found {existingSongs.Data.Count} songs cached by SongCore.");
             _historyPath = Path.Combine(Config.BeatSaberPath, "UserData", "SyncSaberHistory.txt");
             if (File.Exists(_historyPath + ".bak"))
             {
@@ -113,7 +117,7 @@ namespace SyncSaberLib
                 return;
             }
             bool songAlreadyInPlaylist = playlist.Songs.Exists(s => s.hash.ToUpper() == songHash.ToUpper());
-            
+
             if (!songAlreadyInPlaylist)
             {
                 playlist.TryAdd(songHash, songIndex, songName);
@@ -193,7 +197,7 @@ namespace SyncSaberLib
             var bsReader = FeedReaders[BeatSaverReader.NameKey] as BeatSaverReader;
             BeatSaverReader.ScrapeBeatSaver(200, true);
             ScrapedDataProvider.BeatSaverSongs.WriteFile();
-            
+
             if (lastSSScrape.TotalHours > 3)
                 ScoreSaberReader.ScrapeScoreSaber(1000, 500, true, 2);
             ScrapedDataProvider.ScoreSaberSongs.WriteFile();
@@ -271,23 +275,23 @@ namespace SyncSaberLib
 
             Utilities.WriteStringListSafe(_historyPath, _songDownloadHistory.Distinct().ToList(), true);
             //foreach (Playlist playlist in playlists)
-                //playlist.WritePlaylist();
+            //playlist.WritePlaylist();
         }
-        
+
         /// <summary>
-        /// Downloads the songs in the provided Dictionary.
+        /// Downloads the songs in the provided Dictionary. Returns a list of SongInfo for songs that met the criteria (even if they were skipped).
         /// </summary>
         /// <param name="queuedSongs"></param>
         /// <param name="skippedsongs"></param>
         /// <param name="useSongKeyAsOutputFolder"></param>
-        /// <returns></returns>
+        /// <returns>All matching songs that weren't deleted by the user.</returns>
         public List<SongInfo> DownloadSongs(Dictionary<int, SongInfo> queuedSongs, out (List<SongInfo> exists, List<SongInfo> history) skipped, bool useSongKeyAsOutputFolder)
         {
             //var existingSongs = Directory.GetDirectories(CustomSongsPath);
             string tempPath = "";
             string outputPath = "";
             List<SongInfo> matchedSongs = new List<SongInfo>();
-            
+
             skipped.exists = new List<SongInfo>();
             skipped.history = new List<SongInfo>();
             DownloadBatch jobs = new DownloadBatch();
@@ -299,9 +303,16 @@ namespace SyncSaberLib
                     outputPath = Path.Combine(CustomSongsPath, $"{song.key} ({MakeSafeFilename(song.songName)} - {MakeSafeFilename(song.authorName)})");
                 else
                     outputPath = CustomSongsPath;
-                bool songExists = Directory.Exists(outputPath); // TODO: Check if it exists in the SongHash file.
+                bool songExists = existingSongs.Data.Values.Where(h => h.songHash.ToUpper() == song.hash.ToUpper()).Count() > 0;
+                if (!songExists)
+                {
+                    songExists = Directory.Exists(outputPath);
+                }
+                else
+                    Logger.Warning($"Skipping {song.songName}, it's in the HashMap");
+
                 bool songInHistory = _songDownloadHistory.Contains(song.key);
-                if((songExists && songInHistory) || !songInHistory)
+                if ((songExists && songInHistory) || !songInHistory)
                 {
                     matchedSongs.Add(song);
                 }

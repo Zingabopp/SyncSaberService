@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SyncSaberServiceTests", "Sy
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SyncSaberConsole", "SyncSaberConsole\SyncSaberConsole.csproj", "{9F38D628-2649-4890-86D6-419CC225592C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BeatSaber-PlayerDataReader", "SyncSaberLib\libs\BeatSaber-PlayerDataReader\BeatSaber-PlayerDataReader\BeatSaber-PlayerDataReader.csproj", "{76DEA3A1-3558-4DFE-834B-1FBD597A4DD6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{9F38D628-2649-4890-86D6-419CC225592C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9F38D628-2649-4890-86D6-419CC225592C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9F38D628-2649-4890-86D6-419CC225592C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{76DEA3A1-3558-4DFE-834B-1FBD597A4DD6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{76DEA3A1-3558-4DFE-834B-1FBD597A4DD6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{76DEA3A1-3558-4DFE-834B-1FBD597A4DD6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{76DEA3A1-3558-4DFE-834B-1FBD597A4DD6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
