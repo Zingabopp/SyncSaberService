@@ -239,15 +239,15 @@ namespace SyncSaberLib.Data
             if (songIndex == null)
                 songIndex = "";
             bool successful = true;
-            BeatSaverSong enhancedSong;
+            BeatSaverSong beatSaverSong;
             try
             {
-                enhancedSong = token.ToObject<BeatSaverSong>(new JsonSerializer() {
+                beatSaverSong = token.ToObject<BeatSaverSong>(new JsonSerializer() {
                     NullValueHandling = NullValueHandling.Ignore,
                     MissingMemberHandling = MissingMemberHandling.Ignore
                 });
 
-                song = enhancedSong;
+                song = beatSaverSong;
                 //song.EnhancedInfo = enhancedSong;
                 //Logger.Debug(song.ToString());
             }

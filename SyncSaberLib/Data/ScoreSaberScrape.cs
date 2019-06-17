@@ -14,6 +14,7 @@ namespace SyncSaberLib.Data
     public class ScoreSaberScrape : IScrapedDataModel<List<ScoreSaberSong>, ScoreSaberSong>
     {
         private bool _initialized;
+        private object dataLock = new object();
         public ScoreSaberScrape()
         {
             _initialized = false;
@@ -34,5 +35,30 @@ namespace SyncSaberLib.Data
             _initialized = true;
             CurrentFile = new FileInfo(filePath);
         }
+        /*
+        public void AddOrUpdate(ScoreSaberSong newSong)
+        {
+            IEnumerable<ScoreSaberSong> existing = null;
+            lock (dataLock)
+            {
+                existing = Data.Where(s => s.Equals(newSong));
+            }
+            if (existing.Count() > 1)
+            {
+                Logger.Warning("Duplicate hash in BeatSaverScrape, this shouldn't happen");
+            }
+            if (existing.SingleOrDefault() != null)
+            {
+                if (existing.Single().ScrapedAt < newSong.ScrapedAt)
+                {
+                    lock (dataLock)
+                    {
+                        Data.Remove(existing.Single());
+                        Data.Add(newSong);
+                    }
+                }
+            }
+        }
+        */
     }
 }

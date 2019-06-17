@@ -209,6 +209,20 @@ namespace SyncSaberLib
             // TODO: Add fail reason to FailedDownloads items
         }
 
+        public void ScrapeNewSongs()
+        {
+            var lastBSScrape = DateTime.Now - ScrapedDataProvider.BeatSaverSongs.Data.Max(s => s.ScrapedAt);
+            var lastSSScrape = DateTime.Now - ScrapedDataProvider.ScoreSaberSongs.Data.Max(s => s.ScrapedAt);
+            Logger.Info($"Scraping new songs. Last Beat Saver scrape was {lastBSScrape.ToString()} ago. Last ScoreSaber scrape was {lastSSScrape.ToString()} ago.");
+            var bsReader = FeedReaders[BeatSaverReader.NameKey] as BeatSaverReader;
+            BeatSaverReader.ScrapeBeatSaver(200, true);
+            ScrapedDataProvider.BeatSaverSongs.WriteFile();
+            
+            if (lastSSScrape.TotalHours > 3)
+                ScoreSaberReader.ScrapeScoreSaber(1000, 500, true, 2);
+            ScrapedDataProvider.ScoreSaberSongs.WriteFile();
+        }
+
         public void DownloadSongsFromFeed(string feedType, IFeedSettings _settings)
         {
             if (!FeedReaders.ContainsKey(feedType))

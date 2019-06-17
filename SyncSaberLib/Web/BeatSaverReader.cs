@@ -98,7 +98,7 @@ namespace SyncSaberLib.Web
             bool useMaxPages = maxPages != 0;
             int latestVersion = 0;
             if (ScrapedDataProvider.Songs.Values.Count > 0)
-                latestVersion = ScrapedDataProvider.Songs.Values.Max(s => s.BeatSaverInfo.KeyAsInt);
+                latestVersion = ScrapedDataProvider.Songs.Values.Max(s => s.BeatSaverInfo?.KeyAsInt ?? 0);
             List<BeatSaverSong> songs = new List<BeatSaverSong>();
             string pageText = GetPageText(GetPageUrl(feedIndex));
             JObject result = new JObject();
@@ -148,6 +148,7 @@ namespace SyncSaberLib.Web
                 if (useMaxPages && (pageNum >= maxPages))
                     continueLooping = false;
             } while (continueLooping);
+            Logger.Info($"Scraped {songs.Count} new songs");
             return songs;
         }
 
@@ -329,7 +330,7 @@ namespace SyncSaberLib.Web
             var songs = new List<SongInfo>();
             foreach (var song in ParseSongsFromPage(pageText))
             {
-                songs.Add(ScrapedDataProvider.GetOrCreateSong(song, false));
+                songs.Add(ScrapedDataProvider.GetOrCreateSong(song));
             }
             return songs;
         }
@@ -350,6 +351,8 @@ namespace SyncSaberLib.Web
             BeatSaverSong newSong;
             int? resultTotal = result["totalDocs"]?.Value<int>();
             if (resultTotal == null) resultTotal = 0;
+
+            // Single song in page text.
             if (resultTotal == 0)
             {
                 if (result["key"] != null)
@@ -363,6 +366,8 @@ namespace SyncSaberLib.Web
                 }
                 return songs;
             }
+
+            // Array of songs in page text.
             var songJSONAry = result["docs"]?.ToArray();
             
             if (songJSONAry == null)
@@ -396,8 +401,9 @@ namespace SyncSaberLib.Web
             if (BeatSaverSong.TryParseBeatSaver(song, out BeatSaverSong newSong))
             {
                 //newSong.Feed = "followings"; // TODO: What?
-                SongInfo songInfo = ScrapedDataProvider.GetOrCreateSong(newSong, false);
                 newSong.ScrapedAt = DateTime.Now;
+                SongInfo songInfo = ScrapedDataProvider.GetOrCreateSong(newSong);
+                
                 songInfo.BeatSaverInfo = newSong;
                 return newSong;
             }
@@ -447,7 +453,7 @@ namespace SyncSaberLib.Web
             var songs = new List<SongInfo>();
             foreach (var song in ParseSongsFromPage(pageText))
             {
-                songs.Add(ScrapedDataProvider.GetOrCreateSong(song, false));
+                songs.Add(ScrapedDataProvider.GetOrCreateSong(song));
             }
             return songs;
         }
@@ -479,6 +485,7 @@ namespace SyncSaberLib.Web
                 Logger.Exception("Exception getting page", ex);
             }
             song = ParseSongsFromPage(pageText).FirstOrDefault();
+            song.ScrapedAt = DateTime.Now;
             return ScrapedDataProvider.GetOrCreateSong(song);
         }
 

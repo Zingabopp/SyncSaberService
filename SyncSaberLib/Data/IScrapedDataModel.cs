@@ -45,7 +45,7 @@ namespace SyncSaberLib.Data
             using (StreamWriter file = File.CreateText(filePath))
             {
                 JsonSerializer serializer = new JsonSerializer();
-                serializer.Serialize(file, this);
+                serializer.Serialize(file, Data);
             }
         }
         public abstract void Initialize(string filePath = "");
@@ -73,8 +73,8 @@ namespace SyncSaberLib.Data
                 }
                 else
                 {
-                    Data.Remove(match.First());
                     removed = match.First();
+                    Data.Remove(removed);
                     Data.Add(item);
                     added = item;
                     successful = true;
@@ -82,7 +82,7 @@ namespace SyncSaberLib.Data
             }
             if(!(Equals(added,default(DataType)) || Equals(removed, default(DataType))))
             {
-                CollectionChanged(this, new CollectionChangedEventArgs<DataType>(added, removed));
+                CollectionChanged?.Invoke(this, new CollectionChangedEventArgs<DataType>(added, removed));
             }
             return successful;
         }

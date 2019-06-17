@@ -105,6 +105,11 @@ namespace SyncSaberConsole
             //var newSongs = reader.GetNewestSongs(new BeatSaverFeedSettings((int) BeatSaverFeeds.LATEST) { MaxPages = 2 });          
         }
 
+        public void ScrapeNewSongs()
+        {
+
+        }
+
         static void Main(string[] args)
         {
 
@@ -122,6 +127,7 @@ namespace SyncSaberConsole
                     Logger.Exception("Error initializing Config", ex);
                 }
                 ScrapedDataProvider.Initialize();
+                Logger.Info($"Scrapes loaded, {ScrapedDataProvider.BeatSaverSongs.Data.Count} BeatSaverSongs and {ScrapedDataProvider.ScoreSaberSongs.Data.Count} ScoreSaber difficulties loaded");
                 //Tests();
                 try
                 {
@@ -155,7 +161,7 @@ namespace SyncSaberConsole
                     Stopwatch sw = new Stopwatch();
                     sw.Start();
                     SyncSaber ss = new SyncSaber();
-
+                    ss.ScrapeNewSongs();
                     /*
                     ss.DownloadSongsFromFeed(BeatSaverReader.NameKey, new BeatSaverFeedSettings(1) {
                         MaxPages = 5
@@ -281,6 +287,10 @@ namespace SyncSaberConsole
                     foreach (string e in Config.Errors)
                         Logger.Error($"Invalid setting: {e} = {Config.Setting[e]}");
                 }
+
+
+                ScrapedDataProvider.BeatSaverSongs.WriteFile();
+                ScrapedDataProvider.ScoreSaberSongs.WriteFile();
             }
             catch(OutOfDateException ex)
             {

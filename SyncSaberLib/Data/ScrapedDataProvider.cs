@@ -93,6 +93,7 @@ namespace SyncSaberLib.Data
                 song = BeatSaverReader.Search(hash, BeatSaverReader.SearchType.hash).FirstOrDefault();
                 if (song != null)
                 {
+                    song.BeatSaverInfo.ScrapedAt = DateTime.Now;
                     TryAddToScrapedData(song);
                 }
                 else
@@ -121,6 +122,7 @@ namespace SyncSaberLib.Data
                 song = BeatSaverReader.GetSongByKey(key);
                 if (song != null)
                 {
+                    
                     TryAddToScrapedData(song);
                 }
                 else
@@ -156,12 +158,16 @@ namespace SyncSaberLib.Data
         /// <param name="song"></param>
         /// <param name="searchOnline"></param>
         /// <returns></returns>
-        public static SongInfo GetOrCreateSong(BeatSaverSong song, bool searchOnline = true)
+        public static SongInfo GetOrCreateSong(BeatSaverSong song)//, bool searchOnline = true)
         {
-            bool foundOnline = TryGetSongByHash(song.hash, out SongInfo songInfo, searchOnline);
+            bool foundOnline = TryGetSongByHash(song.hash, out SongInfo songInfo, false);
+            //if (foundOnline)
+            //
+            BeatSaverSongs.AddOrUpdate(song);
+            //}
             if (songInfo == null)
             {
-                songInfo = song.GenerateSongInfo();
+                songInfo = new SongInfo(song.hash);
                 TryAddToScrapedData(songInfo);
             }
             songInfo.BeatSaverInfo = song;
@@ -171,6 +177,11 @@ namespace SyncSaberLib.Data
         public static SongInfo GetOrCreateSong(ScoreSaberSong song, bool searchOnline = true)
         {
             bool foundOnline = TryGetSongByHash(song.hash, out SongInfo songInfo, searchOnline);
+            if (foundOnline)
+            {
+                BeatSaverSongs.AddOrUpdate(songInfo.BeatSaverInfo);
+            }
+            ScoreSaberSongs.AddOrUpdate(song);
             if (songInfo == null)
             {
                 songInfo = song.GenerateSongInfo();

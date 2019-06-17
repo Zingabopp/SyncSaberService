@@ -295,7 +295,10 @@ namespace SyncSaberLib.Web
             do
             {
                 url.Clear();
-                url.Append(Feeds[ScoreSaberFeeds.TOP_PLAYED].BaseUrl);
+                if (rankedOnly)
+                    url.Append(Feeds[ScoreSaberFeeds.LATEST_RANKED].BaseUrl);
+                else
+                    url.Append(Feeds[ScoreSaberFeeds.TOP_PLAYED].BaseUrl);
                 url.Replace(RANKEDKEY, rankVal);
                 url.Replace(LIMITKEY, songsPerPage.ToString());
                 url.Replace(PAGENUMKEY, pageNum.ToString());
@@ -317,6 +320,7 @@ namespace SyncSaberLib.Web
                 if (useMaxPages && (pageNum > maxPages))
                     continueLooping = false;
             } while (continueLooping);
+            Logger.Info($"Scraped {songs.Count} new songs");
             return songs;
         }
 
