@@ -191,14 +191,18 @@ namespace SyncSaberLib
 
         public void ScrapeNewSongs()
         {
-            var lastBSScrape = DateTime.Now - ScrapedDataProvider.BeatSaverSongs.Data.Max(s => s.ScrapedAt);
-            var lastSSScrape = DateTime.Now - ScrapedDataProvider.ScoreSaberSongs.Data.Max(s => s.ScrapedAt);
-            Logger.Info($"Scraping new songs. Last Beat Saver scrape was {lastBSScrape.ToString()} ago. Last ScoreSaber scrape was {lastSSScrape.ToString()} ago.");
+            DateTime lastBSScrape = DateTime.MinValue;
+            DateTime lastSSScrape = DateTime.MinValue;
+            if(ScrapedDataProvider.BeatSaverSongs.HasData)
+                lastBSScrape = ScrapedDataProvider.BeatSaverSongs.Data.Max(s => s.ScrapedAt);
+            if (ScrapedDataProvider.ScoreSaberSongs.HasData)
+                lastSSScrape = ScrapedDataProvider.ScoreSaberSongs.Data.Max(s => s.ScrapedAt);
+            Logger.Info($"Scraping new songs. Last Beat Saver scrape was at {lastBSScrape.ToString()}. Last ScoreSaber scrape was at {lastSSScrape.ToString()}.");
             var bsReader = FeedReaders[BeatSaverReader.NameKey] as BeatSaverReader;
             BeatSaverReader.ScrapeBeatSaver(200, true);
             ScrapedDataProvider.BeatSaverSongs.WriteFile();
 
-            if (lastSSScrape.TotalHours > 3)
+            if ((DateTime.Now - lastSSScrape).TotalHours > 3)
                 ScoreSaberReader.ScrapeScoreSaber(1000, 500, true, 2);
             ScrapedDataProvider.ScoreSaberSongs.WriteFile();
         }

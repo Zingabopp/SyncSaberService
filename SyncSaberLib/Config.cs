@@ -7,6 +7,7 @@ using System.IO;
 using IniParser;
 using IniParser.Model;
 using System.Reflection;
+using Microsoft.Win32;
 using static SyncSaberLib.Utilities;
 
 namespace SyncSaberLib
@@ -367,6 +368,38 @@ namespace SyncSaberLib
                 Write();
             }
         }
+        private const string STEAM_REG_KEY = @"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Steam App 620980";
+        private const string OCULUS_REG_KEY = @"SOFTWARE\WOW6432Node\Oculus VR, LLC\Oculus\Config";
+        public static string GetBeatSaberPathFromRegistry()
+        {
+            bool isSteam = false;
+
+            RegistryKey steamKey = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry64); // Doesn't work in 32 bit mode without this
+            steamKey = steamKey.OpenSubKey(STEAM_REG_KEY);
+            string path = (string) steamKey.GetValue("InstallLocation", string.Empty);
+            if (string.IsNullOrEmpty(path))
+            {
+                RegistryKey oculusKey = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry64);
+                oculusKey = oculusKey.OpenSubKey(OCULUS_REG_KEY);
+                path = (string) oculusKey.GetValue("InitialAppLibrary", string.Empty);
+                if (!string.IsNullOrEmpty(path))
+                {
+                    path = Path.Combine(path, @"Software\hyperbolic-magnetism-beat-saber");
+                }
+            }
+            else
+            {
+                isSteam = true;
+            }
+
+            if (IsBeatSaberDirectory(path))
+            {
+                Logger.Info($"Found {(isSteam ? "Steam" : "Oculus")} installation of Beat Saber at {path}");
+            }
+            else
+                path = string.Empty;
+            return path;
+        }
 
         public static string BeatSaberPath
         {
@@ -380,7 +413,14 @@ namespace SyncSaberLib
                     if (!SettingError[setting.KeyName]) // don't repeat error message over and over
                     {
                         Logger.Error($"Beat Saber path {path} is invalid. Couldn't find 'Beat Saber.exe'");
-                        SettingError[setting.KeyName] = true;
+                        path = GetBeatSaberPathFromRegistry();
+                        if (string.IsNullOrEmpty(path))
+                            SettingError[setting.KeyName] = true;
+                        else
+                        {
+                            Settings[SettingKeys.BeatSaberPath.KeyName] = path;
+                            Write();
+                        }
                         //throw new FileNotFoundException($"Unable to locate 'Beat Saber.exe' inside the specified BeatSaberPath folder {path}.");
                     }
                 }
@@ -522,6 +562,9 @@ namespace SyncSaberLib
         public static void ReadAllSettings()
         {
             object setting = null;
+            setting = BeatSaberPath;
+            setting = BeastSaberUsername;
+
             setting = SyncCuratorRecommendedFeed;
             setting = SyncBookmarksFeed;
             setting = SyncFollowingsFeed;
@@ -534,8 +577,6 @@ namespace SyncSaberLib
             setting = MaxScoreSaberPages;
             setting = MaxBeatSaverPages;
 
-            setting = BeatSaberPath;
-            setting = BeastSaberUsername;
             //setting = AutoDownloadSongs;
             //setting = AutoUpdateSongs;
 
@@ -581,9 +622,10 @@ namespace SyncSaberLib
                 if (_errorStatus == null)
                 {
                     _errorStatus = new Dictionary<string, bool>(){
+                        { SettingKeys.BeatSaberPath.KeyName, false },
+                        { SettingKeys.BeastSaberUsername.KeyName, false },
                         { SettingKeys.AutoDownloadSongs.KeyName, false },
                         { SettingKeys.AutoUpdateSongs.KeyName, false },
-                        { SettingKeys.BeastSaberUsername.KeyName, false },
                         { SettingKeys.MaxFollowingsPages.KeyName, false },
                         { SettingKeys.MaxBookmarksPages.KeyName, false },
                         { SettingKeys.MaxBeatSaverPages.KeyName, false },
@@ -592,7 +634,6 @@ namespace SyncSaberLib
                         { SettingKeys.SyncBookmarksFeed.KeyName, false },
                         { SettingKeys.SyncCuratorRecommendedFeed.KeyName, false },
                         { SettingKeys.SyncFollowingsFeed.KeyName, false },
-                        { SettingKeys.BeatSaberPath.KeyName, false },
                         { SettingKeys.MaxConcurrentDownloads.KeyName, false },
                         { SettingKeys.MaxConcurrentPageChecks.KeyName, false },
                         { SettingKeys.DownloadTimeout.KeyName, false },
@@ -755,6 +796,8 @@ namespace SyncSaberLib
 
         public static bool IsBeatSaberDirectory(string path)
         {
+            if (string.IsNullOrEmpty(path.Trim()))
+                return false;
             DirectoryInfo bsDir = new DirectoryInfo(path);
             bool valid = bsDir.Exists;
             if (bsDir.Exists)

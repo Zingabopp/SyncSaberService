@@ -311,9 +311,9 @@ namespace SyncSaberLib.Web
             BeastSaberFeedSettings _settings = settings as BeastSaberFeedSettings;
             if (_settings == null)
                 throw new InvalidCastException(INVALIDFEEDSETTINGSMESSAGE);
-            if (_settings.FeedIndex != 2 && _username == string.Empty)
+            if (_settings.FeedIndex != 2 && _username.Trim() == string.Empty)
             {
-                Logger.Error($"Can't access feed without a valid username and password in the config file");
+                Logger.Error($"Can't access feed without a valid username in the config file");
                 return new Dictionary<int, SongInfo>();
             }
             int pageIndex = 0;

@@ -15,7 +15,7 @@ namespace SyncSaberLib.Data
     {
         private static readonly string ASSEMBLY_PATH = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
         public static readonly DirectoryInfo DATA_DIRECTORY = new DirectoryInfo(Path.Combine(ASSEMBLY_PATH, "ScrapedData"));
-
+        public bool HasData { get { return Data != null && Data.Count > 0; } }
         public virtual T Data { get; protected set; }
         [JsonIgnore]
         public bool ReadOnly { get; protected set; }

@@ -12,6 +12,7 @@ using SyncSaberLib.Web;
 using SyncSaberLib.Data;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Microsoft.Win32;
 
 namespace SyncSaberConsole
 {
@@ -58,10 +59,6 @@ namespace SyncSaberConsole
                  
         }
 
-        public void ScrapeNewSongs()
-        {
-
-        }
 
         static void Main(string[] args)
         {
@@ -114,15 +111,6 @@ namespace SyncSaberConsole
                     sw.Start();
                     SyncSaber ss = new SyncSaber();
                     ss.ScrapeNewSongs();
-                    /*
-                    ss.DownloadSongsFromFeed(BeatSaverReader.NameKey, new BeatSaverFeedSettings(1) {
-                        MaxPages = 5
-                    });
-
-                    ss.DownloadSongsFromFeed(BeatSaverReader.NameKey, new BeatSaverFeedSettings(0) {
-                        Authors = Config.FavoriteMappers.ToArray(),
-                    });
-                    */
                     Console.WriteLine();
                     if (Config.SyncFavoriteMappersFeed && Config.FavoriteMappers.Count > 0)
                     {
