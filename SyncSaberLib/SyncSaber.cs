@@ -312,8 +312,8 @@ namespace SyncSaberLib
                 {
                     songExists = Directory.Exists(outputPath);
                 }
-                else
-                    Logger.Warning($"Skipping {song.songName}, it's in the HashMap");
+                //else
+                    //Logger.Warning($"Skipping {song.songName}, it's in the HashMap");
 
                 bool songInHistory = _songDownloadHistory.Contains(song.key);
                 if ((songExists && songInHistory) || !songInHistory)

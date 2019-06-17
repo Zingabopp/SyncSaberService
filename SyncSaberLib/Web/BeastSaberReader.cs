@@ -261,11 +261,8 @@ namespace SyncSaberLib.Web
                 }
 
             }
-
-
-
             //Task.WaitAll(populateTasks.ToArray());
-            Logger.Info($"{songsOnPage.Count} songs on the page");
+            Logger.Debug($"{songsOnPage.Count} songs on the page");
             return songsOnPage;
         }
 
