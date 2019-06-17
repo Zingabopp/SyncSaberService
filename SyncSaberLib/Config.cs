@@ -36,13 +36,6 @@ namespace SyncSaberLib
                     return CreateKeyData("BeastSaberUsername", "");
                 }
             }
-            public static KeyData BeastSaberPassword
-            {
-                get
-                {
-                    return CreateKeyData("BeastSaberPassword", "");
-                }
-            }
             public static KeyData DeleteOldVersions
             {
                 get
@@ -191,19 +184,6 @@ namespace SyncSaberLib
             get
             {
                 return Settings.GetString(SettingKeys.BeastSaberUsername);
-            }
-            set
-            {
-                Settings[SettingKeys.BeastSaberUsername.KeyName] = value.ToString();
-                Write();
-            }
-        }
-
-        public static string BeastSaberPassword
-        {
-            get
-            {
-                return Settings.GetString(SettingKeys.BeastSaberPassword);
             }
             set
             {
@@ -556,7 +536,6 @@ namespace SyncSaberLib
 
             setting = BeatSaberPath;
             setting = BeastSaberUsername;
-            setting = BeastSaberPassword;
             //setting = AutoDownloadSongs;
             //setting = AutoUpdateSongs;
 
@@ -614,7 +593,6 @@ namespace SyncSaberLib
                         { SettingKeys.SyncCuratorRecommendedFeed.KeyName, false },
                         { SettingKeys.SyncFollowingsFeed.KeyName, false },
                         { SettingKeys.BeatSaberPath.KeyName, false },
-                        { SettingKeys.BeastSaberPassword.KeyName, false },
                         { SettingKeys.MaxConcurrentDownloads.KeyName, false },
                         { SettingKeys.MaxConcurrentPageChecks.KeyName, false },
                         { SettingKeys.DownloadTimeout.KeyName, false },
@@ -820,7 +798,6 @@ namespace SyncSaberLib
             return $"{pad}AutoDownloadSongs: { AutoDownloadSongs}\n" +
                 $"{pad}AutoUpdateSongs: {AutoUpdateSongs}\n" +
                 $"{pad}BeastSaberUsername: {BeastSaberUsername}\n" +
-                $"{pad}BeastSaberPassword: {BeastSaberPassword}\n" +
                 $"{pad}MaxFollowingPages: {MaxFollowingsPages}\n" +
                 $"{pad}MaxBookmarksPages: {MaxBookmarksPages}\n" +
                 $"{pad}MaxCuratorRecommendedPages: {MaxCuratorRecommendedPages}\n" +
