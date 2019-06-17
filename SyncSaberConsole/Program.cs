@@ -70,11 +70,14 @@ namespace SyncSaberConsole
                 {
                     Config.Initialize();
                     Logger.LogLevel = Config.StrToLogLevel(Config.LoggingLevel);
+                    if (Logger.LogLevel < LogLevel.Info)
+                        Logger.ShortenSourceName = false;
                 }
                 catch (FileNotFoundException ex)
                 {
                     Logger.Exception("Error initializing Config", ex);
                 }
+                Logger.Info($"Using Beat Saber directory: {Config.BeatSaberPath}");
                 ScrapedDataProvider.Initialize();
                 Logger.Info($"Scrapes loaded, {ScrapedDataProvider.BeatSaverSongs.Data.Count} BeatSaverSongs and {ScrapedDataProvider.ScoreSaberSongs.Data.Count} ScoreSaber difficulties loaded");
                 //Tests();
