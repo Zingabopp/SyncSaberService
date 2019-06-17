@@ -14,7 +14,7 @@ namespace SyncSaberLib.Data
     public class ScoreSaberScrape : IScrapedDataModel<List<ScoreSaberSong>, ScoreSaberSong>
     {
         private bool _initialized;
-        private object dataLock = new object();
+        private readonly object dataLock = new object();
         public ScoreSaberScrape()
         {
             _initialized = false;

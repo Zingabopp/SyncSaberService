@@ -305,8 +305,7 @@ namespace SyncSaberLib.Web
         public Dictionary<int, SongInfo> GetSongsFromFeed(IFeedSettings settings)
         {
             PrepareReader();
-            BeastSaberFeedSettings _settings = settings as BeastSaberFeedSettings;
-            if (_settings == null)
+            if (!(settings is BeastSaberFeedSettings _settings))
                 throw new InvalidCastException(INVALIDFEEDSETTINGSMESSAGE);
             if (_settings.FeedIndex != 2 && _username.Trim() == string.Empty)
             {

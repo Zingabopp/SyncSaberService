@@ -33,8 +33,9 @@ namespace SyncSaberLib.Data
             Songs = new Dictionary<string, SongInfo>();
             foreach (var song in BeatSaverSongs.Data)
             {
-                var newSong = new SongInfo(song.hash);
-                newSong.BeatSaverInfo = song;
+                var newSong = new SongInfo(song.hash) {
+                    BeatSaverInfo = song
+                };
                 if (Songs.AddOrUpdate(song.hash.ToUpper(), newSong))
                     Logger.Warning($"Repeated hash while creating SongInfo Dictionary, this should not happen. {song.name} by {song.metadata.levelAuthorName}");
             }

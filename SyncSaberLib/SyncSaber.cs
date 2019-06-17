@@ -217,8 +217,9 @@ namespace SyncSaberLib
             var reader = FeedReaders[feedType];
             DateTime startTime = DateTime.Now;
             Dictionary<int, SongInfo> songs;
-            List<Playlist> playlists = new List<Playlist>();
-            playlists.Add(_syncSaberSongs);
+            List<Playlist> playlists = new List<Playlist> {
+                _syncSaberSongs
+            };
             playlists.AddRange(reader.PlaylistsForFeed(_settings.FeedIndex));
             try
             {
@@ -251,8 +252,9 @@ namespace SyncSaberLib
         {
             if (playlists == null)
             {
-                playlists = new List<Playlist>();
-                playlists.Add(_syncSaberSongs);
+                playlists = new List<Playlist> {
+                    _syncSaberSongs
+                };
             }
             Logger.Debug("Processing downloads...");
             DownloadJob job;
