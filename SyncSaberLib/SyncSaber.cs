@@ -250,8 +250,10 @@ namespace SyncSaberLib
         private void ProcessDownloads(List<Playlist> playlists = null)
         {
             if (playlists == null)
+            {
                 playlists = new List<Playlist>();
-            playlists.Add(_syncSaberSongs);
+                playlists.Add(_syncSaberSongs);
+            }
             Logger.Debug("Processing downloads...");
             DownloadJob job;
             while (SuccessfulDownloads.TryDequeue(out job))

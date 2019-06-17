@@ -26,8 +26,16 @@ namespace SyncSaberLib
 
         public void TryAdd(string songHash, string songIndex, string songName)
         {
-            if(!Songs.Exists(s => s.hash.ToUpper() == songHash))
+            if (!Songs.Exists(s => !string.IsNullOrEmpty(s.hash) && s.hash.ToUpper() == songHash))
+            {
                 Songs.Add(new PlaylistSong(songHash, songIndex, songName));
+                // Remove any duplicate song that doesn't have a hash
+                var oldSongs = Songs.Where(s => string.IsNullOrEmpty(s.hash) && !string.IsNullOrEmpty(s.key) && s.key.ToLower() == songIndex.ToLower()).ToArray();
+                foreach (var song in oldSongs)
+                {
+                    Songs.Remove(song);
+                }
+            }
         }
 
         public void WritePlaylist()
