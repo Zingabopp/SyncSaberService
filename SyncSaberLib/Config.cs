@@ -791,6 +791,8 @@ namespace SyncSaberLib
             {
                 if (_favoriteMappers == null)
                     _favoriteMappers = new List<string>();
+                if (_favoriteMappers.Count > 0)
+                    return _favoriteMappers;
                 FileInfo mapperFile = new FileInfo(Path.Combine(BeatSaberPath, "UserData", "Favoritemappers.ini"));
                 //Logger.Debug($"MapperFile: {mapperFile.FullName}");
 

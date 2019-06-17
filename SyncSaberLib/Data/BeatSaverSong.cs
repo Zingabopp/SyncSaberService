@@ -373,8 +373,10 @@ namespace SyncSaberLib.Data
         public DateTime deletedAt { get; set; }
         [JsonProperty("_id")]
         public string _id { get; set; }
+        [JsonIgnore]
+        private string _key;
         [JsonProperty("key")]
-        public string key { get; set; }
+        public string key { get { return _key; } set { _key = value.ToLower(); } }
         [JsonProperty("name")]
         public string name { get; set; }
         [JsonProperty("uploader")]

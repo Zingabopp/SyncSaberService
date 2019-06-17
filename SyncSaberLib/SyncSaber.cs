@@ -16,6 +16,7 @@ using System.Net.Http;
 using static SyncSaberLib.Utilities;
 using SyncSaberLib.Data;
 using SyncSaberLib.Web;
+using System.Reflection;
 
 namespace SyncSaberLib
 {
@@ -25,10 +26,54 @@ namespace SyncSaberLib
         public string CustomSongsPath;
         private static readonly string zipExtension = ".zip";
 
+        public static string VersionCheck()
+        {
+            string retStr = "";
+            var getPage = WebUtils.httpClient.GetAsync("https://raw.githubusercontent.com/Zingabopp/SyncSaberService/master/Status");
+            getPage.Wait();
+            
+            if(getPage.Result.StatusCode != HttpStatusCode.OK)
+            {
+                retStr = "Unable to check version.";
+                Logger.Warning(retStr);
+                return retStr;
+            }
+            var statusText = getPage.Result.Content.ReadAsStringAsync().Result.Split(
+                Environment.NewLine.ToCharArray(), StringSplitOptions.RemoveEmptyEntries).Select(l => l.Split(',')).ToDictionary(s => s[0], x => x[1]);
+            var version = Assembly.GetExecutingAssembly().GetName().Version;
+            var versionStr = string.Join(".", version.Major, version.Minor, version.Build);
+            if (statusText.ContainsKey(versionStr))
+            {
+                var status = statusText[versionStr];
+                switch (status)
+                {
+                    case "Broken":
+                        string errorMsg = "This version of SyncSaberService is no longer functional.";
+                        if (statusText.Values.Any(s => s != "Broken"))
+                            errorMsg = errorMsg + " Please update to a newer version.";
+                        throw new OutOfDateException(errorMsg);
+                    case "Outdated":
+                        retStr = "This version of SyncSaberService is outdated, please update to a newer version.";
+                        Logger.Warning(retStr);
+                        break;
+                    case "Latest":
+                        retStr = "Running the latest version of SyncSaberService.";
+                        Logger.Info(retStr);
+                        break;
+                    default:
+                        retStr = "Running an unknown version of SyncSaberService.";
+                        Logger.Info(retStr);
+                        break;
+                }
+            }
+            return retStr;
+        }
+
         public SyncSaber()
         {
             Instance = this;
-
+            //VersionCheck();
+            
             _historyPath = Path.Combine(Config.BeatSaberPath, "UserData", "SyncSaberHistory.txt");
             if (File.Exists(_historyPath + ".bak"))
             {
@@ -55,7 +100,7 @@ namespace SyncSaberLib
 
             FeedReaders = new Dictionary<string, IFeedReader> {
                 {BeatSaverReader.NameKey, new BeatSaverReader() },
-                {BeastSaberReader.NameKey, new BeastSaberReader(Config.MaxConcurrentPageChecks) },
+                {BeastSaberReader.NameKey, new BeastSaberReader(Config.BeastSaberUsername, Config.MaxConcurrentPageChecks) },
                 {ScoreSaberReader.NameKey, new ScoreSaberReader() }
             };
         }
@@ -316,6 +361,13 @@ namespace SyncSaberLib
 
         public Dictionary<string, IFeedReader> FeedReaders;
 
+    }
+
+    public class OutOfDateException : ApplicationException
+    {
+        public OutOfDateException(string message) : base(message)
+        {
+        }
     }
 
 }

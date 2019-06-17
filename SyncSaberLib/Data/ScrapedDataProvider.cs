@@ -113,7 +113,8 @@ namespace SyncSaberLib.Data
         /// <returns></returns>
         public static bool TryGetSongByKey(string key, out SongInfo song, bool searchOnline = true)
         {
-            song = Songs.Values.Where(s => s.key == key).FirstOrDefault();
+            key = key.ToLower();
+            song = Songs.Values.Where(s => s.key.ToLower() == key).FirstOrDefault();
             if (song == null && searchOnline)
             {
                 Logger.Info($"Song with key: {key}, not in scraped data, searching Beat Saver...");

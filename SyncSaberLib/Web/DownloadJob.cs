@@ -94,7 +94,7 @@ namespace SyncSaberLib.Web
             }
             else
             {
-                Logger.Debug($"Download failed for {Song.key}");
+                Logger.Debug($"Download failed for {Song.key} - {Song.songName} by {Song.authorName}");
                 //result = false;
                 if (Result == JobResult.SUCCESS)
                 {

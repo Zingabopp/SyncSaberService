@@ -24,11 +24,11 @@ namespace SyncSaberConsole
             //ScrapedDataProvider.Initialize();
 
             WebUtils.Initialize(5);
-            
-            
+
+
             //ScrapedDataProvider.Initialize();
-            
-           
+
+
             //ScrapedDataProvider.Initialize();
             var bsScrape = ScrapedDataProvider.BeatSaverSongs;
             var ssScrape = ScrapedDataProvider.ScoreSaberSongs;
@@ -51,7 +51,7 @@ namespace SyncSaberConsole
             //var test = new SyncSaberScrape();
 
             //test.Initialize();
-            
+
             var beatSaverScrape = new BeatSaverScrape();
             beatSaverScrape.Initialize();
             var songs = beatSaverScrape.Data;
@@ -152,6 +152,7 @@ namespace SyncSaberConsole
                     Stopwatch sw = new Stopwatch();
                     sw.Start();
                     SyncSaber ss = new SyncSaber();
+
                     /*
                     ss.DownloadSongsFromFeed(BeatSaverReader.NameKey, new BeatSaverFeedSettings(1) {
                         MaxPages = 5
@@ -277,6 +278,10 @@ namespace SyncSaberConsole
                     foreach (string e in Config.Errors)
                         Logger.Error($"Invalid setting: {e} = {Config.Setting[e]}");
                 }
+            }
+            catch(OutOfDateException ex)
+            {
+                Logger.Error(ex.Message);
             }
             catch (Exception ex)
             {

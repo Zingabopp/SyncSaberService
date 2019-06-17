@@ -174,7 +174,7 @@ namespace SyncSaberLib.Web
                     {
                         if (!settings.searchOnline)
                         {
-                            newSongs = ScrapedDataProvider.Songs.Values.Where(s => s.BeatSaverInfo.uploader.username.ToLower() == author.ToLower()).ToList();
+                            newSongs = ScrapedDataProvider.Songs.Values.Where(s => !string.IsNullOrEmpty(s.BeatSaverInfo?.uploader?.username) && s.BeatSaverInfo?.uploader.username.ToLower() == author.ToLower()).ToList();
                             songSource = "scraped data";
                         }
                         if (newSongs == null || newSongs.Count == 0)

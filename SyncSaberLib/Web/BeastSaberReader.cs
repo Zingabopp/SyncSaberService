@@ -96,9 +96,10 @@ namespace SyncSaberLib.Web
             }
         }
 
-        public BeastSaberReader(int maxConcurrency)
+        public BeastSaberReader(string username, int maxConcurrency)
         {
             Ready = false;
+            _username = username;
             if (maxConcurrency > 0)
                 _maxConcurrency = maxConcurrency;
             else
@@ -108,15 +109,16 @@ namespace SyncSaberLib.Web
 
         [Obsolete("Login info is no longer required for Bookmarks and Followings.")]
         public BeastSaberReader(string username, string password, int maxConcurrency, string loginUri = DefaultLoginUri)
-            : this(maxConcurrency)
+            : this(username, maxConcurrency)
         {
-            _username = username;
+            
             _password = password;
             _loginUri = loginUri;
 
             _cookieLock = new object();
         }
 
+        [Obsolete("Not necessary anymore")]
         public static CookieContainer GetBSaberCookies(string username, string password)
         {
             CookieContainer tempContainer = null;
@@ -178,7 +180,7 @@ namespace SyncSaberLib.Web
             int totalSongsForPage = 0;
             XmlDocument xmlDocument = new XmlDocument();
 
-            xmlDocument.LoadXml(pageText);
+            xmlDocument.LoadXml(pageText); // TODO: Catch exception for when the page provides bad xml
             List<Task> populateTasks = new List<Task>();
             XmlNodeList xmlNodeList = xmlDocument.DocumentElement.SelectNodes("/rss/channel/item");
             foreach (object obj in xmlNodeList)
@@ -191,17 +193,20 @@ namespace SyncSaberLib.Web
                 else
                 {
                     string songName = node["SongTitle"].InnerText;
-                    string innerText = node["DownloadURL"].InnerText;
-                    if (innerText.Contains("dl.php"))
+                    string downloadUrl = node["DownloadURL"]?.InnerText;
+                    string hash = node["Hash"]?.InnerText?.ToUpper();
+                    string authorName = node["LevelAuthorName"]?.InnerText;
+                    string songKey = node["SongKey"]?.InnerText;
+                    if (downloadUrl.Contains("dl.php"))
                     {
                         Logger.Warning("Skipping BeastSaber download with old url format!");
                         totalSongsForPage++;
                     }
                     else
                     {
-                        string songIndex = innerText.Substring(innerText.LastIndexOf('/') + 1);
-                        string mapper = GetMapperFromBsaber(node.InnerText);
-                        string songUrl = BeatSaverDownloadURL_Base + songIndex;
+                        string songIndex = !string.IsNullOrEmpty(songKey) ? songKey : downloadUrl.Substring(downloadUrl.LastIndexOf('/') + 1) ;
+                        string mapper = !string.IsNullOrEmpty(authorName) ? authorName : GetMapperFromBsaber(node.InnerText);
+                        string songUrl = !string.IsNullOrEmpty(downloadUrl) ? downloadUrl : BeatSaverDownloadURL_Base + songIndex;
 
                         // TODO: Get song from the scrape, if not maybe scrape beat saver for the song.
                         //SongInfo currentSong = new SongInfo(songIndex, songName, songUrl, mapper);

@@ -131,20 +131,22 @@ namespace SyncSaberLib.Web
             AddCookies(newCookies, new Uri(url));
         }
 
-        public async static Task DownloadFileAsync(string downloadUrl, string path, bool overwrite = true)
+        public async static Task<bool> DownloadFileAsync(string downloadUrl, string path, bool overwrite = true)
         {
-            var downloadTask = WebUtils.httpClient.GetAsync(downloadUrl).ContinueWith((requestTask) => {
-                HttpResponseMessage response = requestTask.Result;
-                response.EnsureSuccessStatusCode();
-                response.Content.ReadAsFileAsync(path, overwrite);
-            });
-            await downloadTask;
+            var success = true;
+            var response = await WebUtils.httpClient.GetAsync(downloadUrl);
+
+            response.EnsureSuccessStatusCode();
+
+
+            await response.Content.ReadAsFileAsync(path, overwrite);
+            return success;
         }
 
         public async static Task<string> TryGetStringAsync(string url)
         {
             HttpResponseMessage response = await httpClient.GetAsync(url);
-            if(response.IsSuccessStatusCode)
+            if (response.IsSuccessStatusCode)
             {
                 return await response.Content.ReadAsStringAsync();
             }
