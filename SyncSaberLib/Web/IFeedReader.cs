@@ -1,7 +1,9 @@
-﻿using System.Collections.Generic;
-using SyncSaberService.Data;
+﻿using System.Collections;
+using System.Collections.Generic;
+using SyncSaberLib.Data;
+using System.Linq;
 
-namespace SyncSaberService.Web
+namespace SyncSaberLib.Web
 {
     public interface IFeedReader
     {
@@ -9,7 +11,7 @@ namespace SyncSaberService.Web
         string Source { get; } // Name of the site
         bool Ready { get; }
         void PrepareReader();
-        List<SongInfo> GetSongsFromPage(string pageText);
+        //List<SongInfo> GetSongsFromPage(string pageText);
         //Dictionary<int, FeedInfo> Feeds { get; }
         Dictionary<int, SongInfo> GetSongsFromFeed(IFeedSettings settings);
         Playlist[] PlaylistsForFeed(int feedIndex);
@@ -19,8 +21,11 @@ namespace SyncSaberService.Web
     {
         string FeedName { get; }
         int FeedIndex { get; }
+        int MaxSongs { get; set; }
+        bool searchOnline { get; set; }
         bool UseSongKeyAsOutputFolder { get; set; }
     }
+
     public struct FeedInfo
     {
         public FeedInfo(string _name, string _baseUrl)

@@ -7,9 +7,9 @@ using System.IO;
 using IniParser;
 using IniParser.Model;
 using System.Reflection;
-using static SyncSaberService.Utilities;
+using static SyncSaberLib.Utilities;
 
-namespace SyncSaberService
+namespace SyncSaberLib
 {
     public static class Config
     {
@@ -791,6 +791,8 @@ namespace SyncSaberService
             {
                 if (_favoriteMappers == null)
                     _favoriteMappers = new List<string>();
+                if (_favoriteMappers.Count > 0)
+                    return _favoriteMappers;
                 FileInfo mapperFile = new FileInfo(Path.Combine(BeatSaberPath, "UserData", "Favoritemappers.ini"));
                 //Logger.Debug($"MapperFile: {mapperFile.FullName}");
 

@@ -14,13 +14,13 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Threading.Tasks.Dataflow;
 using System.Net.Http;
-using SyncSaberService.Data;
-using static SyncSaberService.Utilities;
-using static SyncSaberService.Web.HttpClientWrapper;
+using SyncSaberLib.Data;
+using static SyncSaberLib.Utilities;
+using static SyncSaberLib.Web.WebUtils;
 
-namespace SyncSaberService.Web
+namespace SyncSaberLib.Web
 {
-    class ScoreSaberReader : IFeedReader
+    public class ScoreSaberReader : IFeedReader
     {
         /// API Examples:
         /// https://scoresaber.com/api.php?function=get-leaderboards&cat=3&limit=50&page=1&ranked=1 // Sorted by PP
@@ -47,7 +47,7 @@ namespace SyncSaberService.Web
         private const string TOP_PLAYED_KEY = "Top Played";
         private const string LATEST_RANKED_KEY = "Latest Ranked";
         #endregion
-        
+
         public string Name { get { return NameKey; } }
         public string Source { get { return SourceKey; } }
         public bool Ready { get; private set; }
@@ -61,10 +61,10 @@ namespace SyncSaberService.Web
                 {
                     _feeds = new Dictionary<ScoreSaberFeeds, FeedInfo>()
                     {
-                        { (ScoreSaberFeeds)0, new FeedInfo(TOP_RANKED_KEY, $"https://scoresaber.com/api.php?function=get-leaderboards&cat=3&limit={LIMITKEY}&page={PAGENUMKEY}&ranked={RANKEDKEY}") },
-                        { (ScoreSaberFeeds)1, new FeedInfo(TRENDING_KEY, $"https://scoresaber.com/api.php?function=get-leaderboards&cat=0&limit={LIMITKEY}&page={PAGENUMKEY}&ranked={RANKEDKEY}") },
+                        { (ScoreSaberFeeds)0, new FeedInfo(TRENDING_KEY, $"https://scoresaber.com/api.php?function=get-leaderboards&cat=0&limit={LIMITKEY}&page={PAGENUMKEY}&ranked={RANKEDKEY}") },
+                        { (ScoreSaberFeeds)1, new FeedInfo(LATEST_RANKED_KEY, $"https://scoresaber.com/api.php?function=get-leaderboards&cat=1&limit={LIMITKEY}&page={PAGENUMKEY}&ranked={RANKEDKEY}") },
                         { (ScoreSaberFeeds)2, new FeedInfo(TOP_PLAYED_KEY, $"https://scoresaber.com/api.php?function=get-leaderboards&cat=2&limit={LIMITKEY}&page={PAGENUMKEY}&ranked={RANKEDKEY}") },
-                        { (ScoreSaberFeeds)3, new FeedInfo(LATEST_RANKED_KEY, $"https://scoresaber.com/api.php?function=get-leaderboards&cat=1&limit={LIMITKEY}&page={PAGENUMKEY}&ranked={RANKEDKEY}") }
+                        { (ScoreSaberFeeds)3, new FeedInfo(TOP_RANKED_KEY, $"https://scoresaber.com/api.php?function=get-leaderboards&cat=3&limit={LIMITKEY}&page={PAGENUMKEY}&ranked={RANKEDKEY}") }
                     };
                 }
                 return _feeds;
@@ -77,12 +77,46 @@ namespace SyncSaberService.Web
             if (!(_settings is ScoreSaberFeedSettings settings))
                 throw new InvalidCastException(INVALID_FEED_SETTINGS_MESSAGE);
             List<SongInfo> songs = new List<SongInfo>();
-
-            switch (settings.FeedIndex)
+            int maxSongs = settings.MaxSongs > 0 ? settings.MaxSongs : settings.SongsPerPage * settings.SongsPerPage;
+            switch ((ScoreSaberFeeds) settings.FeedIndex)
             {
-                // Author
-                case 0:
-                    songs.AddRange(GetTopPPSongs(settings));
+                case ScoreSaberFeeds.TRENDING:
+
+                    if (!settings.searchOnline)
+                    {
+                        if (maxSongs <= 0)
+                            throw new ArgumentException("You must specify a value greater than 0 for MaxPages or MaxSongs.");
+                        songs.AddRange(ScrapedDataProvider.Songs.Values.Where(s => s.ScoreSaberInfo.Count > 0).OrderByDescending(s =>
+                        s.ScoreSaberInfo.Values.Select(ss => ss.scores_day).Aggregate((a, b) => a + b)).Take(maxSongs));
+                    }
+                    break;
+                case ScoreSaberFeeds.LATEST_RANKED:
+                    if (!settings.searchOnline)
+                    {
+                        if (maxSongs <= 0)
+                            throw new ArgumentException("You must specify a value greater than 0 for MaxPages or MaxSongs.");
+                        songs.AddRange(ScrapedDataProvider.Songs.Values.Where(s => s.RankedDifficulties.Count > 0).OrderByDescending(ss =>
+                        ss.ScoreSaberInfo.Keys.Max()).Take(maxSongs));
+                    }
+                    break;
+                case ScoreSaberFeeds.TOP_PLAYED:
+                    if (!settings.searchOnline)
+                    {
+                        if (maxSongs <= 0)
+                            throw new ArgumentException("You must specify a value greater than 0 for MaxPages or MaxSongs.");
+                        songs.AddRange(ScrapedDataProvider.Songs.Values.Where(s => s.ScoreSaberInfo.Count > 0).OrderByDescending(s =>
+                        s.ScoreSaberInfo.Values.Select(ss => ss.scores).Aggregate((a, b) => a + b)).Take(maxSongs));
+                    }
+                    break;
+                case ScoreSaberFeeds.TOP_RANKED:
+                    if (!settings.searchOnline)
+                    {
+                        if (maxSongs <= 0)
+                            throw new ArgumentException("You must specify a value greater than 0 for MaxPages or MaxSongs.");
+                        songs.AddRange(ScrapedDataProvider.Songs.Values.Where(s => s.RankedDifficulties.Count > 0).OrderByDescending(s => s.RankedDifficulties.Max(d => d.Value)).Take(maxSongs));
+                    }
+                    else
+                        songs.AddRange(GetTopPPSongs(settings));
                     break;
                 default:
                     break;
@@ -91,20 +125,10 @@ namespace SyncSaberService.Web
             Dictionary<int, SongInfo> retDict = new Dictionary<int, SongInfo>();
             foreach (var song in songs)
             {
-                if (retDict.ContainsKey(song.id))
+                if (!retDict.ContainsKey(song.keyAsInt))
                 {
-                    if (retDict[song.id].SongVersion < song.SongVersion)
-                    {
-                        Logger.Debug($"Song with ID {song.id} already exists, updating");
-                        retDict[song.id] = song;
-                    }
-                    else if (retDict[song.id].SongVersion == song.SongVersion)
-                        Logger.Debug($"Tried to add a song we already got");
-                    else
-                        Logger.Debug($"Song with ID {song.id} is already the newest version");
+                    retDict.Add(song.keyAsInt, song);
                 }
-                else
-                    retDict.Add(song.id, song);
             }
             return retDict;
         }
@@ -120,10 +144,11 @@ namespace SyncSaberService.Web
         public List<SongInfo> GetTopPPSongs(ScoreSaberFeedSettings settings)
         {
             // "https://scoresaber.com/api.php?function=get-leaderboards&cat={CATKEY}&limit={LIMITKEY}&page={PAGENUMKEY}&ranked={RANKEDKEY}"
-            int songsPerPage = 40;
+            int songsPerPage = 1000;
             int pageNum = 1;
             bool useMaxPages = settings.MaxPages != 0;
             List<SongInfo> songs = new List<SongInfo>();
+
             StringBuilder url = new StringBuilder(Feeds[settings.Feed].BaseUrl);
             Dictionary<string, string> urlReplacements = new Dictionary<string, string>() {
                 {LIMITKEY, songsPerPage.ToString() },
@@ -168,37 +193,42 @@ namespace SyncSaberService.Web
             }
             return songs;
         }
+
+
         public async Task<List<SongInfo>> GetSongsFromPageAsync(string url)
         {
             string pageText = await GetPageTextAsync(url).ConfigureAwait(false);
             List<SongInfo> songs = GetSongsFromPage(pageText);
             return songs;
         }
-        public List<SongInfo> GetSongsFromPage(string pageText)
+
+
+        public static List<SongInfo> GetSongsFromPage(string pageText)
         {
             var sssongs = GetSSSongsFromPage(pageText);
 
             List<SongInfo> songs = new List<SongInfo>();
             SongInfo tempSong;
             //sssongs.AsParallel().WithDegreeOfParallelism(Config.MaxConcurrentPageChecks).ForAll(s => s.PopulateFields());
-            Parallel.ForEach(sssongs, new ParallelOptions { MaxDegreeOfParallelism = Config.MaxConcurrentPageChecks }, s => s.PopulateFields());
+            //Parallel.ForEach(sssongs, new ParallelOptions { MaxDegreeOfParallelism = Config.MaxConcurrentPageChecks }, s => s.PopulateFields());
             foreach (var song in sssongs)
             {
-                tempSong = song.Song;
+                tempSong = ScrapedDataProvider.GetSong(song, false);
                 if (tempSong != null && !string.IsNullOrEmpty(tempSong.key))
                 {
+                    //tempSong.ScoreSaberInfo.AddOrUpdate(song.uid, song);
                     songs.Add(tempSong);
                 }
                 else
                 {
-                    Logger.Warning($"Could not convert song {song.name} with hash {song.md5Hash} to a SongInfo, skipping...");
+                    Logger.Warning($"Could not find song {song.name} with hash {song.hash} on Beat Saver, skipping...");
                 }
             }
 
             return songs;
         }
 
-        public List<ScoreSaberSong> GetSSSongsFromPage(string pageText)
+        public static List<ScoreSaberSong> GetSSSongsFromPage(string pageText)
         {
             JObject result = new JObject();
             try
@@ -217,38 +247,19 @@ namespace SyncSaberService.Web
             {
                 Logger.Error("Invalid page text: 'songs' field not found.");
             }
+            ScoreSaberSong newSong;
             foreach (var song in songJSONAry)
             {
-                //JSONObject song = (JSONObject) aKeyValue;
-                //string songIndex = song["key"]?.Value<string>();
-                string songHash = song["id"]?.Value<string>();
-                string songName = song["name"]?.Value<string>();
-                string author = song["author"]?.Value<string>();
-                //string songUrl = "https://beatsaver.com/download/" + songIndex;
-
-                if (ScoreSaberSong.TryParseScoreSaberSong(song, out ScoreSaberSong newSong))
-                {
-                    //newSong.Feed = "followings";
+                newSong = GetScoreSaberSongFromJson(song);
+                if (newSong != null)
                     songs.Add(newSong);
-                }
-                else
-                {
-                    if (!(string.IsNullOrEmpty(songName)))
-                    {
-                        Logger.Warning($"Couldn't parse song {songName}, using sparse definition.");
-                        //songs.Add(new ScoreSaberSong("", songName, "", author));
-                    }
-                    else
-                        Logger.Error("Unable to identify song, skipping");
-                }
-
             }
             return songs;
         }
 
         public Playlist[] PlaylistsForFeed(int feedIndex)
         {
-            switch ((ScoreSaberFeeds)feedIndex)
+            switch ((ScoreSaberFeeds) feedIndex)
             {
                 case ScoreSaberFeeds.TOP_RANKED:
                     return new Playlist[] { _topRanked };
@@ -269,6 +280,78 @@ namespace SyncSaberService.Web
 
         }
 
+        public static List<ScoreSaberSong> ScrapeScoreSaber(int requestDelay, int songsPerPage, bool rankedOnly, int maxPages = 0)
+        {
+            bool useMaxPages = maxPages != 0;
+            List<ScoreSaberSong> songs = new List<ScoreSaberSong>();
+
+            string rankVal = rankedOnly ? "1" : "0";
+            int songCount = 0;
+            int pageNum = 1;
+
+            StringBuilder url = new StringBuilder();
+
+            bool continueLooping = true;
+            do
+            {
+                url.Clear();
+                if (rankedOnly)
+                    url.Append(Feeds[ScoreSaberFeeds.LATEST_RANKED].BaseUrl);
+                else
+                    url.Append(Feeds[ScoreSaberFeeds.TOP_PLAYED].BaseUrl);
+                url.Replace(RANKEDKEY, rankVal);
+                url.Replace(LIMITKEY, songsPerPage.ToString());
+                url.Replace(PAGENUMKEY, pageNum.ToString());
+                Thread.Sleep(requestDelay);
+
+                Logger.Info($"On page {pageNum}");
+
+                //Logger.Debug($"Creating task for {url}");
+                string pageText = GetPageText(url.ToString());
+                songs.AddRange(GetSSSongsFromPage(pageText));
+                if (songs.Count == songCount)
+                    continueLooping = false;
+                songCount = songs.Count;
+                if (pageText.ToLower().Contains("rate limit"))
+                {
+                    Logger.Warning("Rate limit exceeded?");
+                }
+                pageNum++;
+                if (useMaxPages && (pageNum > maxPages))
+                    continueLooping = false;
+            } while (continueLooping);
+            Logger.Info($"Scraped {songs.Count} new songs");
+            return songs;
+        }
+
+        public static ScoreSaberSong GetScoreSaberSongFromJson(JToken song)
+        {
+            //JSONObject song = (JSONObject) aKeyValue;
+            //string songIndex = song["key"]?.Value<string>();
+            string songHash = song["id"]?.Value<string>();
+            string songName = song["name"]?.Value<string>();
+            string author = song["author"]?.Value<string>();
+            //string songUrl = "https://beatsaver.com/download/" + songIndex;
+            ScoreSaberSong newSong = null;
+            if (ScoreSaberSong.TryParseScoreSaberSong(song, ref newSong))
+            {
+                //newSong.Feed = "followings";
+                newSong.ScrapedAt = DateTime.Now;
+                return newSong;
+            }
+            else
+            {
+                if (!(string.IsNullOrEmpty(songName)))
+                {
+                    Logger.Warning($"Couldn't parse song {songName}, using sparse definition.");
+                    //songs.Add(new ScoreSaberSong("", songName, "", author));
+                }
+                else
+                    Logger.Error("Unable to identify song, skipping");
+            }
+            return null;
+        }
+
         private readonly Playlist _topRanked = new Playlist("ScoreSaberTopRanked", "ScoreSaber Top Ranked", "SyncSaber", "1");
         private readonly Playlist _trending = new Playlist("ScoreSaberTrending", "ScoreSaber Trending", "SyncSaber", "1");
         private readonly Playlist _topPlayed = new Playlist("ScoreSaberTopPlayed", "ScoreSaber Top Played", "SyncSaber", "1");
@@ -277,13 +360,17 @@ namespace SyncSaberService.Web
 
     public class ScoreSaberFeedSettings : IFeedSettings
     {
+        public int SongsPerPage = 100;
         public string FeedName { get { return ScoreSaberReader.Feeds[Feed].Name; } }
         public ScoreSaberFeeds Feed { get { return (ScoreSaberFeeds) FeedIndex; } set { FeedIndex = (int) value; } }
         public int FeedIndex { get; set; }
         public bool UseSongKeyAsOutputFolder { get; set; }
+        public bool searchOnline { get; set; }
         public int MaxPages;
+        public int MaxSongs { get; set; }
         public ScoreSaberFeedSettings(int feedIndex)
         {
+            searchOnline = false;
             FeedIndex = feedIndex;
             UseSongKeyAsOutputFolder = true;
         }
@@ -291,9 +378,9 @@ namespace SyncSaberService.Web
 
     public enum ScoreSaberFeeds
     {
-        TOP_RANKED = 0,
-        TRENDING = 1,
+        TRENDING = 0,
+        LATEST_RANKED = 1,
         TOP_PLAYED = 2,
-        LATEST_RANKED = 3
+        TOP_RANKED = 3,
     }
 }

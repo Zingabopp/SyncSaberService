@@ -7,7 +7,7 @@ using SimpleJSON;
 using System.IO;
 
 
-namespace SyncSaberService
+namespace SyncSaberLib
 {
     class PlaylistIO
     {

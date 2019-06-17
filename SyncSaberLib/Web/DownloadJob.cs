@@ -10,15 +10,15 @@ using System.IO.Compression;
 using System.Net;
 using System.Net.Http;
 using System.Diagnostics;
-using static SyncSaberService.Utilities;
-using SyncSaberService.Data;
+using static SyncSaberLib.Utilities;
+using SyncSaberLib.Data;
 
-namespace SyncSaberService.Web
+namespace SyncSaberLib.Web
 {
     public class DownloadJob
     {
         public const string NOTFOUNDERROR = "The remote server returned an error: (404) Not Found.";
-        public const string BEATSAVER_DOWNLOAD_URL_BASE = "https://beatsaver.com/download/";
+        public const string BEATSAVER_DOWNLOAD_URL_BASE = "https://beatsaver.com/api/download/key/";
         private const string TIMEOUTERROR = "The request was aborted: The request was canceled.";
 
         public enum JobResult
@@ -94,7 +94,7 @@ namespace SyncSaberService.Web
             }
             else
             {
-                Logger.Debug($"Download failed for {Song.key}");
+                Logger.Debug($"Download failed for {Song.key} - {Song.songName} by {Song.authorName}");
                 //result = false;
                 if (Result == JobResult.SUCCESS)
                 {
@@ -104,20 +104,9 @@ namespace SyncSaberService.Web
 
             return successful;
         }
-        private System.Timers.Timer webTimer;
+
         private CancellationTokenSource _tokenSource;
 
-        private void WebTimer_Elapsed(object sender, ElapsedEventArgs e)
-        {
-            Logger.Debug($"WebTimer Elapsed for job {Song.key}, canceling download...");
-            _tokenSource.Cancel();
-        }
-        public void OnDownloadProgressChanged(object sender, DownloadProgressChangedEventArgs e)
-        {
-            Logger.Debug($"                 DownloadProgressChanged for {Song.key}, reseting Timeout");
-            //webTimer.Stop();
-            //webTimer.Start();
-        }
 
         public async Task<bool> DownloadFile(string url, string path)
         {
@@ -129,21 +118,18 @@ namespace SyncSaberService.Web
 
             var token = _tokenSource.Token;
 
-            webTimer = new System.Timers.Timer(Config.DownloadTimeout * 1000);
-            webTimer.Elapsed += WebTimer_Elapsed;
-
-            var downloadAsync = HttpClientWrapper.httpClient.GetAsync(url).ContinueWith((requestTask) => {
-                HttpResponseMessage response = requestTask.Result;
-                response.EnsureSuccessStatusCode();
-                response.Content.ReadAsFileAsync(path, true);
-            });
-            await downloadAsync;
+            Task downloadAsync = WebUtils.DownloadFileAsync(url, path, true);
+            try
+            {
+                await downloadAsync;
+            }
+            catch (Exception) { }
             if (downloadAsync.IsFaulted || !File.Exists(path))
             {
                 successful = false;
                 if (downloadAsync.Exception != null)
                 {
-                    if (downloadAsync.Exception.InnerException.Message == NOTFOUNDERROR)
+                    if (downloadAsync.Exception.InnerException.Message.Contains("404"))
                     {
                         Logger.Error($"{url} was not found on Beat Saver.");
                         Result = JobResult.NOTFOUND;
@@ -183,7 +169,7 @@ namespace SyncSaberService.Web
                 {
                     Logger.Warning("File is in use and can't be deleted");
                 }
-                
+
                 successful = false;
             }
             return successful;

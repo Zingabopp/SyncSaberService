@@ -5,10 +5,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Threading.Tasks.Dataflow;
-using static SyncSaberService.Utilities;
-using SyncSaberService.Data;
+using static SyncSaberLib.Utilities;
+using SyncSaberLib.Data;
 
-namespace SyncSaberService.Web
+namespace SyncSaberLib.Web
 {
     class DownloadBatch
     {
@@ -45,7 +45,7 @@ namespace SyncSaberService.Web
             switch (job.Result)
             {
                 case DownloadJob.JobResult.SUCCESS:
-                    Logger.Info($"Finished job {song.key}-{song.name} by {song.authorName} successfully.");
+                    Logger.Info($"Finished job {song.key}-{song.songName} by {song.authorName} successfully.");
                     break;
                 case DownloadJob.JobResult.TIMEOUT:
                     Logger.Warning($"Job {song.key} failed due to download timeout.");

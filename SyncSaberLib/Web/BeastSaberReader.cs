@@ -14,11 +14,11 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Threading.Tasks.Dataflow;
 using System.Net.Http;
-using static SyncSaberService.Utilities;
-using SyncSaberService.Data;
-using static SyncSaberService.Web.HttpClientWrapper;
+using static SyncSaberLib.Utilities;
+using SyncSaberLib.Data;
+using static SyncSaberLib.Web.WebUtils;
 
-namespace SyncSaberService.Web
+namespace SyncSaberLib.Web
 {
     public class BeastSaberReader : IFeedReader
     {
@@ -28,7 +28,9 @@ namespace SyncSaberService.Web
         private static readonly string USERNAMEKEY = "{USERNAME}";
         private static readonly string PAGENUMKEY = "{PAGENUM}";
         private const string DefaultLoginUri = "https://bsaber.com/wp-login.php?jetpack-sso-show-default-form=1";
+        private const string BeatSaverDownloadURL_Base = "https://beatsaver.com/api/download/key/";
         private static readonly Uri FeedRootUri = new Uri("https://bsaber.com");
+        public const int SONGS_PER_PAGE = 50;
         #endregion
 
         public string Name { get { return NameKey; } }
@@ -56,8 +58,8 @@ namespace SyncSaberService.Web
                     _feeds = new Dictionary<BeastSaberFeeds, FeedInfo>()
                     {
                         { (BeastSaberFeeds)0, new FeedInfo("followings", "https://bsaber.com/members/" + USERNAMEKEY + "/wall/followings/feed/?acpage=" + PAGENUMKEY) },
-                        { (BeastSaberFeeds)1, new FeedInfo("bookmarks", "https://bsaber.com/members/" + USERNAMEKEY + "/bookmarks/feed/?acpage=" + PAGENUMKEY )},
-                        { (BeastSaberFeeds)2, new FeedInfo("curator recommended", "https://bsaber.com/members/curatorrecommended/bookmarks/feed/?acpage=" + PAGENUMKEY) }
+                        { (BeastSaberFeeds)1, new FeedInfo("bookmarks", "https://bsaber.com/wp-json/bsaber-api/songs/?bookmarked_by=" + USERNAMEKEY + "&page=" + PAGENUMKEY )},
+                        { (BeastSaberFeeds)2, new FeedInfo("curator recommended", "https://bsaber.com/wp-json/bsaber-api/songs/?bookmarked_by=curatorrecommended&page=" + PAGENUMKEY) }
                     };
                 }
                 return _feeds;
@@ -86,29 +88,37 @@ namespace SyncSaberService.Web
         {
             if (!Ready)
             {
-                Cookies = GetBSaberCookies(_username, _password);
-                AddCookies(Cookies, FeedRootUri);
+                //Cookies = GetBSaberCookies(_username, _password);
+                //AddCookies(Cookies, FeedRootUri);
                 for (int i = 0; i < Feeds.Keys.Count; i++)
-                    _earliestEmptyPage.AddOrUpdate((int)Feeds.Keys.ElementAt(i), 9999);
+                    _earliestEmptyPage.AddOrUpdate((int) Feeds.Keys.ElementAt(i), 9999);
                 Ready = true;
             }
         }
 
-        public BeastSaberReader(string username, string password, int maxConcurrency, string loginUri = DefaultLoginUri)
+        public BeastSaberReader(string username, int maxConcurrency)
         {
             Ready = false;
             _username = username;
-            _password = password;
-            _loginUri = loginUri;
-
             if (maxConcurrency > 0)
                 _maxConcurrency = maxConcurrency;
             else
                 _maxConcurrency = 5;
             _earliestEmptyPage = new Dictionary<int, int>();
+        }
+
+        [Obsolete("Login info is no longer required for Bookmarks and Followings.")]
+        public BeastSaberReader(string username, string password, int maxConcurrency, string loginUri = DefaultLoginUri)
+            : this(username, maxConcurrency)
+        {
+
+            _password = password;
+            _loginUri = loginUri;
+
             _cookieLock = new object();
         }
 
+        [Obsolete("Not necessary anymore")]
         public static CookieContainer GetBSaberCookies(string username, string password)
         {
             CookieContainer tempContainer = null;
@@ -166,45 +176,96 @@ namespace SyncSaberService.Web
         public List<SongInfo> GetSongsFromPage(string pageText)
         {
             List<SongInfo> songsOnPage = new List<SongInfo>();
-
+            List<BSaberSong> bSongs = new List<BSaberSong>();
             int totalSongsForPage = 0;
-            XmlDocument xmlDocument = new XmlDocument();
-
-            xmlDocument.LoadXml(pageText);
-            List<Task> populateTasks = new List<Task>();
-            XmlNodeList xmlNodeList = xmlDocument.DocumentElement.SelectNodes("/rss/channel/item");
-            foreach (object obj in xmlNodeList)
+            if (pageText.ToLower().StartsWith(@"<?xml"))
             {
-                XmlNode node = (XmlNode) obj;
-                if (node["DownloadURL"] == null || node["SongTitle"] == null)
+                XmlDocument xmlDocument = new XmlDocument();
+
+                xmlDocument.LoadXml(pageText); // TODO: Catch exception for when the page provides bad xml
+                List<Task> populateTasks = new List<Task>();
+                XmlNodeList xmlNodeList = xmlDocument.DocumentElement.SelectNodes("/rss/channel/item");
+                foreach (object obj in xmlNodeList)
                 {
-                    Logger.Debug("Not a song! Skipping!");
-                }
-                else
-                {
-                    string songName = node["SongTitle"].InnerText;
-                    string innerText = node["DownloadURL"].InnerText;
-                    if (innerText.Contains("dl.php"))
+                    XmlNode node = (XmlNode) obj;
+                    if (node["DownloadURL"] == null || node["SongTitle"] == null)
                     {
-                        Logger.Warning("Skipping BeastSaber download with old url format!");
-                        totalSongsForPage++;
+                        Logger.Debug("Not a song! Skipping!");
                     }
                     else
                     {
-                        string songIndex = innerText.Substring(innerText.LastIndexOf('/') + 1);
-                        string mapper = GetMapperFromBsaber(node.InnerText);
-                        string songUrl = "https://beatsaver.com/download/" + songIndex;
-                        SongInfo currentSong = new SongInfo(songIndex, songName, songUrl, mapper);
-                        //string currentSongDirectory = Path.Combine(Config.BeatSaberPath, "CustomSongs", songIndex);
-                        //bool downloadFailed = false;
-                        //populateTasks.Add(currentSong.PopulateFieldsAsync());
-                        //SongInfo.PopulateFields(currentSong);
-                        songsOnPage.Add(currentSong);
+                        string songName = node["SongTitle"].InnerText;
+                        string downloadUrl = node["DownloadURL"]?.InnerText;
+                        string hash = node["Hash"]?.InnerText?.ToUpper();
+                        string authorName = node["LevelAuthorName"]?.InnerText;
+                        string songKey = node["SongKey"]?.InnerText;
+                        if (downloadUrl.Contains("dl.php"))
+                        {
+                            Logger.Warning("Skipping BeastSaber download with old url format!");
+                            totalSongsForPage++;
+                        }
+                        else
+                        {
+
+                            string songIndex = !string.IsNullOrEmpty(songKey) ? songKey : downloadUrl.Substring(downloadUrl.LastIndexOf('/') + 1);
+                            string mapper = !string.IsNullOrEmpty(authorName) ? authorName : GetMapperFromBsaber(node.InnerText);
+                            string songUrl = !string.IsNullOrEmpty(downloadUrl) ? downloadUrl : BeatSaverDownloadURL_Base + songIndex;
+
+                            // TODO: Get song from the scrape, if not maybe scrape beat saver for the song.
+                            //SongInfo currentSong = new SongInfo(songIndex, songName, songUrl, mapper);
+                            //string currentSongDirectory = Path.Combine(Config.BeatSaberPath, "CustomSongs", songIndex);
+                            //bool downloadFailed = false;
+                            //populateTasks.Add(currentSong.PopulateFieldsAsync());
+                            //SongInfo.PopulateFields(currentSong);
+                            if (ScrapedDataProvider.TryGetSongByKey(songIndex, out SongInfo currentSong))
+                                songsOnPage.Add(currentSong);
+                        }
                     }
                 }
             }
+            else // Page is JSON (hopefully)
+            {
+                JObject result = new JObject();
+                try
+                {
+                    result = JObject.Parse(pageText);
+
+                }
+                catch (Exception ex)
+                {
+                    Logger.Exception("Unable to parse JSON from text", ex);
+                }
+
+                result["songs"].Populate<List<BSaberSong>>(bSongs);
+
+                foreach (var bSong in bSongs)
+                {
+                    if (string.IsNullOrEmpty(bSong.song_key) && string.IsNullOrEmpty(bSong.hash))
+                    {
+                        continue; // Not a song
+                    }
+                    totalSongsForPage++;
+                    if (!string.IsNullOrEmpty(bSong.song_key))
+                    {
+                        if (ScrapedDataProvider.TryGetSongByKey(bSong.song_key, out SongInfo currentSong))
+                        {
+                            songsOnPage.Add(currentSong);
+                        }
+                    }else if(!string.IsNullOrEmpty(bSong.hash))
+                    {
+                        if (ScrapedDataProvider.TryGetSongByHash(bSong.hash, out SongInfo currentSong))
+                        {
+                            songsOnPage.Add(currentSong);
+                        }
+                    }
+                }
+
+            }
+
+
 
             //Task.WaitAll(populateTasks.ToArray());
+            Logger.Info($"{songsOnPage.Count} songs on the page");
             return songsOnPage;
         }
 
@@ -217,7 +278,7 @@ namespace SyncSaberService.Web
 
         public string GetPageUrl(int feedIndex, int page)
         {
-            return GetPageUrl(Feeds[(BeastSaberFeeds)feedIndex].BaseUrl, page);
+            return GetPageUrl(Feeds[(BeastSaberFeeds) feedIndex].BaseUrl, page);
         }
 
         private static string GetMapperFromBsaber(string innerText)
@@ -323,21 +384,22 @@ namespace SyncSaberService.Web
             Dictionary<int, SongInfo> retDict = new Dictionary<int, SongInfo>();
             foreach (var song in songList)
             {
-                if (retDict.ContainsKey(song.id))
+                if (retDict.ContainsKey(song.keyAsInt))
                 {
-                    if (retDict[song.id].SongVersion < song.SongVersion)
+                    /*
+                    if (retDict[song.keyAsInt].SongVersion < song.SongVersion)
                     {
-                        Logger.Debug($"Song with ID {song.id} already exists, updating");
-                        retDict[song.id] = song;
+                        Logger.Debug($"Song with ID {song.keyAsInt} already exists, updating");
+                        retDict[song.keyAsInt] = song;
                     }
                     else
                     {
-                        Logger.Debug($"Song with ID {song.id} is already the newest version");
-                    }
+                        Logger.Debug($"Song with ID {song.keyAsInt} is already the newest version");
+                    }*/
                 }
                 else
                 {
-                    retDict.Add(song.id, song);
+                    retDict.Add(song.keyAsInt, song);
                 }
             }
             return retDict;
@@ -360,6 +422,15 @@ namespace SyncSaberService.Web
 
     }
 
+    [Serializable]
+    public class BSaberSong
+    {
+        public string title;
+        public string song_key;
+        public string hash;
+        public string level_author_name;
+    }
+
     public struct FeedPageInfo
     {
         public int feedToDownload;
@@ -374,9 +445,13 @@ namespace SyncSaberService.Web
         public int FeedIndex { get; set; }
         public BeastSaberFeeds Feed { get { return (BeastSaberFeeds) FeedIndex; } set { FeedIndex = (int) value; } }
         public bool UseSongKeyAsOutputFolder { get; set; }
+        public bool searchOnline { get; set; }
         public int MaxPages;
+        public int MaxSongs { get; set; }
         public BeastSaberFeedSettings(int feedIndex, int _maxPages = 0)
         {
+            MaxSongs = BeastSaberReader.SONGS_PER_PAGE * _maxPages;
+            searchOnline = true;
             FeedIndex = feedIndex;
             MaxPages = _maxPages;
             UseSongKeyAsOutputFolder = true;

@@ -7,9 +7,9 @@ using System.IO;
 using System.Net.Http;
 using System.Net;
 
-namespace SyncSaberService.Web
+namespace SyncSaberLib.Web
 {
-    public static class HttpClientWrapper
+    public static class WebUtils
     {
         private static bool _initialized = false;
         private static object lockObject = new object();
@@ -23,6 +23,7 @@ namespace SyncSaberService.Web
                     _httpClientHandler = new HttpClientHandler();
                     httpClientHandler.MaxConnectionsPerServer = 10;
                     httpClientHandler.UseCookies = true;
+                    httpClientHandler.AllowAutoRedirect = true; // Needs to be false to detect Beat Saver song download rate limit
                 }
                 return _httpClientHandler;
             }
@@ -47,6 +48,27 @@ namespace SyncSaberService.Web
             }
         }
 
+        public static DateTime UnixTimeStampToDateTime(double unixTimeStamp)
+        {
+            // Unix timestamp is seconds past epoch
+            System.DateTime dtDateTime = new DateTime(1970, 1, 1, 0, 0, 0, 0, System.DateTimeKind.Utc);
+            dtDateTime = dtDateTime.AddSeconds(unixTimeStamp).ToLocalTime();
+            return dtDateTime;
+        }
+        private const string RATE_LIMIT_REMAINING_KEY = "Rate-Limit-Remaining";
+        private const string RATE_LIMIT_RESET_KEY = "Rate-Limit-Reset";
+        private const string RATE_LIMIT_TOTAL_KEY = "Rate-Limit-Total";
+        private const string RATE_LIMIT_PREFIX = "Rate-Limit";
+
+        public static RateLimit ParseRateLimit(Dictionary<string, string> headers)
+        {
+            return new RateLimit() {
+                CallsRemaining = int.Parse(headers[RATE_LIMIT_REMAINING_KEY]),
+                TimeToReset = UnixTimeStampToDateTime(double.Parse(headers[RATE_LIMIT_RESET_KEY])) - DateTime.Now,
+                CallsPerReset = int.Parse(headers[RATE_LIMIT_TOTAL_KEY])
+            };
+        }
+
         public static void Initialize(int maxConnectionsPerServer)
         {
             if (_initialized == false)
@@ -57,6 +79,8 @@ namespace SyncSaberService.Web
                 _httpClient = new HttpClient(httpClientHandler);
             }
         }
+
+
 
         /// <summary>
         /// Downloads the page and returns it as a string.
@@ -84,7 +108,7 @@ namespace SyncSaberService.Web
         public static async Task<string> GetPageTextAsync(string url)
         {
             //lock (lockObject)
-            
+
             string pageText = await httpClient.GetStringAsync(url);
             //Logger.Debug(pageText.Result);
             //Logger.Debug($"Got page text for {url}");
@@ -93,7 +117,7 @@ namespace SyncSaberService.Web
 
         public static void AddCookies(CookieContainer newCookies, Uri uri)
         {
-            lock(httpClientHandler)
+            lock (httpClientHandler)
             {
                 if (httpClientHandler.CookieContainer == null)
                     httpClientHandler.CookieContainer = newCookies;
@@ -106,6 +130,35 @@ namespace SyncSaberService.Web
         {
             AddCookies(newCookies, new Uri(url));
         }
+
+        public async static Task<bool> DownloadFileAsync(string downloadUrl, string path, bool overwrite = true)
+        {
+            var success = true;
+            var response = await WebUtils.httpClient.GetAsync(downloadUrl);
+
+            response.EnsureSuccessStatusCode();
+
+
+            await response.Content.ReadAsFileAsync(path, overwrite);
+            return success;
+        }
+
+        public async static Task<string> TryGetStringAsync(string url)
+        {
+            HttpResponseMessage response = await httpClient.GetAsync(url);
+            if (response.IsSuccessStatusCode)
+            {
+                return await response.Content.ReadAsStringAsync();
+            }
+            return string.Empty;
+        }
+    }
+
+    public class RateLimit
+    {
+        public int CallsRemaining;
+        public TimeSpan TimeToReset;
+        public int CallsPerReset;
     }
 
     // From https://stackoverflow.com/questions/45711428/download-file-with-webclient-or-httpclient

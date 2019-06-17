@@ -7,7 +7,7 @@ using System.Reflection;
 using System.IO;
 using System.Runtime.CompilerServices;
 
-namespace SyncSaberService
+namespace SyncSaberLib
 {
     public enum LogLevel
     {

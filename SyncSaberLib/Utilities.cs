@@ -12,11 +12,19 @@ using System.IO.Compression;
 using System.Net;
 using System.ComponentModel;
 
-namespace SyncSaberService
+namespace SyncSaberLib
 {
     public static class Utilities
     {
-
+        public static string MakeSafeFilename(string str)
+        {
+            StringBuilder retStr = new StringBuilder(str);
+            foreach (var character in Path.GetInvalidFileNameChars())
+            {
+                retStr.Replace(character.ToString(), string.Empty);
+            }
+            return retStr.ToString();
+        }
 
         /// <summary>
         /// Creates a new KeyData object with the provided keyName and keyValue;

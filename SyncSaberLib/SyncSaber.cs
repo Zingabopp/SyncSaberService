@@ -13,11 +13,12 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Threading.Tasks.Dataflow;
 using System.Net.Http;
-using static SyncSaberService.Utilities;
-using SyncSaberService.Data;
-using SyncSaberService.Web;
+using static SyncSaberLib.Utilities;
+using SyncSaberLib.Data;
+using SyncSaberLib.Web;
+using System.Reflection;
 
-namespace SyncSaberService
+namespace SyncSaberLib
 {
     public class SyncSaber
     {
@@ -25,10 +26,54 @@ namespace SyncSaberService
         public string CustomSongsPath;
         private static readonly string zipExtension = ".zip";
 
+        public static string VersionCheck()
+        {
+            string retStr = "";
+            var getPage = WebUtils.httpClient.GetAsync("https://raw.githubusercontent.com/Zingabopp/SyncSaberService/master/Status");
+            getPage.Wait();
+            
+            if(getPage.Result.StatusCode != HttpStatusCode.OK)
+            {
+                retStr = "Unable to check version.";
+                Logger.Warning(retStr);
+                return retStr;
+            }
+            var statusText = getPage.Result.Content.ReadAsStringAsync().Result.Split(
+                Environment.NewLine.ToCharArray(), StringSplitOptions.RemoveEmptyEntries).Select(l => l.Split(',')).ToDictionary(s => s[0], x => x[1]);
+            var version = Assembly.GetExecutingAssembly().GetName().Version;
+            var versionStr = string.Join(".", version.Major, version.Minor, version.Build);
+            if (statusText.ContainsKey(versionStr))
+            {
+                var status = statusText[versionStr];
+                switch (status)
+                {
+                    case "Broken":
+                        string errorMsg = "This version of SyncSaberService is no longer functional.";
+                        if (statusText.Values.Any(s => s != "Broken"))
+                            errorMsg = errorMsg + " Please update to a newer version.";
+                        throw new OutOfDateException(errorMsg);
+                    case "Outdated":
+                        retStr = "This version of SyncSaberService is outdated, please update to a newer version.";
+                        Logger.Warning(retStr);
+                        break;
+                    case "Latest":
+                        retStr = "Running the latest version of SyncSaberService.";
+                        Logger.Info(retStr);
+                        break;
+                    default:
+                        retStr = "Running an unknown version of SyncSaberService.";
+                        Logger.Info(retStr);
+                        break;
+                }
+            }
+            return retStr;
+        }
+
         public SyncSaber()
         {
             Instance = this;
-
+            //VersionCheck();
+            
             _historyPath = Path.Combine(Config.BeatSaberPath, "UserData", "SyncSaberHistory.txt");
             if (File.Exists(_historyPath + ".bak"))
             {
@@ -42,9 +87,11 @@ namespace SyncSaberService
             {
                 _songDownloadHistory = File.ReadAllLines(_historyPath).ToList<string>();
             }
+            else
+                File.Create(_historyPath); // TODO: Check if this works
             if (Directory.Exists(Config.BeatSaberPath))
             {
-                CustomSongsPath = Path.Combine(Config.BeatSaberPath, "CustomSongs");
+                CustomSongsPath = Path.Combine(Config.BeatSaberPath, @"Beat Saber_Data\CustomLevels");
                 if (!Directory.Exists(CustomSongsPath))
                 {
                     Directory.CreateDirectory(CustomSongsPath);
@@ -53,7 +100,7 @@ namespace SyncSaberService
 
             FeedReaders = new Dictionary<string, IFeedReader> {
                 {BeatSaverReader.NameKey, new BeatSaverReader() },
-                {BeastSaberReader.NameKey, new BeastSaberReader(Config.BeastSaberUsername, Config.BeastSaberPassword, Config.MaxConcurrentPageChecks) },
+                {BeastSaberReader.NameKey, new BeastSaberReader(Config.BeastSaberUsername, Config.MaxConcurrentPageChecks) },
                 {ScoreSaberReader.NameKey, new ScoreSaberReader() }
             };
         }
@@ -98,8 +145,10 @@ namespace SyncSaberService
             }
         }
 
+        [Obsolete("Does not work anymore, returns immediately")]
         private void RemoveOldVersions(string songIndex)
         {
+            return;
             if (!Config.DeleteOldVersions)
             {
                 return;
@@ -112,7 +161,7 @@ namespace SyncSaberService
                 try
                 {
                     string directoryName = Path.GetFileName(directory);
-                    if (this._beatSaverRegex.IsMatch(directoryName) && directoryName != songIndex)
+                    if (_beatSaverRegex.IsMatch(directoryName) && directoryName != songIndex)
                     {
                         string directoryId = directoryName.Substring(0, directoryName.IndexOf("-"));
                         if (directoryId == id)
@@ -132,7 +181,7 @@ namespace SyncSaberService
                             Directory.Delete(directoryToRemove, true);
                         }
                     }
-                    else if (this._digitRegex.IsMatch(directoryName) && directoryName == id)
+                    else if (_digitRegex.IsMatch(directoryName) && directoryName == id)
                     {
                         Logger.Info($"Deleting old song with identifier \"{directoryName}\" (current version: {id}-{version})");
                         Directory.Delete(directory, true);
@@ -160,6 +209,20 @@ namespace SyncSaberService
             // TODO: Add fail reason to FailedDownloads items
         }
 
+        public void ScrapeNewSongs()
+        {
+            var lastBSScrape = DateTime.Now - ScrapedDataProvider.BeatSaverSongs.Data.Max(s => s.ScrapedAt);
+            var lastSSScrape = DateTime.Now - ScrapedDataProvider.ScoreSaberSongs.Data.Max(s => s.ScrapedAt);
+            Logger.Info($"Scraping new songs. Last Beat Saver scrape was {lastBSScrape.ToString()} ago. Last ScoreSaber scrape was {lastSSScrape.ToString()} ago.");
+            var bsReader = FeedReaders[BeatSaverReader.NameKey] as BeatSaverReader;
+            BeatSaverReader.ScrapeBeatSaver(200, true);
+            ScrapedDataProvider.BeatSaverSongs.WriteFile();
+            
+            if (lastSSScrape.TotalHours > 3)
+                ScoreSaberReader.ScrapeScoreSaber(1000, 500, true, 2);
+            ScrapedDataProvider.ScoreSaberSongs.WriteFile();
+        }
+
         public void DownloadSongsFromFeed(string feedType, IFeedSettings _settings)
         {
             if (!FeedReaders.ContainsKey(feedType))
@@ -184,14 +247,14 @@ namespace SyncSaberService
             }
             int totalSongs = songs.Count;
             Logger.Debug($"Finished checking pages, found {totalSongs} songs");
-            List<SongInfo> matchedSongs = DownloadSongs(songs, out int skippedSongs, _settings.UseSongKeyAsOutputFolder);
+            List<SongInfo> matchedSongs = DownloadSongs(songs, out (int exists, int history) skippedSongs, _settings.UseSongKeyAsOutputFolder);
             Logger.Debug("Jobs finished, Processing downloads...");
             int downloadCount = SuccessfulDownloads.Count;
             int failedCount = FailedDownloads.Count;
             ProcessDownloads(playlists);
             var timeElapsed = (DateTime.Now - startTime);
             Logger.Info($"Downloaded {downloadCount} songs from {reader.Source}'s {_settings.FeedName} feed in {FormatTimeSpan(timeElapsed)}. " +
-                $"Skipped {skippedSongs} songs that are in history or already exist{(failedCount > 0 ? $", failed to download {failedCount} songs." : "")}.");
+                $"Skipped {skippedSongs.exists} songs that already exist and {skippedSongs.history} that are in history{(failedCount > 0 ? $", failed to download {failedCount} songs." : "")}.");
 
         }
 
@@ -237,20 +300,21 @@ namespace SyncSaberService
         /// <param name="skippedsongs"></param>
         /// <param name="useSongKeyAsOutputFolder"></param>
         /// <returns></returns>
-        public List<SongInfo> DownloadSongs(Dictionary<int, SongInfo> queuedSongs, out int skippedsongs, bool useSongKeyAsOutputFolder)
+        public List<SongInfo> DownloadSongs(Dictionary<int, SongInfo> queuedSongs, out (int exists, int history) skipped, bool useSongKeyAsOutputFolder)
         {
             //var existingSongs = Directory.GetDirectories(CustomSongsPath);
             string tempPath = "";
             string outputPath = "";
             List<SongInfo> matchedSongs = new List<SongInfo>();
-            skippedsongs = 0;
+            
+            skipped.exists = skipped.history = 0;
             DownloadBatch jobs = new DownloadBatch();
             jobs.JobCompleted += OnJobFinished;
             foreach (var song in queuedSongs.Values)
             {
                 tempPath = Path.Combine(Path.GetTempPath(), song.key + zipExtension);
                 if (useSongKeyAsOutputFolder)
-                    outputPath = Path.Combine(CustomSongsPath, song.key);
+                    outputPath = Path.Combine(CustomSongsPath, $"{song.key} ({MakeSafeFilename(song.songName)})");
                 else
                     outputPath = CustomSongsPath;
                 bool songExists = Directory.Exists(outputPath);
@@ -261,7 +325,10 @@ namespace SyncSaberService
                 }
                 if (songExists || songInHistory)
                 {
-                    skippedsongs++;
+                    if (songExists)
+                        skipped.exists++;
+                    else
+                        skipped.history++;
                     //Logger.Debug($"Skipping song - SongExists: {songExists}, SongInHistory: {songInHistory}");
                     continue; // We already have the song or don't want it, skip
                 }
@@ -272,9 +339,9 @@ namespace SyncSaberService
             return matchedSongs;
         }
 
-        private readonly Regex _digitRegex = new Regex("^[0-9]+$", RegexOptions.Compiled);
+        private static readonly Regex _digitRegex = new Regex("^[0-9]+$", RegexOptions.Compiled);
 
-        private readonly Regex _beatSaverRegex = new Regex("^[0-9]+-[0-9]+$", RegexOptions.Compiled);
+        private static readonly Regex _beatSaverRegex = new Regex("^[0-9]+-[0-9]+$", RegexOptions.Compiled);
 
         private readonly string _historyPath;
 
@@ -308,6 +375,13 @@ namespace SyncSaberService
 
         public Dictionary<string, IFeedReader> FeedReaders;
 
+    }
+
+    public class OutOfDateException : ApplicationException
+    {
+        public OutOfDateException(string message) : base(message)
+        {
+        }
     }
 
 }
