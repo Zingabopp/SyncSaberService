@@ -24,6 +24,9 @@ namespace SyncSaberConsole
             //ScrapedDataProvider.Initialize();
 
             WebUtils.Initialize(5);
+            var br = new BeastSaberReader("Zingabopp", 3);
+            var text = WebUtils.GetPageText("https://bsaber.com/wp-json/bsaber-api/songs/?bookmarked_by=Zingabopp&page=1");
+            var bSongs = br.GetSongsFromPage(text);
 
 
             //ScrapedDataProvider.Initialize();
