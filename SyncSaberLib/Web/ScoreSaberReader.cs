@@ -337,6 +337,7 @@ namespace SyncSaberLib.Web
             {
                 //newSong.Feed = "followings";
                 newSong.ScrapedAt = DateTime.Now;
+                ScrapedDataProvider.GetOrCreateSong(newSong, true);
                 return newSong;
             }
             else

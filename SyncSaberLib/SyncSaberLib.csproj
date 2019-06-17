@@ -61,7 +61,6 @@
     <Compile Include="Data\SongInfo.cs" />
     <Compile Include="Data\SongInfoProvider.cs" />
     <Compile Include="Data\SyncSaberScrape.cs" />
-    <Compile Include="SimpleJson.cs" />
     <Compile Include="Web\BeatSaverReader.cs" />
     <Compile Include="Web\DownloadBatch.cs" />
     <Compile Include="Web\BeastSaberReader.cs" />

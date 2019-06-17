@@ -4,25 +4,30 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.IO;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace SyncSaberLib
 {
+
+    [Serializable]
     public class Playlist
     {
         public Playlist(string playlistFileName, string playlistTitle, string playlistAuthor, string image)
         {
-            this.fileName = playlistFileName;
-            this.Title = playlistTitle;
-            this.Author = playlistAuthor;
-            this.Image = image;
-            this.Songs = new List<PlaylistSong>();
-            this.fileLoc = "";
-            this.ReadPlaylist();
+            fileName = playlistFileName;
+            Title = playlistTitle;
+            Author = playlistAuthor;
+            Image = image;
+            Songs = new List<PlaylistSong>();
+            fileLoc = "";
+            ReadPlaylist();
         }
 
-        public void Add(string songIndex, string songName)
+        public void TryAdd(string songHash, string songIndex, string songName)
         {
-            this.Songs.Add(new PlaylistSong(songIndex, songName));
+            if(!Songs.Exists(s => s.hash.ToUpper() == songHash))
+                Songs.Add(new PlaylistSong(songHash, songIndex, songName));
         }
 
         public void WritePlaylist()
@@ -34,44 +39,43 @@ namespace SyncSaberLib
         {
             string oldFormatPath = Config.BeatSaberPath + "\\Playlists\\" + this.fileName + ".json";
             string newFormatPath = Config.BeatSaberPath + "\\Playlists\\" + this.fileName + ".bplist";
-            this.oldFormat = !File.Exists(newFormatPath);
-            Logger.Info(string.Concat(new string[]
-            {
-                "Playlist \"",
-                this.Title,
-                "\" found in ",
-                this.oldFormat ? "old" : "new",
-                " playlist format."
-            }), "C:\\Users\\brian\\Documents\\GitHub\\SyncSaber\\SyncSaber\\Playlist.cs", "ReadPlaylist", 126);
+            oldFormat = !File.Exists(newFormatPath);
+            Logger.Info($"Playlist {Title} found in {(oldFormat ? "old" : "new")} playlist format.");
             if (File.Exists(this.oldFormat ? oldFormatPath : newFormatPath))
             {
-                Playlist playlist = PlaylistIO.ReadPlaylistSongs(this);
+
+                PlaylistIO.ReadPlaylistSongs(this);
+                /*
                 if (playlist != null)
                 {
-                    this.Title = playlist.Title;
-                    this.Author = playlist.Author;
-                    this.Image = playlist.Image;
-                    this.Songs = playlist.Songs;
-                    this.fileLoc = playlist.fileLoc;
-                    Logger.Info("Success loading playlist!", "C:\\Users\\brian\\Documents\\GitHub\\SyncSaber\\SyncSaber\\Playlist.cs", "ReadPlaylist", 139);
+                    Title = playlist.Title;
+                    Author = playlist.Author;
+                    Image = playlist.Image;
+                    Songs = playlist.Songs;
+                    fileLoc = playlist.fileLoc;
+                    Logger.Info("Success loading playlist!");
                     return true;
-                }
+                }*/
             }
             return false;
         }
 
+        [JsonProperty("playlistTitle")]
         public string Title;
-
+        [JsonProperty("playlistAuthor")]
         public string Author;
 
+        [JsonProperty("image")]
         public string Image;
 
+        [JsonProperty("songs")]
         public List<PlaylistSong> Songs;
 
+        [JsonProperty("fileLoc")]
         public string fileLoc;
-
+        [JsonIgnore]
         public string fileName;
-
+        [JsonIgnore]
         public bool oldFormat = true;
     }
 }

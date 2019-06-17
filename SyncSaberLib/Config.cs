@@ -627,6 +627,7 @@ namespace SyncSaberLib
         /// <returns></returns>
         public static bool Initialize()
         {
+            
             bool successful = true;
             bool changed = false;
 
@@ -652,7 +653,9 @@ namespace SyncSaberLib
             Setting = new Dictionary<string, Func<string>> {
                 { SettingKeys.BeatSaberPath.KeyName, () => { return BeatSaberPath; } }
             };
-            Console.WriteLine($"Path: {Setting[SettingKeys.BeatSaberPath.KeyName]()}");
+            //Console.WriteLine($"Path: {Setting[SettingKeys.BeatSaberPath.KeyName]()}");
+            var version = Assembly.GetExecutingAssembly().GetName().Version;
+            Logger.Info($"SyncSaberService {version.Major}.{version.Minor}.{version.Build}");
             return successful;
         }
 

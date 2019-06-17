@@ -109,7 +109,7 @@ namespace SyncSaberLib.Data
             get
             {
                 if (BeatSaverInfo != null)
-                    return BeatSaverInfo.name;
+                    return BeatSaverInfo.metadata.songName;
                 var ssSong = ScoreSaberInfo.Values.FirstOrDefault();
                 if (ssSong != null)
                     return ssSong.name;

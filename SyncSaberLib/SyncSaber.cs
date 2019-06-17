@@ -72,7 +72,7 @@ namespace SyncSaberLib
         public SyncSaber()
         {
             Instance = this;
-            //VersionCheck();
+            VersionCheck();
             
             _historyPath = Path.Combine(Config.BeatSaberPath, "UserData", "SyncSaberHistory.txt");
             if (File.Exists(_historyPath + ".bak"))
@@ -105,42 +105,18 @@ namespace SyncSaberLib
             };
         }
 
-        private void UpdatePlaylist(Playlist playlist, string songIndex, string songName)
+        private void UpdatePlaylist(Playlist playlist, string songHash, string songIndex, string songName)
         {
             if (playlist == null)
             {
                 Logger.Warning($"playlist is null in UpdatePlaylist for song {songIndex} - {songName}");
                 return;
             }
-            bool songAlreadyInPlaylist = false;
-            foreach (PlaylistSong playlistSong in playlist.Songs)
-            {
-                string songID = songIndex.Substring(0, songIndex.IndexOf("-"));
-                string songVersion = songIndex.Substring(songIndex.IndexOf("-") + 1);
-                if (playlistSong.key.StartsWith(songID))
-                {
-                    if (_beatSaverRegex.IsMatch(playlistSong.key))
-                    {
-                        string oldVersionId = playlistSong.key.Substring(playlistSong.key.IndexOf("-") + 1);
-                        if (Convert.ToInt32(oldVersionId) < Convert.ToInt32(songVersion))
-                        {
-                            playlistSong.key = songIndex;
-                            playlistSong.songName = songName;
-                            Logger.Info($"Success updating playlist {playlist.Title}! Updated \"{songName}\" with index {songID} from version {oldVersionId} to {songVersion}");
-                        }
-                    }
-                    else if (_digitRegex.IsMatch(playlistSong.key))
-                    {
-                        playlistSong.key = songIndex;
-                        playlistSong.songName = songName;
-                        Logger.Info($"Success updating playlist {playlist.Title}! Song \"{songName}\" with index {songID} was missing version! Adding version {songVersion}");
-                    }
-                    songAlreadyInPlaylist = true;
-                }
-            }
+            bool songAlreadyInPlaylist = playlist.Songs.Exists(s => s.hash.ToUpper() == songHash.ToUpper());
+            
             if (!songAlreadyInPlaylist)
             {
-                playlist.Add(songIndex, songName);
+                playlist.TryAdd(songHash, songIndex, songName);
                 Logger.Info($"Success adding new song \"{songName}\" with BeatSaver index {songIndex} to playlist {playlist.Title}!");
             }
         }
@@ -247,14 +223,19 @@ namespace SyncSaberLib
             }
             int totalSongs = songs.Count;
             Logger.Debug($"Finished checking pages, found {totalSongs} songs");
-            List<SongInfo> matchedSongs = DownloadSongs(songs, out (int exists, int history) skippedSongs, _settings.UseSongKeyAsOutputFolder);
+            List<SongInfo> matchedSongs = DownloadSongs(songs, out (List<SongInfo> exists, List<SongInfo> history) skippedSongs, _settings.UseSongKeyAsOutputFolder);
             Logger.Debug("Jobs finished, Processing downloads...");
             int downloadCount = SuccessfulDownloads.Count;
             int failedCount = FailedDownloads.Count;
             ProcessDownloads(playlists);
+            foreach (var p in playlists)
+            {
+                matchedSongs.ForEach(s => p.TryAdd(s.hash, s.key, s.songName));
+                p.WritePlaylist();
+            }
             var timeElapsed = (DateTime.Now - startTime);
             Logger.Info($"Downloaded {downloadCount} songs from {reader.Source}'s {_settings.FeedName} feed in {FormatTimeSpan(timeElapsed)}. " +
-                $"Skipped {skippedSongs.exists} songs that already exist and {skippedSongs.history} that are in history{(failedCount > 0 ? $", failed to download {failedCount} songs." : "")}.");
+                $"Skipped {skippedSongs.exists.Count} songs that already exist and {skippedSongs.history.Count} that are in history{(failedCount > 0 ? $", failed to download {failedCount} songs." : "")}.");
 
         }
 
@@ -271,12 +252,12 @@ namespace SyncSaberLib
                     _songDownloadHistory.Add(job.Song.key);
 
                 //UpdatePlaylist(_syncSaberSongs, job.Song.key, job.Song.name);
-                foreach (var playlist in playlists)
-                {
-                    // TODO: fix this maybe
-                    //UpdatePlaylist(playlist, job.Song.key, job.Song.name);
+                //foreach (var playlist in playlists)
+                //{
+                //    // TODO: fix this maybe
+                //    UpdatePlaylist(playlist, job.Song.hash, job.Song.key, job.Song.songName);
 
-                }
+                //}
                 RemoveOldVersions(job.Song.key);
             }
             while (FailedDownloads.TryDequeue(out job))
@@ -300,24 +281,25 @@ namespace SyncSaberLib
         /// <param name="skippedsongs"></param>
         /// <param name="useSongKeyAsOutputFolder"></param>
         /// <returns></returns>
-        public List<SongInfo> DownloadSongs(Dictionary<int, SongInfo> queuedSongs, out (int exists, int history) skipped, bool useSongKeyAsOutputFolder)
+        public List<SongInfo> DownloadSongs(Dictionary<int, SongInfo> queuedSongs, out (List<SongInfo> exists, List<SongInfo> history) skipped, bool useSongKeyAsOutputFolder)
         {
             //var existingSongs = Directory.GetDirectories(CustomSongsPath);
             string tempPath = "";
             string outputPath = "";
             List<SongInfo> matchedSongs = new List<SongInfo>();
             
-            skipped.exists = skipped.history = 0;
+            skipped.exists = new List<SongInfo>();
+            skipped.history = new List<SongInfo>();
             DownloadBatch jobs = new DownloadBatch();
             jobs.JobCompleted += OnJobFinished;
             foreach (var song in queuedSongs.Values)
             {
                 tempPath = Path.Combine(Path.GetTempPath(), song.key + zipExtension);
                 if (useSongKeyAsOutputFolder)
-                    outputPath = Path.Combine(CustomSongsPath, $"{song.key} ({MakeSafeFilename(song.songName)})");
+                    outputPath = Path.Combine(CustomSongsPath, $"{song.key} ({MakeSafeFilename(song.songName)} - {MakeSafeFilename(song.authorName)})");
                 else
                     outputPath = CustomSongsPath;
-                bool songExists = Directory.Exists(outputPath);
+                bool songExists = Directory.Exists(outputPath); // TODO: Check if it exists in the SongHash file.
                 bool songInHistory = _songDownloadHistory.Contains(song.key);
                 if((songExists && songInHistory) || !songInHistory)
                 {
@@ -326,9 +308,9 @@ namespace SyncSaberLib
                 if (songExists || songInHistory)
                 {
                     if (songExists)
-                        skipped.exists++;
+                        skipped.exists.Add(song);
                     else
-                        skipped.history++;
+                        skipped.history.Add(song);
                     //Logger.Debug($"Skipping song - SongExists: {songExists}, SongInHistory: {songInHistory}");
                     continue; // We already have the song or don't want it, skip
                 }

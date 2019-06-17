@@ -51,58 +51,11 @@ namespace SyncSaberConsole
             {
                 Console.WriteLine($"{item.Key}: {string.Join("|", item.Value)}");
             }
-            //var test = new SyncSaberScrape();
-
-            //test.Initialize();
-
-            var beatSaverScrape = new BeatSaverScrape();
-            beatSaverScrape.Initialize();
-            var songs = beatSaverScrape.Data;
-            var deleted = songs.Where(s => s.deletedAt > DateTime.MinValue);
-            //var pageText = File.ReadAllText("test_multiplesongs_page.txt");
-            //var multiSongs = BeatSaverReader.ParseSongsFromPage(pageText);
-            //pageText = File.ReadAllText("test_detail_page.txt");
-            //var singleSong = BeatSaverReader.ParseSongsFromPage(pageText);
-            //var newSongs = BeatSaverReader.ScrapeBeatSaver(500, true, 1);
-            var scoreSaberSongs = ScoreSaberReader.ScrapeScoreSaber(5000, 10000, false, 0);
-            using (StreamWriter file = File.CreateText(@"ScrapedData\ScoreSaberScrape.json"))
-            {
-                //JsonSerializer serializer = new JsonSerializer();
-                //serializer.Serialize(file, beatSaverSongs);
-                file.Write(JsonConvert.SerializeObject(scoreSaberSongs));
-            }
-            var beatSaverSongs = ScrapedDataProvider.Songs.Values.Select(s => s.BeatSaverInfo).ToArray();
-            using (StreamWriter file = File.CreateText(@"ScrapedData\BeatSaverScrape.json"))
-            {
-                //JsonSerializer serializer = new JsonSerializer();
-                //serializer.Serialize(file, beatSaverSongs);
-                file.Write(JsonConvert.SerializeObject(beatSaverSongs));
-            }
-            //ScrapedDataProvider.UpdateScrapedFile();
-            //test.Data.AddRange(ScrapedDataProvider.SyncSaberScrape.Take(20));
-            //test.WriteFile(Path.Combine(SyncSaberScrape.DATA_DIRECTORY.FullName, "newScrap.json"));
-
+            
             var trending = ScrapedDataProvider.Songs.Values.Where(s => s.ScoreSaberInfo.Count > 0).OrderByDescending(s => s.ScoreSaberInfo.Values.Select(ss => ss.scores).Aggregate((a, b) => a + b)).Take(100);
             var detTrending = trending.Select(s => (s.ScoreSaberInfo.Values.Select(ss => ss.scores).Aggregate((a, b) => a + b), s)).ToList();
 
-            //var scrapeSongs = BeatSaverReader.ScrapeBeatSaver(500, true, 0);
-            //ScoreSaberReader.ScrapeScoreSaber(3000, 1000, false);
-
-            //ScrapedDataProvider.UpdateScrapedFile();
-
-            var reader = new BeatSaverReader();
-
-            //var SSReader = new ScoreSaberReader();
-
-            //var diffs = ssongs.Where(s => s.RankedDifficulties.Count > 0).OrderByDescending(s => s.RankedDifficulties.Max(d => d.Value)).Select(s => s.hash).ToList();
-            ////var maybe = diffs.Where(s => s.id == 6602).ToList();
-            //var ranked = ssongs.Where(s => s.ScoreSaberInfo.Values.Where(ss => ss.ranked == true).Count() > 0).Select(s => s.hash).ToList();
-            //var difference = ranked.Where(r => !diffs.Contains(r)).ToList();
-            //var difSongs = ssongs.Where(s => difference.Contains(s.hash)).ToList();
-            //var scoreSaberSongs = SSReader.GetTopPPSongs(new ScoreSaberFeedSettings(0) { MaxPages = 1 });
-
-
-            //var newSongs = reader.GetNewestSongs(new BeatSaverFeedSettings((int) BeatSaverFeeds.LATEST) { MaxPages = 2 });          
+                 
         }
 
         public void ScrapeNewSongs()
@@ -112,8 +65,6 @@ namespace SyncSaberConsole
 
         static void Main(string[] args)
         {
-
-            Logger.LogLevel = Config.StrToLogLevel(Config.LoggingLevel);
             Logger.fileWriter.AutoFlush = true;
             Logger.ShortenSourceName = true;
             try
@@ -121,6 +72,7 @@ namespace SyncSaberConsole
                 try
                 {
                     Config.Initialize();
+                    Logger.LogLevel = Config.StrToLogLevel(Config.LoggingLevel);
                 }
                 catch (FileNotFoundException ex)
                 {
