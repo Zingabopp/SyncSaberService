@@ -368,38 +368,6 @@ namespace SyncSaberLib
                 Write();
             }
         }
-        private const string STEAM_REG_KEY = @"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Steam App 620980";
-        private const string OCULUS_REG_KEY = @"SOFTWARE\WOW6432Node\Oculus VR, LLC\Oculus\Config";
-        public static string GetBeatSaberPathFromRegistry()
-        {
-            bool isSteam = false;
-
-            RegistryKey steamKey = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry64); // Doesn't work in 32 bit mode without this
-            steamKey = steamKey.OpenSubKey(STEAM_REG_KEY);
-            string path = (string) steamKey.GetValue("InstallLocation", string.Empty);
-            if (string.IsNullOrEmpty(path))
-            {
-                RegistryKey oculusKey = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry64);
-                oculusKey = oculusKey.OpenSubKey(OCULUS_REG_KEY);
-                path = (string) oculusKey.GetValue("InitialAppLibrary", string.Empty);
-                if (!string.IsNullOrEmpty(path))
-                {
-                    path = Path.Combine(path, @"Software\hyperbolic-magnetism-beat-saber");
-                }
-            }
-            else
-            {
-                isSteam = true;
-            }
-
-            if (IsBeatSaberDirectory(path))
-            {
-                Logger.Info($"Found {(isSteam ? "Steam" : "Oculus")} installation of Beat Saber at {path}");
-            }
-            else
-                path = string.Empty;
-            return path;
-        }
 
         public static string BeatSaberPath
         {
@@ -614,6 +582,40 @@ namespace SyncSaberLib
             return level;
         }
 
+
+        private const string STEAM_REG_KEY = @"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Steam App 620980";
+        private const string OCULUS_REG_KEY = @"SOFTWARE\WOW6432Node\Oculus VR, LLC\Oculus\Config";
+        public static string GetBeatSaberPathFromRegistry()
+        {
+            bool isSteam = false;
+
+            RegistryKey steamKey = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry64); // Doesn't work in 32 bit mode without this
+            steamKey = steamKey?.OpenSubKey(STEAM_REG_KEY);
+            string path = (string) steamKey?.GetValue("InstallLocation", string.Empty);
+            if (string.IsNullOrEmpty(path))
+            {
+                RegistryKey oculusKey = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry64);
+                oculusKey = oculusKey?.OpenSubKey(OCULUS_REG_KEY);
+                path = (string) oculusKey?.GetValue("InitialAppLibrary", string.Empty);
+                if (!string.IsNullOrEmpty(path))
+                {
+                    path = Path.Combine(path, @"Software\hyperbolic-magnetism-beat-saber");
+                }
+            }
+            else
+            {
+                isSteam = true;
+            }
+
+            if (IsBeatSaberDirectory(path))
+            {
+                Logger.Info($"Found {(isSteam ? "Steam" : "Oculus")} installation of Beat Saber at {path}");
+            }
+            else
+                path = string.Empty;
+            return path;
+        }
+
         private static Dictionary<string, bool> _errorStatus;
         private static Dictionary<string, bool> SettingError
         {
@@ -796,7 +798,7 @@ namespace SyncSaberLib
 
         public static bool IsBeatSaberDirectory(string path)
         {
-            if (string.IsNullOrEmpty(path.Trim()))
+            if (string.IsNullOrEmpty(path?.Trim()))
                 return false;
             DirectoryInfo bsDir = new DirectoryInfo(path);
             bool valid = bsDir.Exists;
