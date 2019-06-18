@@ -14,13 +14,26 @@ namespace SyncSaberLib.Web
     {
         public async Task WorkDownloadQueue()
         {
-            _batchComplete = false;
+            BatchComplete = false;
             int maxConcurrentDownloads = Config.MaxConcurrentDownloads; // Set it here so it doesn't error
             var actionBlock = new ActionBlock<DownloadJob>(job => {
                 Logger.Debug($"Running job {job.Song.key} in ActionBlock");
                 Task newTask = job.RunJobAsync();
-                newTask.Wait();
-                TaskComplete(job.Song, job);
+                try
+                {
+                    newTask.Wait();
+                }
+                catch (AggregateException ae)
+                {
+                    foreach (var ex in ae.InnerExceptions)
+                    {
+                        Logger.Exception($"Error while running job {job.Song.key}-{job.Song.songName} by {job.Song.authorName}\n", ex);
+                    }
+                }
+                finally
+                {
+                    TaskComplete(job.Song, job);
+                }
             }, new ExecutionDataflowBlockOptions {
                 BoundedCapacity = 500,
                 MaxDegreeOfParallelism = maxConcurrentDownloads
@@ -35,7 +48,7 @@ namespace SyncSaberLib.Web
             actionBlock.Complete();
             await actionBlock.Completion;
             Logger.Trace($"Actionblock complete");
-            _batchComplete = true;
+            BatchComplete = true;
         }
 
         public void TaskComplete(SongInfo song, DownloadJob job)
@@ -51,7 +64,7 @@ namespace SyncSaberLib.Web
                     Logger.Warning($"Job {song.key} failed due to download timeout.");
                     break;
                 case DownloadJob.JobResult.NOTFOUND:
-                    Logger.Info($"Job failed, {song.key} could not be found on Beat Saver.");
+                    Logger.Warning($"Job failed, {song.key} could not be found on Beat Saver."); // TODO: Put song in history so we don't try to download it again.
                     break;
                 case DownloadJob.JobResult.UNZIPFAILED:
                     Logger.Warning($"Job failed, {song.key} failed during unzipping.");
@@ -83,11 +96,7 @@ namespace SyncSaberLib.Web
         public event Action<DownloadJob> JobCompleted;
 
         private Stack<DownloadJob> _songDownloadQueue = new Stack<DownloadJob>();
-        private bool _batchComplete = false;
-        public bool BatchComplete
-        {
-            get { return _batchComplete; }
-        }
+        public bool BatchComplete { get; private set; } = false;
 
     }
 }

@@ -138,7 +138,7 @@ namespace SyncSaberLib.Web
 
             response.EnsureSuccessStatusCode();
 
-
+            
             await response.Content.ReadAsFileAsync(path, overwrite);
             return success;
         }

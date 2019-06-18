@@ -161,6 +161,17 @@ namespace SyncSaberLib
         }
     }
 
+    public static class AggregateExceptionExtensions
+    {
+        public static void WriteExceptions(this AggregateException ae, string message)
+        {
+            for(int i = 0; i < ae.InnerExceptions.Count; i++)
+            {
+                Logger.Exception($"Exception {i}:\n", ae.InnerExceptions[i]);
+            }
+        }
+    }
+
     internal static class DictionaryExtensions
     {
         /// <summary>

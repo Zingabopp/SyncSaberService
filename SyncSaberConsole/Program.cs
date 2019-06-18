@@ -12,7 +12,6 @@ using SyncSaberLib.Web;
 using SyncSaberLib.Data;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using Microsoft.Win32;
 
 namespace SyncSaberConsole
 {
@@ -25,6 +24,12 @@ namespace SyncSaberConsole
             //ScrapedDataProvider.Initialize();
 
             WebUtils.Initialize(5);
+            var found = ScrapedDataProvider.TryGetSongByKey("3f57", out SongInfo badSong, false);
+            var CustomSongsPath = Path.Combine(Config.BeatSaberPath, @"Beat Saber_Data\CustomLevels"); 
+            var tempFolder = new DirectoryInfo(Path.Combine(Path.GetTempPath(), badSong.key + ".zip"));
+            var outputFolder = new DirectoryInfo(Path.Combine(CustomSongsPath, $"{badSong.key} ({Utilities.MakeSafeFilename(badSong.songName)} - {Utilities.MakeSafeFilename(badSong.authorName)})"));
+            var job = new DownloadJob(badSong, tempFolder.FullName, outputFolder.FullName);
+            job.RunJobAsync().Wait();
             var br = new BeastSaberReader("Zingabopp", 3);
             var text = WebUtils.GetPageText("https://bsaber.com/wp-json/bsaber-api/songs/?bookmarked_by=Zingabopp&page=1");
             var bSongs = br.GetSongsFromPage(text);
@@ -37,9 +42,9 @@ namespace SyncSaberConsole
             var bsScrape = ScrapedDataProvider.BeatSaverSongs;
             var ssScrape = ScrapedDataProvider.ScoreSaberSongs;
             ScrapedDataProvider.TryGetSongByHash("501f6b1bddb2af72abda0f1e6b7b89cb1eb3db67", out SongInfo deletedSong);
-            var job = new DownloadJob(deletedSong, "test.zip", @"ScrapedData\test");
-            var jobTask = job.RunJobAsync();
-            jobTask.Wait();
+            //var job = new DownloadJob(deletedSong, "test.zip", @"ScrapedData\test");
+            //var jobTask = job.RunJobAsync();
+            //jobTask.Wait();
             bsScrape.AddOrUpdate(null);
             var resp = WebUtils.httpClient.GetAsync("https://beatsaver.com/api/maps/detail/b");
             Task.WaitAll(resp);
@@ -124,14 +129,19 @@ namespace SyncSaberConsole
                                 Authors = Config.FavoriteMappers.ToArray()
                             });
                         }
+                        catch(AggregateException ae)
+                        {
+                            ae.WriteExceptions($"Exceptions downloading songs from FavoriteMappers.ini.");
+                        }
                         catch (Exception ex)
                         {
-                            Logger.Exception("Exception downloading BeatSaver authors feed.", ex);
+                            Logger.Exception("Exception downloading songs from FavoriteMappers.ini.", ex);
                         }
                     }
                     else
                     {
-                        Logger.Warning($"Skipping FavoriteMappers.ini feed, no authors found in {Config.BeatSaberPath + @"\UserData\FavoriteMappers.ini"}");
+                        if(Config.SyncFavoriteMappersFeed)
+                            Logger.Warning($"Skipping FavoriteMappers.ini feed, no authors found in {Config.BeatSaberPath + @"\UserData\FavoriteMappers.ini"}");
                     }
 
                     if (Config.SyncFollowingsFeed)
@@ -145,6 +155,10 @@ namespace SyncSaberConsole
                             ss.DownloadSongsFromFeed(BeastSaberReader.NameKey, new BeastSaberFeedSettings(0) {
                                 MaxPages = Config.MaxFollowingsPages
                             });
+                        }
+                        catch (AggregateException ae)
+                        {
+                            ae.WriteExceptions($"Exceptions downloading songs from BeastSaberFeed: Following.");
                         }
                         catch (Exception ex)
                         {
@@ -163,6 +177,10 @@ namespace SyncSaberConsole
                                 MaxPages = Config.MaxBookmarksPages
                             });
                         }
+                        catch (AggregateException ae)
+                        {
+                            ae.WriteExceptions($"Exceptions downloading songs from BeastSaberFeed: Bookmarks.");
+                        }
                         catch (Exception ex)
                         {
                             Logger.Exception($"Exception downloading BeastSaberFeed: Bookmarks", ex);
@@ -179,6 +197,10 @@ namespace SyncSaberConsole
                             ss.DownloadSongsFromFeed(BeastSaberReader.NameKey, new BeastSaberFeedSettings(2) {
                                 MaxPages = Config.MaxCuratorRecommendedPages
                             });
+                        }
+                        catch (AggregateException ae)
+                        {
+                            ae.WriteExceptions($"Exceptions downloading songs from BeastSaberFeed: Curator Recommended.");
                         }
                         catch (Exception ex)
                         {
@@ -199,9 +221,13 @@ namespace SyncSaberConsole
                                 searchOnline = false
                             });
                         }
+                        catch (AggregateException ae)
+                        {
+                            ae.WriteExceptions($"Exceptions downloading songs from ScoreSaberFeed: Top Ranked.");
+                        }
                         catch (Exception ex)
                         {
-                            Logger.Exception($"Exception downloading ScoreSaberFeed: Top Ranked", ex);
+                            Logger.Exception($"Exception downloading ScoreSaberFeed: Top Ranked.", ex);
                         }
                     }
                     /*
@@ -238,6 +264,10 @@ namespace SyncSaberConsole
             catch(OutOfDateException ex)
             {
                 Logger.Error(ex.Message);
+            }
+            catch (AggregateException ae)
+            {
+                ae.WriteExceptions($"Uncaught exceptions in Main()");
             }
             catch (Exception ex)
             {

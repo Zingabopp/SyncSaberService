@@ -75,20 +75,35 @@ namespace SyncSaberLib.Web
             bool successful = true;
             Task<bool> dwnl = DownloadFile(BEATSAVER_DOWNLOAD_URL_BASE + Song.key, _localZip.FullName);
             //Task<bool> dwnl = DownloadFile("http://releases.ubuntu.com/18.04.2/ubuntu-18.04.2-desktop-amd64.iso", "test.iso");
-            successful = await dwnl;
+            try
+            {
+                successful = await dwnl;
+            }catch(AggregateException ae)
+            {
+                ae.WriteExceptions($"Error downloading song {_song.key} {_song.songName} by {_song.authorName}.\n");
+                successful = false;
+            }
 
             if (successful)
             {
-                Logger.Debug($"Downloaded {Song.key} successfully");
-                successful = await ExtractZipAsync(_localZip.FullName, _songDir.FullName, TempPath);
-
+                Logger.Debug($"Downloaded {Song.key}-{Song.songName} by {Song.authorName} successfully");
+                try
+                {
+                    successful = await ExtractZipAsync(_localZip.FullName, _songDir.FullName, TempPath); ;
+                }
+                catch (AggregateException ae)
+                {
+                    ae.WriteExceptions($"Error extracting zip {_localZip.FullName} to {TempPath}, with the files to be moved to {_songDir.FullName}.\n");
+                    successful = false;
+                }
+ 
                 if (successful)
                 {
-                    Logger.Debug($"Extracted {Song.key} successfully");
+                    Logger.Debug($"Extracted {Song.key}-{Song.songName} by {Song.authorName} successfully");
                 }
                 else
                 {
-                    Logger.Error($"Extraction failed for {Song.key}");
+                    Logger.Error($"Extraction failed for {Song.key}-{Song.songName} by {Song.authorName}");
                     Result = JobResult.UNZIPFAILED;
                 }
             }
@@ -114,7 +129,6 @@ namespace SyncSaberLib.Web
             Result = JobResult.SUCCESS;
 
             FileInfo zipFile = new FileInfo(path);
-            WebClient client = new WebClient();
 
             var token = _tokenSource.Token;
 
@@ -124,6 +138,7 @@ namespace SyncSaberLib.Web
                 await downloadAsync;
             }
             catch (Exception) { }
+            
             if (downloadAsync.IsFaulted || !File.Exists(path))
             {
                 successful = false;
