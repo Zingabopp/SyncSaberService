@@ -244,7 +244,7 @@ namespace SyncSaberLib
             }
             var timeElapsed = (DateTime.Now - startTime);
             Logger.Info($"Downloaded {downloadCount} songs from {reader.Source}'s {_settings.FeedName} feed in {FormatTimeSpan(timeElapsed)}. " +
-                $"Skipped {skippedSongs.exists.Count} songs that already exist and {skippedSongs.history.Count} that are in history{(failedCount > 0 ? $", failed to download {failedCount} songs." : "")}.");
+                $"Skipped {skippedSongs.exists.Count} songs that already exist and {skippedSongs.history.Count} that are only in history{(failedCount > 0 ? $", failed to download {failedCount} songs." : "")}.");
 
         }
 
