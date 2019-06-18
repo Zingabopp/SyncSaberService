@@ -44,6 +44,7 @@ namespace SyncSaberLib
                 Environment.NewLine.ToCharArray(), StringSplitOptions.RemoveEmptyEntries).Select(l => l.Split(',')).ToDictionary(s => s[0], x => x[1]);
             var version = Assembly.GetExecutingAssembly().GetName().Version;
             var versionStr = string.Join(".", version.Major, version.Minor, version.Build);
+            Console.WriteLine();
             if (statusText.ContainsKey(versionStr))
             {
                 var status = statusText[versionStr];
@@ -68,6 +69,11 @@ namespace SyncSaberLib
                         break;
                 }
             }
+            else
+            {
+                Logger.Info("Running an unknown version of SyncSaberService.");
+            }
+            Console.WriteLine();
             return retStr;
         }
 
