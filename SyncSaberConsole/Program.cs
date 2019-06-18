@@ -217,7 +217,7 @@ namespace SyncSaberConsole
                         {
                             //ss.DownloadBeastSaberFeed(2, Web.BeastSaberReader.GetMaxBeastSaberPages(2));
                             ss.DownloadSongsFromFeed(ScoreSaberReader.NameKey, new ScoreSaberFeedSettings((int) ScoreSaberFeeds.TOP_RANKED) {
-                                MaxPages = Config.MaxScoreSaberPages,
+                                MaxSongs = Config.MaxScoreSaberSongs,
                                 searchOnline = false
                             });
                         }

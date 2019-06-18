@@ -132,7 +132,7 @@ namespace SyncSaberLib
             {
                 get
                 {
-                    return CreateKeyData("MaxScoreSaberPages", "10");
+                    return CreateKeyData("MaxScoreSaberSongs", "50");
                 }
             }
             public static KeyData LoggingLevel
@@ -347,7 +347,7 @@ namespace SyncSaberLib
             }
         }
 
-        public static int MaxScoreSaberPages
+        public static int MaxScoreSaberSongs
         {
             get
             {
@@ -542,7 +542,7 @@ namespace SyncSaberLib
             setting = MaxCuratorRecommendedPages;
             setting = MaxBookmarksPages;
             setting = MaxFollowingsPages;
-            setting = MaxScoreSaberPages;
+            setting = MaxScoreSaberSongs;
             setting = MaxBeatSaverPages;
 
             //setting = AutoDownloadSongs;
