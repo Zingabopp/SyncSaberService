@@ -375,6 +375,9 @@ namespace SyncSaberLib.Data
         public string _id { get; set; }
         [JsonIgnore]
         private string _key;
+        /// <summary>
+        /// Key is always lowercase.
+        /// </summary>
         [JsonProperty("key")]
         public string key { get { return _key; } set { _key = value.ToLower(); } }
         [JsonProperty("name")]
@@ -383,8 +386,13 @@ namespace SyncSaberLib.Data
         public SongUploader uploader { get; }
         [JsonProperty("uploaded")]
         public DateTime uploaded { get; set; }
+        [JsonIgnore]
+        private string _hash;
+        /// <summary>
+        /// Hash is always uppercase.
+        /// </summary>
         [JsonProperty("hash")]
-        public string hash { get; set; }
+        public string hash { get { return _hash; } set { _hash = value.ToUpper(); } }
         [JsonProperty("downloadURL")]
         public string downloadURL { get; set; }
         [JsonProperty("coverURL")]

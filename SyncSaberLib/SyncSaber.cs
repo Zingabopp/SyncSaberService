@@ -233,6 +233,7 @@ namespace SyncSaberLib
             int totalSongs = songs.Count;
             Logger.Debug($"Finished checking pages, found {totalSongs} songs");
             List<SongInfo> matchedSongs = DownloadSongs(songs, out (List<SongInfo> exists, List<SongInfo> history) skippedSongs, _settings.UseSongKeyAsOutputFolder);
+            _songDownloadHistory.AddRange(skippedSongs.exists.Select(s => s.key));
             Logger.Debug("Jobs finished, Processing downloads...");
             int downloadCount = SuccessfulDownloads.Count;
             int failedCount = FailedDownloads.Count;
@@ -311,7 +312,7 @@ namespace SyncSaberLib
                     outputPath = Path.Combine(CustomSongsPath, $"{song.key} ({MakeSafeFilename(song.songName)} - {MakeSafeFilename(song.authorName)})");
                 else
                     outputPath = CustomSongsPath;
-                bool songExists = existingSongs.Data.Values.Where(h => h.songHash.ToUpper() == song.hash.ToUpper()).Count() > 0;
+                bool songExists = existingSongs.Data.Values.Where(h => h.songHash.ToUpper() == song.hash).Count() > 0;
                 if (!songExists)
                 {
                     songExists = Directory.Exists(outputPath);

@@ -36,7 +36,7 @@ namespace SyncSaberLib.Data
                 var newSong = new SongInfo(song.hash) {
                     BeatSaverInfo = song
                 };
-                if (Songs.AddOrUpdate(song.hash.ToUpper(), newSong))
+                if (Songs.AddOrUpdate(song.hash, newSong))
                     Logger.Warning($"Repeated hash while creating SongInfo Dictionary, this should not happen. {song.name} by {song.metadata.levelAuthorName}");
             }
             foreach (var diff in ScoreSaberSongs.Data)
@@ -116,7 +116,7 @@ namespace SyncSaberLib.Data
         public static bool TryGetSongByKey(string key, out SongInfo song, bool searchOnline = true)
         {
             key = key.ToLower();
-            song = Songs.Values.Where(s => s.key.ToLower() == key).FirstOrDefault();
+            song = Songs.Values.Where(s => s.key == key).FirstOrDefault();
             if (song == null && searchOnline)
             {
                 Logger.Info($"Song with key: {key}, not in scraped data, searching Beat Saver...");
@@ -140,7 +140,7 @@ namespace SyncSaberLib.Data
         /// <returns></returns>
         public static bool TryAddToScrapedData(SongInfo song)
         {
-            if (Songs.Values.Where(s => s.hash.ToLower() == song.hash.ToLower()).Count() == 0)
+            if (Songs.Values.Where(s => s.hash == song.hash).Count() == 0)
             {
                 //Logger.Debug($"Adding song {song.key} - {song.songName} by {song.authorName} to ScrapedData");
                 lock (Songs)

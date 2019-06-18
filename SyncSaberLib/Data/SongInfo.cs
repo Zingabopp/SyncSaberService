@@ -39,11 +39,11 @@ namespace SyncSaberLib.Data
                     {
                         if (ScoreSaberInfo[key].ranked)
                         {
-                            if (hash.ToUpper() == ScoreSaberInfo[key].hash.ToUpper())
+                            if (hash == ScoreSaberInfo[key].hash)
                                 _rankedDiffs.AddOrUpdate(ScoreSaberInfo[key].difficulty, ScoreSaberInfo[key].stars);
                             else
                                 Logger.Debug($"Ranked version of {key} is outdated.\n" +
-                                    $"   {hash.ToUpper()} != {ScoreSaberInfo[key].hash.ToUpper()}");
+                                    $"   {hash} != {ScoreSaberInfo[key].hash}");
                         }
                     }
                 }
@@ -66,6 +66,9 @@ namespace SyncSaberLib.Data
         }
 
         private string _hash;
+        /// <summary>
+        /// Hash is always uppercase (or empty).
+        /// </summary>
         public string hash
         {
             get

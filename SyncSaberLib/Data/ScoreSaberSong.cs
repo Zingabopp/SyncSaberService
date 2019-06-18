@@ -39,8 +39,13 @@ namespace SyncSaberLib.Data
         }
         [JsonProperty("uid")]
         public int uid { get; set; }
+        [JsonIgnore]
+        private string _hash;
+        /// <summary>
+        /// Hash is always uppercase.
+        /// </summary>
         [JsonProperty("id")]
-        public string hash { get; set; }
+        public string hash { get { return _hash; } set { _hash = value.ToUpper(); } }
         [JsonProperty("name")]
         public string name { get; set; }
         [JsonProperty("songSubName")]
