@@ -17,13 +17,20 @@ namespace SyncSaberConsole
 {
     class Program
     {
-
+        private static void DoFullScrape()
+        {
+            BeatSaverReader.ScrapeBeatSaver(400, false);
+            ScrapedDataProvider.BeatSaverSongs.WriteFile();
+            ScoreSaberReader.ScrapeScoreSaber(5000, 13000, false);
+            ScrapedDataProvider.ScoreSaberSongs.WriteFile();
+        }
 
         private static void Tests()
         {
             //ScrapedDataProvider.Initialize();
 
             WebUtils.Initialize(5);
+
             var found = ScrapedDataProvider.TryGetSongByKey("3f57", out SongInfo badSong, false);
             var CustomSongsPath = Path.Combine(Config.BeatSaberPath, @"Beat Saber_Data\CustomLevels"); 
             var tempFolder = new DirectoryInfo(Path.Combine(Path.GetTempPath(), badSong.key + ".zip"));
@@ -85,6 +92,7 @@ namespace SyncSaberConsole
                 Logger.Info($"Using Beat Saber directory: {Config.BeatSaberPath}");
                 ScrapedDataProvider.Initialize();
                 Logger.Info($"Scrapes loaded, {ScrapedDataProvider.BeatSaverSongs.Data.Count} BeatSaverSongs and {ScrapedDataProvider.ScoreSaberSongs.Data.Count} ScoreSaber difficulties loaded");
+                //DoFullScrape();
                 //Tests();
                 try
                 {

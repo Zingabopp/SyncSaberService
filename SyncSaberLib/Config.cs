@@ -111,21 +111,21 @@ namespace SyncSaberLib
             {
                 get
                 {
-                    return CreateKeyData("MaxConcurrentDownloads", "2");
+                    return CreateKeyData("MaxConcurrentDownloads", "3");
                 }
             }
             public static KeyData MaxConcurrentPageChecks
             {
                 get
                 {
-                    return CreateKeyData("MaxConcurrentPageChecks", "10");
+                    return CreateKeyData("MaxConcurrentPageChecks", "5");
                 }
             }
             public static KeyData SyncTopPPFeed
             {
                 get
                 {
-                    return CreateKeyData("SyncTopPPFeed", "1");
+                    return CreateKeyData("SyncTopPPFeed", "0");
                 }
             }
             public static KeyData MaxScoreSaberPages

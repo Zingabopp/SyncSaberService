@@ -64,6 +64,7 @@ namespace SyncSaberLib.Data
             }
             set { _scoreSaberInfo = value; }
         }
+
         private string _hash;
         public string hash
         {
