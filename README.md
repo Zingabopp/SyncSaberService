@@ -5,6 +5,9 @@ Based on SyncSaber by brian, https://github.com/brian91292/SyncSaber/.
 
 This is currently a standalone application you can run to automatically download maps like the original SyncSaber did.
 
+# Usage
+<p>Extract the zip to a folder of your choosing. It is recommended to adjust the default configuration in SyncSaberService.ini (to avoid downloading songs you don't want) then run SyncSaberConsole.exe</P>
+
 # Configuration
 <p>The app's settings are in the SyncSaberService.ini file in the same folder as the executable</p>
 <p>You must add your BeastSaber username if you want to download your bookmarks and following feeds.</p>
