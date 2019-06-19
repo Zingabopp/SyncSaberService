@@ -16,7 +16,7 @@ using SyncSaberLib.Web;
 namespace SyncSaberLib.Data
 {
     /// <summary>
-    /// TODO: Make Scrapped song the base with separate objects (using Lazy<>) for Beat Saver and Score Saber data.
+    /// Holds all the data for a song provided by Beat Saver's API.
     /// </summary>
     public class BeatSaverSong : IEquatable<BeatSaverSong>
     {

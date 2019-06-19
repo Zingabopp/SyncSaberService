@@ -27,7 +27,13 @@ namespace SyncSaberLib.Data
         public virtual JToken ReadScrapedFile(string filePath)
         {
             JToken results = null;
-
+            string backupPath = filePath + ".bak";
+            if(File.Exists(backupPath)) // Last write was unsuccessful, delete corrupted file and use the backup
+            {
+                if (File.Exists(filePath))
+                    File.Delete(filePath);
+                File.Move(backupPath, filePath);
+            }
             if (File.Exists(filePath))
                 using (StreamReader file = File.OpenText(filePath))
                 {
@@ -42,11 +48,24 @@ namespace SyncSaberLib.Data
         {
             if (string.IsNullOrEmpty(filePath))
                 filePath = CurrentFile.FullName;
+            string backupPath = "";
+            //Backup file before overwriting
+            if (File.Exists(filePath))
+            {
+                backupPath = filePath + ".bak";
+                File.Move(filePath, backupPath);
+            }
             using (StreamWriter file = File.CreateText(filePath))
             {
                 JsonSerializer serializer = new JsonSerializer();
                 serializer.Serialize(file, Data);
             }
+            //Write was successful, delete backup
+            if(!string.IsNullOrEmpty(backupPath) && File.Exists(backupPath))
+            {
+                File.Delete(backupPath);
+            }
+                               
         }
         public abstract void Initialize(string filePath = "");
 
@@ -80,7 +99,7 @@ namespace SyncSaberLib.Data
                     successful = true;
                 }
             }
-            if(!(Equals(added,default(DataType)) || Equals(removed, default(DataType))))
+            if (!(Equals(added, default(DataType)) || Equals(removed, default(DataType))))
             {
                 CollectionChanged?.Invoke(this, new CollectionChangedEventArgs<DataType>(added, removed));
             }

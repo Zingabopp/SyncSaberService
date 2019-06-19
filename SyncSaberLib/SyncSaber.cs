@@ -95,10 +95,10 @@ namespace SyncSaberLib
             }
             if (File.Exists(_historyPath))
             {
-                _songDownloadHistory = File.ReadAllLines(_historyPath).ToList<string>();
+                _songDownloadHistory = File.ReadAllLines(_historyPath).ToList();
             }
             else
-                File.Create(_historyPath); // TODO: Check if this works
+                File.Create(_historyPath);
             if (Directory.Exists(Config.BeatSaberPath))
             {
                 CustomSongsPath = Path.Combine(Config.BeatSaberPath, @"Beat Saber_Data\CustomLevels");
@@ -192,14 +192,13 @@ namespace SyncSaberLib
                 SuccessfulDownloads.Enqueue(job);
             else
                 FailedDownloads.Enqueue(job);
-            // TODO: Add fail reason to FailedDownloads items
         }
 
         public void ScrapeNewSongs()
         {
             DateTime lastBSScrape = DateTime.MinValue;
             DateTime lastSSScrape = DateTime.MinValue;
-            if(ScrapedDataProvider.BeatSaverSongs.HasData)
+            if (ScrapedDataProvider.BeatSaverSongs.HasData)
                 lastBSScrape = ScrapedDataProvider.BeatSaverSongs.Data.Max(s => s.ScrapedAt);
             if (ScrapedDataProvider.ScoreSaberSongs.HasData)
                 lastSSScrape = ScrapedDataProvider.ScoreSaberSongs.Data.Max(s => s.ScrapedAt);
@@ -270,13 +269,6 @@ namespace SyncSaberLib
                 if (!_songDownloadHistory.Contains(job.Song.key))
                     _songDownloadHistory.Add(job.Song.key);
 
-                //UpdatePlaylist(_syncSaberSongs, job.Song.key, job.Song.name);
-                //foreach (var playlist in playlists)
-                //{
-                //    // TODO: fix this maybe
-                //    UpdatePlaylist(playlist, job.Song.hash, job.Song.key, job.Song.songName);
-
-                //}
                 RemoveOldVersions(job.Song.key);
             }
             while (FailedDownloads.TryDequeue(out job))
@@ -285,7 +277,8 @@ namespace SyncSaberLib
                 {
                     _songDownloadHistory.Add(job.Song.key);
                 }
-                Logger.Error($"Failed to download {job.Song.key} by {job.Song.authorName}");
+                // TODO: Be more specific/user friendly when outputting the reason.
+                Logger.Error($"Failed to download {job.Song.key} by {job.Song.authorName}: {job.Result.ToString()}");
             }
 
             Utilities.WriteStringListSafe(_historyPath, _songDownloadHistory.Distinct().ToList(), true);
@@ -324,7 +317,7 @@ namespace SyncSaberLib
                     songExists = Directory.Exists(outputPath);
                 }
                 //else
-                    //Logger.Warning($"Skipping {song.songName}, it's in the HashMap");
+                //Logger.Warning($"Skipping {song.songName}, it's in the HashMap");
 
                 bool songInHistory = _songDownloadHistory.Contains(song.key);
                 if ((songExists && songInHistory) || !songInHistory)

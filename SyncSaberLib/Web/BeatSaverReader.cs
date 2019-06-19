@@ -395,12 +395,11 @@ namespace SyncSaberLib.Web
             //JSONObject song = (JSONObject) aKeyValue;
             string songIndex = song["key"]?.Value<string>();
             string songName = song["name"]?.Value<string>();
-            string author = song["uploader"]["username"]?.Value<string>();
+            string author = song["uploader"]?["username"]?.Value<string>();
             string songUrl = "https://beatsaver.com/download/" + songIndex;
 
             if (BeatSaverSong.TryParseBeatSaver(song, out BeatSaverSong newSong))
             {
-                //newSong.Feed = "followings"; // TODO: What?
                 newSong.ScrapedAt = DateTime.Now;
                 SongInfo songInfo = ScrapedDataProvider.GetOrCreateSong(newSong);
                 
@@ -480,7 +479,11 @@ namespace SyncSaberLib.Web
                 Logger.Error($"HttpRequestException while trying to populate fields for {key}");
                 return null;
             }
-            catch (Exception ex) // TODO: Throws AggregateException when page not found.
+            catch(AggregateException ae)
+            {
+                ae.WriteExceptions($"Exception while trying to get details for {key}");
+            }
+            catch (Exception ex)
             {
                 Logger.Exception("Exception getting page", ex);
             }

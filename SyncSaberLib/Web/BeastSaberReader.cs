@@ -180,9 +180,31 @@ namespace SyncSaberLib.Web
             int totalSongsForPage = 0;
             if (pageText.ToLower().StartsWith(@"<?xml"))
             {
+                bool retry = false;
                 XmlDocument xmlDocument = new XmlDocument();
-
-                xmlDocument.LoadXml(pageText); // TODO: Catch exception for when the page provides bad xml
+                do
+                {
+                    try
+                    {
+                        xmlDocument.LoadXml(pageText);
+                        retry = false;
+                    }
+                    catch (XmlException ex)
+                    {
+                        if (retry == true)
+                        {
+                            Logger.Exception("Exception parsing XML.", ex);
+                            retry = false;
+                        }
+                        else
+                        {
+                            Logger.Warning("Invalid XML formatting detected, attempting to fix...");
+                            pageText = pageText.Replace(" & ", " &amp; ");
+                            retry = true;
+                        }
+                        //File.WriteAllText("ErrorText.xml", pageText);
+                    }
+                } while (retry == true);
                 List<Task> populateTasks = new List<Task>();
                 XmlNodeList xmlNodeList = xmlDocument.DocumentElement.SelectNodes("/rss/channel/item");
                 foreach (object obj in xmlNodeList)
@@ -194,6 +216,7 @@ namespace SyncSaberLib.Web
                     }
                     else
                     {
+                        // TODO: Not really using any of this except the hash.
                         string songName = node["SongTitle"].InnerText;
                         string downloadUrl = node["DownloadURL"]?.InnerText;
                         string hash = node["Hash"]?.InnerText?.ToUpper();
@@ -211,12 +234,6 @@ namespace SyncSaberLib.Web
                             string mapper = !string.IsNullOrEmpty(authorName) ? authorName : GetMapperFromBsaber(node.InnerText);
                             string songUrl = !string.IsNullOrEmpty(downloadUrl) ? downloadUrl : BeatSaverDownloadURL_Base + songIndex;
 
-                            // TODO: Get song from the scrape, if not maybe scrape beat saver for the song.
-                            //SongInfo currentSong = new SongInfo(songIndex, songName, songUrl, mapper);
-                            //string currentSongDirectory = Path.Combine(Config.BeatSaberPath, "CustomSongs", songIndex);
-                            //bool downloadFailed = false;
-                            //populateTasks.Add(currentSong.PopulateFieldsAsync());
-                            //SongInfo.PopulateFields(currentSong);
                             if (ScrapedDataProvider.TryGetSongByKey(songIndex, out SongInfo currentSong))
                                 songsOnPage.Add(currentSong);
                         }
@@ -236,7 +253,7 @@ namespace SyncSaberLib.Web
                     Logger.Exception("Unable to parse JSON from text", ex);
                 }
 
-                result["songs"].Populate<List<BSaberSong>>(bSongs);
+                result["songs"].Populate(bSongs);
 
                 foreach (var bSong in bSongs)
                 {
@@ -278,9 +295,9 @@ namespace SyncSaberLib.Web
             return GetPageUrl(Feeds[(BeastSaberFeeds) feedIndex].BaseUrl, page);
         }
 
+        [Obsolete("Don't seem to need this with BeastSaber anymore.")]
         private static string GetMapperFromBsaber(string innerText)
         {
-            //TODO: Needs testing for when a mapper's name isn't obvious
             string prefix = "Mapper: ";
             string suffix = "<"; //"</p>"; Some mapper names don't end with </p>
 
