@@ -180,9 +180,31 @@ namespace SyncSaberLib.Web
             int totalSongsForPage = 0;
             if (pageText.ToLower().StartsWith(@"<?xml"))
             {
+                bool retry = false;
                 XmlDocument xmlDocument = new XmlDocument();
-
-                xmlDocument.LoadXml(pageText); // TODO: Catch exception for when the page provides bad xml
+                do
+                {
+                    try
+                    {
+                        xmlDocument.LoadXml(pageText); // TODO: Catch exception for when the page provides bad xml
+                        retry = false;
+                    }
+                    catch (XmlException ex)
+                    {
+                        if (retry == true)
+                        {
+                            Logger.Exception("Exception parsing XML.", ex);
+                            retry = false;
+                        }
+                        else
+                        {
+                            Logger.Warning("Invalid XML formatting detected, attempting to fix...");
+                            pageText = pageText.Replace(" & ", "&amp;");
+                            retry = true;
+                        }
+                        //File.WriteAllText("ErrorText.xml", pageText);
+                    }
+                } while (retry == true);
                 List<Task> populateTasks = new List<Task>();
                 XmlNodeList xmlNodeList = xmlDocument.DocumentElement.SelectNodes("/rss/channel/item");
                 foreach (object obj in xmlNodeList)
