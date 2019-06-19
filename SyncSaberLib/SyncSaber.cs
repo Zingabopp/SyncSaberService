@@ -98,7 +98,7 @@ namespace SyncSaberLib
                 _songDownloadHistory = File.ReadAllLines(_historyPath).ToList();
             }
             else
-                File.Create(_historyPath); // TODO: Check if this works
+                File.Create(_historyPath);
             if (Directory.Exists(Config.BeatSaberPath))
             {
                 CustomSongsPath = Path.Combine(Config.BeatSaberPath, @"Beat Saber_Data\CustomLevels");
@@ -198,7 +198,7 @@ namespace SyncSaberLib
         {
             DateTime lastBSScrape = DateTime.MinValue;
             DateTime lastSSScrape = DateTime.MinValue;
-            if(ScrapedDataProvider.BeatSaverSongs.HasData)
+            if (ScrapedDataProvider.BeatSaverSongs.HasData)
                 lastBSScrape = ScrapedDataProvider.BeatSaverSongs.Data.Max(s => s.ScrapedAt);
             if (ScrapedDataProvider.ScoreSaberSongs.HasData)
                 lastSSScrape = ScrapedDataProvider.ScoreSaberSongs.Data.Max(s => s.ScrapedAt);
@@ -317,7 +317,7 @@ namespace SyncSaberLib
                     songExists = Directory.Exists(outputPath);
                 }
                 //else
-                    //Logger.Warning($"Skipping {song.songName}, it's in the HashMap");
+                //Logger.Warning($"Skipping {song.songName}, it's in the HashMap");
 
                 bool songInHistory = _songDownloadHistory.Contains(song.key);
                 if ((songExists && songInHistory) || !songInHistory)
