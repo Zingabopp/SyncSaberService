@@ -174,7 +174,7 @@ namespace SyncSaberLib.Web
                 {
                     var time = Stopwatch.StartNew();
                     bool waitTimeout = false;
-                    while (!(IsFileReady(zipFile.FullName) || !waitTimeout))
+                    while (!(IsFileLocked(zipFile.FullName) || !waitTimeout))
                         waitTimeout = time.ElapsedMilliseconds < 3000;
                     if (waitTimeout)
                         Logger.Warning($"Timeout waiting for {zipFile.FullName} to be released for deletion.");
@@ -211,8 +211,8 @@ namespace SyncSaberLib.Web
                     await Task.Run(() => {
                         var time = Stopwatch.StartNew();
                         bool waitTimeout = false;
-                        while (!(IsFileReady(zipPath) || !waitTimeout))
-                            waitTimeout = time.ElapsedMilliseconds < 3000;
+                        while (IsFileLocked(zipPath) && !waitTimeout)
+                            waitTimeout = time.ElapsedMilliseconds < 1000;
                         if (waitTimeout)
                             Logger.Warning($"Timeout waiting for {zipPath} to be released for extraction.");
                         using (ZipArchive zipFile = ZipFile.OpenRead(zipPath))
@@ -229,7 +229,7 @@ namespace SyncSaberLib.Web
                 {
                     var time = Stopwatch.StartNew();
                     bool waitTimeout = false;
-                    while (!(IsFileReady(zipPath) || !waitTimeout))
+                    while (!(IsFileLocked(zipPath) || !waitTimeout))
                         waitTimeout = time.ElapsedMilliseconds < 3000;
                     if (waitTimeout)
                         Logger.Warning($"Timeout waiting for {zipPath} to be released for extraction.");
@@ -250,6 +250,8 @@ namespace SyncSaberLib.Web
                             extractDir.Create();
                         }
                         Logger.Trace($"Moving files from {tempDir.FullName} to {extractDir.FullName}");
+
+                        
                         Utilities.MoveFilesRecursively(tempDir, extractDir);
                     }
                 }
@@ -263,20 +265,7 @@ namespace SyncSaberLib.Web
             return extracted;
         }
 
-        public static bool IsFileReady(string filename)
-        {
-            // If the file can be opened for exclusive access it means that the file
-            // is no longer locked by another process.
-            try
-            {
-                using (FileStream inputStream = File.Open(filename, FileMode.Open, FileAccess.Read, FileShare.None))
-                    return inputStream.Length > 0;
-            }
-            catch (Exception)
-            {
-                return false;
-            }
-        }
+        
     }
 
     public static class ZipArchiveExtensions
