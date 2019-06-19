@@ -88,8 +88,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
-    <None Include="ScrapedData\BeatSaverScrape.json" />
-    <None Include="ScrapedData\ScoreSaberScrape.json" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json">
@@ -101,6 +99,9 @@
       <Project>{47e9e695-c638-4e4f-ad3d-6e8f6abd983f}</Project>
       <Name>SyncSaberLib</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="ScrapedData\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
