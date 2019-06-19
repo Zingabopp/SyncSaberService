@@ -199,7 +199,7 @@ namespace SyncSaberLib.Web
                         else
                         {
                             Logger.Warning("Invalid XML formatting detected, attempting to fix...");
-                            pageText = pageText.Replace(" & ", "&amp;");
+                            pageText = pageText.Replace(" & ", " &amp; ");
                             retry = true;
                         }
                         //File.WriteAllText("ErrorText.xml", pageText);
