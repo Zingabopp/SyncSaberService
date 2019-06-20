@@ -15,12 +15,12 @@ namespace SyncSaberLib.Data
         public DbSet<Characteristic> Characteristics { get; set; }
         public DbSet<Difficulty> Difficulties { get; set; }
         public DbSet<Uploader> Uploaders { get; set; }
-        
+
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             optionsBuilder.UseSqlite("Data Source=songs.db");
-            
+
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -33,8 +33,13 @@ namespace SyncSaberLib.Data
                 .HasKey(c => c.CharacteristicId);
             modelBuilder.Entity<Difficulty>()
                 .HasKey(d => d.DifficultyId);
+            modelBuilder.Entity<Difficulty>()
+                .HasAlternateKey(d => d.DifficultyName);
             modelBuilder.Entity<Uploader>()
                 .HasKey(u => u.UploaderId);
+            modelBuilder.Entity<Uploader>()
+                .HasAlternateKey(u => u.UploaderName);
+
             modelBuilder.Entity<BeatmapCharacteristic>()
                 .HasKey(b => new { b.CharactersticId, b.SongId });
             modelBuilder.Entity<SongDifficulty>()
