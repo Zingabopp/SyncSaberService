@@ -21,6 +21,8 @@ namespace SyncSaberLib.Data
         public static BeatSaverScrape BeatSaverSongs { get; set; }
         public static ScoreSaberScrape ScoreSaberSongs { get; set; }
         public static Dictionary<string, SongInfo> Songs { get; set; }
+
+        public static SongDataContext SongData { get; set; }
         public static void Initialize()
         {
             if (!DATA_DIRECTORY.Exists)
@@ -52,6 +54,10 @@ namespace SyncSaberLib.Data
                     Songs.AddOrUpdate(diff.hash, newSong);
                 }
             }
+            SongData = new SongDataContext();
+            SongData.Database.EnsureCreated();
+            SongData.AddRange(Songs.Values.Where(s => s.BeatSaverInfo != null && s.ScoreSaberInfo != null).Select(s => new Song(s)));
+            SongData.SaveChanges();
             _initialized = true;
         }
 
