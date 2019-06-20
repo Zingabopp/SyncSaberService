@@ -12,6 +12,9 @@ using SyncSaberLib.Web;
 using SyncSaberLib.Data;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Microsoft.EntityFrameworkCore.Query;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Extensions;
 
 namespace SyncSaberConsole
 {
@@ -30,6 +33,10 @@ namespace SyncSaberConsole
             //ScrapedDataProvider.Initialize();
 
             WebUtils.Initialize(5);
+
+            var matchedSongs = ScrapedDataProvider.SongData.Songs
+                .Include(song => song.ScoreSaberDifficulties)
+                .Where(s => s.ScoreSaberDifficulties.Any(d => d.Ranked == true)).ToList();
 
             var found = ScrapedDataProvider.TryGetSongByKey("3f57", out SongInfo badSong, false);
             var CustomSongsPath = Path.Combine(Config.BeatSaberPath, @"Beat Saber_Data\CustomLevels"); 
@@ -93,7 +100,7 @@ namespace SyncSaberConsole
                 ScrapedDataProvider.Initialize();
                 Logger.Info($"Scrapes loaded, {ScrapedDataProvider.BeatSaverSongs.Data.Count} BeatSaverSongs and {ScrapedDataProvider.ScoreSaberSongs.Data.Count} ScoreSaber difficulties loaded");
                 //DoFullScrape();
-                //Tests();
+                Tests();
                 try
                 {
                     if (args.Length > 0)

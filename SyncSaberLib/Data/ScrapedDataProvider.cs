@@ -55,9 +55,9 @@ namespace SyncSaberLib.Data
                 }
             }
             SongData = new SongDataContext();
-            SongData.Database.EnsureCreated();
-            SongData.AddRange(Songs.Values.Where(s => s.BeatSaverInfo != null && s.ScoreSaberInfo != null).Select(s => new Song(s)));
-            SongData.SaveChanges();
+            //SongData.Database.EnsureCreated();
+            //SongData.AddRange(Songs.Values.Where(s => s.BeatSaverInfo != null && s.ScoreSaberInfo != null).Select(s => new Song(s)));
+            //SongData.SaveChanges();
             _initialized = true;
         }
 
