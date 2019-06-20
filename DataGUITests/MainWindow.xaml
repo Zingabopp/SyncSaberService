@@ -11,7 +11,10 @@
         <CollectionViewSource x:Key="SongViewSource" d:DesignSource="{d:DesignInstance {x:Type domain:Song}, CreateList=True}"/>
     </Window.Resources>
     <Grid DataContext="{StaticResource SongViewSource}">
-        <DataGrid x:Name="dataGrid" HorizontalAlignment="Left" Margin="10,10,10,10" VerticalAlignment="Top"
+        <Grid.Resources>
+            <Style TargetType="DataGridCell" x:Name="SongNameCell" />
+        </Grid.Resources>
+        <DataGrid x:Name="SongGrid" HorizontalAlignment="Left" Margin="10,10,10,10" VerticalAlignment="Top"
                   ItemsSource="{ Binding }" AutoGenerateColumns="True" EnableRowVirtualization="True">
         </DataGrid>
                   

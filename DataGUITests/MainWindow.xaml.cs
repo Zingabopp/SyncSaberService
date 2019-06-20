@@ -35,7 +35,7 @@ namespace DataGUITests
             CollectionViewSource songViewSource = ((System.Windows.Data.CollectionViewSource) (this.FindResource("SongViewSource")));
             _context.Songs.Load();
             _context.ScoreSaberDifficulties.Load();
-            songViewSource.Source = _context.Songs.Local.ToList();
+            SongGrid.ItemsSource = _context.Songs.Local.ToObservableCollection();
         }
     }
 
