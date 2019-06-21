@@ -4,6 +4,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using IniParser;
 using IniParser.Model;
@@ -17,6 +18,8 @@ namespace SyncSaberLib
 {
     public static class Utilities
     {
+        private static readonly Regex _digitRegex = new Regex("^(?:0[xX])?([0-9a-fA-F]+)$", RegexOptions.Compiled);
+
         public static string MakeSafeFilename(string str)
         {
             StringBuilder retStr = new StringBuilder(str);
@@ -39,6 +42,33 @@ namespace SyncSaberLib
                 Value = keyValue
             };
             return data;
+        }
+
+        /// <summary>
+        /// Converts a hex string to an integer. Returns 0 if the passed string is not a hex value.
+        /// </summary>
+        /// <param name="hexVal"></param>
+        /// <returns></returns>
+        public static int HexToInt(string hexVal)
+        {
+            var match = _digitRegex.Match(hexVal);
+            return match.Success ? int.Parse(match.Groups[1].Value, System.Globalization.NumberStyles.HexNumber) : 0;
+        }
+
+        /// <summary>
+        /// Converts a hex string to an integer. Returns false if the passed string isn't a hex value.
+        /// </summary>
+        /// <param name="hexVal"></param>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public static bool HexToInt(string hexVal, out int value)
+        {
+            value = 0;
+            var match = _digitRegex.Match(hexVal);
+            if (!match.Success)
+                return false;
+            value =  int.Parse(match.Groups[1].Value, System.Globalization.NumberStyles.HexNumber);
+            return true;
         }
 
         /// <summary>

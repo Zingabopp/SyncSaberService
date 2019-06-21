@@ -23,35 +23,40 @@ namespace SyncSaberLib.Data
         public static Dictionary<string, SongInfo> Songs { get; set; }
 
         public static SongDataContext SongData { get; set; }
-        public static void Initialize()
+        public static void Initialize(bool loadJson = true)
         {
             if (!DATA_DIRECTORY.Exists)
                 DATA_DIRECTORY.Create();
             DATA_DIRECTORY.Refresh();
             BeatSaverSongs = new BeatSaverScrape();
-            BeatSaverSongs.Initialize();
             ScoreSaberSongs = new ScoreSaberScrape();
-            ScoreSaberSongs.Initialize();
-            Songs = new Dictionary<string, SongInfo>();
-            foreach (var song in BeatSaverSongs.Data)
+            if (loadJson)
             {
-                var newSong = new SongInfo(song.hash) {
-                    BeatSaverInfo = song
-                };
-                if (Songs.AddOrUpdate(song.hash, newSong))
-                    Logger.Warning($"Repeated hash while creating SongInfo Dictionary, this should not happen. {song.name} by {song.metadata.levelAuthorName}");
-            }
-            foreach (var diff in ScoreSaberSongs.Data)
-            {
-                if (diff.hash.Count() < 40)
-                    continue; // Using the old hash, skip
-                if (Songs.ContainsKey(diff.hash))
-                    Songs[diff.hash].ScoreSaberInfo.AddOrUpdate(diff.uid, diff);
-                else
+                BeatSaverSongs.Initialize();
+                ScoreSaberSongs.Initialize();
+
+                Songs = new Dictionary<string, SongInfo>();
+                foreach (var song in BeatSaverSongs.Data)
                 {
-                    var newSong = new SongInfo(diff.hash);
-                    newSong.ScoreSaberInfo.AddOrUpdate(diff.uid, diff);
-                    Songs.AddOrUpdate(diff.hash, newSong);
+                    var newSong = new SongInfo(song.hash)
+                    {
+                        BeatSaverInfo = song
+                    };
+                    if (Songs.AddOrUpdate(song.hash, newSong))
+                        Logger.Warning($"Repeated hash while creating SongInfo Dictionary, this should not happen. {song.name} by {song.metadata.levelAuthorName}");
+                }
+                foreach (var diff in ScoreSaberSongs.Data)
+                {
+                    if (diff.hash.Count() < 40)
+                        continue; // Using the old hash, skip
+                    if (Songs.ContainsKey(diff.hash))
+                        Songs[diff.hash].ScoreSaberInfo.AddOrUpdate(diff.uid, diff);
+                    else
+                    {
+                        var newSong = new SongInfo(diff.hash);
+                        newSong.ScoreSaberInfo.AddOrUpdate(diff.uid, diff);
+                        Songs.AddOrUpdate(diff.hash, newSong);
+                    }
                 }
             }
             SongData = new SongDataContext();
@@ -69,7 +74,7 @@ namespace SyncSaberLib.Data
                 using (StreamReader file = File.OpenText(filePath))
                 {
                     JsonSerializer serializer = new JsonSerializer();
-                    results = (List<SongInfo>) serializer.Deserialize(file, typeof(List<SongInfo>));
+                    results = (List<SongInfo>)serializer.Deserialize(file, typeof(List<SongInfo>));
                 }
 
             return results;
@@ -129,7 +134,7 @@ namespace SyncSaberLib.Data
                 song = BeatSaverReader.GetSongByKey(key);
                 if (song != null)
                 {
-                    
+
                     TryAddToScrapedData(song);
                 }
                 else

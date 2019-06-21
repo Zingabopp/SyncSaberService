@@ -5,10 +5,14 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:domain="clr-namespace:SyncSaberLib.Data;assembly=SyncSaberLib"
         xmlns:local="clr-namespace:DataGUITests"
+        xmlns:dataconverters="clr-namespace:DataGUITests.DataConverters"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
     <Window.Resources>
         <CollectionViewSource x:Key="SongViewSource" d:DesignSource="{d:DesignInstance {x:Type domain:Song}, CreateList=True}"/>
+        <dataconverters:SongRankedConverter x:Key="SongRankedConverter"/>
+        <dataconverters:SongRankedComparer x:Key="SongRankedComparer"/>
+        <dataconverters:ScoreSaberDifficultiesCountConverter x:Key="ScoreSaberCount"/>
     </Window.Resources>
     <Grid DataContext="{StaticResource SongViewSource}">
         <Grid.RowDefinitions>
@@ -19,9 +23,20 @@
             <Style TargetType="DataGridCell" x:Name="SongNameCell" />
         </Grid.Resources>
         <DataGrid Grid.Row="1" x:Name="SongGrid" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" Margin="10,10,10,10" 
-                  ItemsSource="{ Binding }" AutoGenerateColumns="True" EnableRowVirtualization="True">
+                  ItemsSource="{ Binding }" AutoGenerateColumns="False" EnableRowVirtualization="True" IsReadOnly="True" >
+            <DataGrid.Columns>
+                <DataGridTextColumn x:Name="SongIdColumn" Header="SongId" Visibility="Hidden" Binding="{Binding SongId}"/>
+                <DataGridTextColumn x:Name="SongKeyColumn" Header="Key" Binding="{Binding Key}"/>
+                <DataGridTextColumn x:Name="RankedColumn" Header="Ranked" Binding="{Binding ScoreSaberDifficulties, Converter={StaticResource SongRankedConverter}}"/>
+                <DataGridTextColumn x:Name="ScoreSaberDiffsColumn" Header="ScoreSaberDiffs" Binding="{Binding ScoreSaberDifficulties, Converter={StaticResource ScoreSaberCount}}"/>
+                <DataGridTextColumn x:Name="NameColumn" Header="Name" Binding="{Binding Difficulties[0]}"/>
+                <DataGridTextColumn x:Name="DescriptionColumn" Header="Description" Visibility="Hidden" Binding="{Binding Description}"/>
+                <DataGridTextColumn x:Name="HashColumn" Header="Hash" Binding="{Binding Hash}"/>
+                <DataGridTextColumn x:Name="UploadedColumn" Header="Uploaded" Binding="{Binding Uploaded}"/>
+            </DataGrid.Columns>
         </DataGrid>
-                  
+        <Button x:Name="button" Content="Button" HorizontalAlignment="Left" Margin="97,39,0,0" VerticalAlignment="Top" Width="75" Click="Button_Click"/>
+
 
     </Grid>
 </Window>

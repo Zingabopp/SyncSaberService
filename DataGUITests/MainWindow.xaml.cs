@@ -17,6 +17,8 @@ using SyncSaberLib.Data;
 using Microsoft.EntityFrameworkCore.Query;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Extensions;
+using System.Linq.Expressions;
+using static SyncSaberLib.Utilities;
 
 namespace DataGUITests
 {
@@ -26,18 +28,38 @@ namespace DataGUITests
     public partial class MainWindow : Window
     {
         private SongDataContext _context;
-
+        private int skip = 0;
+        private IIncludableQueryable<Song, ICollection<ScoreSaberDifficulty>> currentQuery;
+        System.Linq.Expressions.Expression<Func<Song, bool>> currentExpression;
         public MainWindow()
         {
             InitializeComponent();
-            ScrapedDataProvider.Initialize();
+            currentExpression = (s) => s != null;
+            System.Linq.Expressions.Expression<Func<Song, bool>> newExpression = (s) => s.ScoreSaberDifficulties.Count > 5;
+            var test = System.Linq.Expressions.Expression.And(currentExpression.Reduce(), newExpression.ReduceExtensions());
+            ScrapedDataProvider.Initialize(false);
             _context = ScrapedDataProvider.SongData;
-            CollectionViewSource songViewSource = ((System.Windows.Data.CollectionViewSource) (this.FindResource("SongViewSource")));
-            _context.Songs.Load();
-            _context.ScoreSaberDifficulties.Load();
-            SongGrid.ItemsSource = _context.Songs.Local.ToObservableCollection();
+            CollectionViewSource songViewSource = ((System.Windows.Data.CollectionViewSource)(this.FindResource("SongViewSource")));
+            currentQuery = _context.Songs.Include(s => s.Difficulties).Include(s => s.BeatmapCharacteristics).Include(s => s.ScoreSaberDifficulties);
+            _context.Difficulties.Load();
+            //currentQuery.Where(s => s.ScoreSaberDifficulties.Count() > 5).Skip(skip).Take(10).Load();
+            currentQuery.Where(currentExpression).Skip(skip).Take(10).Load();
+            //_context.ScoreSaberDifficulties.Load();
+
+            songViewSource.Source = _context.Songs.Local.ToObservableCollection();
+            button.Content = _context.Songs.Local.Count.ToString();
+            //SongGrid.ItemsSource = _context.Songs.Local.ToObservableCollection();
+        }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            skip += 10;
+            currentQuery.Where(s => s.ScoreSaberDifficulties.Count() > 5).Skip(skip).Take(10).Load();
+            button.Content = _context.Songs.Local.Count.ToString();
         }
     }
+
+
 
     /*
     public class SongTracker : IObservable<Song>

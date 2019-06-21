@@ -83,7 +83,7 @@ namespace SyncSaberLib.Data
             Difficulties = Difficulty.DictionaryToDifficulties(s.BeatSaverInfo.metadata.difficulties).Select(d =>
             new SongDifficulty() { Difficulty = d, Song = this, SongId = s.BeatSaverInfo._id }).ToList();
             BeatmapCharacteristics = Characteristic.ConvertCharacteristics(s.BeatSaverInfo.metadata.characteristics).Select(c =>
-            new BeatmapCharacteristic() { SongId = s.BeatSaverInfo._id, Song = this, Characteristic = c}).ToList();
+            new BeatmapCharacteristic() { SongId = s.BeatSaverInfo._id, Song = this, Characteristic = c }).ToList();
             UploaderRefId = s.BeatSaverInfo.uploader.id;
             Uploader = new Uploader() { UploaderId = UploaderRefId, UploaderName = s.BeatSaverInfo.uploader.username };
             ScoreSaberDifficulties = s.ScoreSaberInfo.Values.Select(d => new ScoreSaberDifficulty(d)).ToList();
@@ -110,66 +110,76 @@ namespace SyncSaberLib.Data
             return retList;
         }
 
-    [Key]
-    public int CharacteristicId { get; set; }
-    [Key]
-    public string CharacteristicName { get; set; }
-    public virtual ICollection<BeatmapCharacteristic> BeatmapCharacteristics { get; set; }
-}
-
-[Table("BeatmapCharacteristics")]
-public class BeatmapCharacteristic
-{
-
-    public int CharactersticId { get; set; }
-    public Characteristic Characteristic { get; set; }
-
-    public string SongId { get; set; }
-    public Song Song { get; set; }
-}
-
-[Table("songdifficulties")]
-public class SongDifficulty
-{
-    public int DifficultyId { get; set; }
-    public Difficulty Difficulty { get; set; }
-
-    public string SongId { get; set; }
-    public Song Song { get; set; }
-}
-
-[Table("difficulties")]
-public class Difficulty
-{
-    [NotMapped]
-    public static Dictionary<int, Difficulty> AvailableDifficulties = new Dictionary<int, Difficulty>();
-
-    public int DifficultyId { get; set; }
-    public string DifficultyName { get; set; }
-    public virtual ICollection<SongDifficulty> SongDifficulties { get; set; }
-
-    public static ICollection<Difficulty> DictionaryToDifficulties(Dictionary<string, bool> diffs)
-    {
-        List<Difficulty> difficulties = new List<Difficulty>();
-        for (int i = 0; i < diffs.Count; i++)
-        {
-            if (diffs.Values.ElementAt(i))
-            {
-                if (!AvailableDifficulties.ContainsKey(i))
-                    AvailableDifficulties.Add(i, new Difficulty() { DifficultyId = i, DifficultyName = diffs.Keys.ElementAt(i) });
-                difficulties.Add(AvailableDifficulties[i]);
-            }
-        }
-        return difficulties;
+        [Key]
+        public int CharacteristicId { get; set; }
+        [Key]
+        public string CharacteristicName { get; set; }
+        public virtual ICollection<BeatmapCharacteristic> BeatmapCharacteristics { get; set; }
     }
-}
 
-[Table("uploaders")]
-public class Uploader
-{
-    public string UploaderId { get; set; }
-    public string UploaderName { get; set; }
-    [ForeignKey("UploaderRefId")]
-    public virtual ICollection<Song> Songs { get; set; }
-}
+    [Table("BeatmapCharacteristics")]
+    public class BeatmapCharacteristic
+    {
+
+        public int CharactersticId { get; set; }
+        public Characteristic Characteristic { get; set; }
+
+        public string SongId { get; set; }
+        public Song Song { get; set; }
+    }
+
+    [Table("songdifficulties")]
+    public class SongDifficulty
+    {
+        public int DifficultyId { get; set; }
+        public Difficulty Difficulty { get; set; }
+
+        public string SongId { get; set; }
+        public Song Song { get; set; }
+    }
+
+    [Table("difficulties")]
+    public class Difficulty
+    {
+        [NotMapped]
+        public static Dictionary<int, Difficulty> AvailableDifficulties;
+        static Difficulty()
+        {
+            AvailableDifficulties = new Dictionary<int, Difficulty>();
+            AvailableDifficulties.Add(0, new Difficulty() { DifficultyId = 0, DifficultyName = "Easy" });
+            AvailableDifficulties.Add(1, new Difficulty() { DifficultyId = 0, DifficultyName = "Normal" });
+            AvailableDifficulties.Add(2, new Difficulty() { DifficultyId = 0, DifficultyName = "Hard" });
+            AvailableDifficulties.Add(3, new Difficulty() { DifficultyId = 0, DifficultyName = "Expert" });
+            AvailableDifficulties.Add(4, new Difficulty() { DifficultyId = 0, DifficultyName = "ExpertPlus" });
+
+        }
+        public int DifficultyId { get; set; }
+        public string DifficultyName { get; set; }
+        public virtual ICollection<SongDifficulty> SongDifficulties { get; set; }
+
+
+        public static ICollection<Difficulty> DictionaryToDifficulties(Dictionary<string, bool> diffs)
+        {
+            List<Difficulty> difficulties = new List<Difficulty>();
+            for (int i = 0; i < diffs.Count; i++)
+            {
+                if (diffs.Values.ElementAt(i))
+                {
+                    if (!AvailableDifficulties.ContainsKey(i))
+                        AvailableDifficulties.Add(i, new Difficulty() { DifficultyId = i, DifficultyName = diffs.Keys.ElementAt(i) });
+                    difficulties.Add(AvailableDifficulties[i]);
+                }
+            }
+            return difficulties;
+        }
+    }
+
+    [Table("uploaders")]
+    public class Uploader
+    {
+        public string UploaderId { get; set; }
+        public string UploaderName { get; set; }
+        [ForeignKey("UploaderRefId")]
+        public virtual ICollection<Song> Songs { get; set; }
+    }
 }
