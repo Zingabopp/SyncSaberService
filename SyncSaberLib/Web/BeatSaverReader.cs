@@ -148,7 +148,7 @@ namespace SyncSaberLib.Web
                 if (useMaxPages && (pageNum >= maxPages))
                     continueLooping = false;
             } while (continueLooping);
-            Logger.Info($"Scraped {songs.Count} new songs");
+            //Logger.Info($"Scraped {songs.Count} new songs");
             return songs;
         }
 

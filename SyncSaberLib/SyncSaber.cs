@@ -196,19 +196,38 @@ namespace SyncSaberLib
 
         public void ScrapeNewSongs()
         {
+            int lastBeatSaverCount = 0;
+            int lastScoreSaberCount = 0;
             DateTime lastBSScrape = DateTime.MinValue;
             DateTime lastSSScrape = DateTime.MinValue;
             if (ScrapedDataProvider.BeatSaverSongs.HasData)
+            {
+                lastBeatSaverCount = ScrapedDataProvider.BeatSaverSongs.Data.Count;
                 lastBSScrape = ScrapedDataProvider.BeatSaverSongs.Data.Max(s => s.ScrapedAt);
+            }
             if (ScrapedDataProvider.ScoreSaberSongs.HasData)
+            {
+                lastScoreSaberCount = ScrapedDataProvider.ScoreSaberSongs.Data.Count;
                 lastSSScrape = ScrapedDataProvider.ScoreSaberSongs.Data.Max(s => s.ScrapedAt);
-            Logger.Info($"Scraping new songs. Last Beat Saver scrape was at {lastBSScrape.ToString()}. Last ScoreSaber scrape was at {lastSSScrape.ToString()}.");
+            }
+            Logger.Info($"Scraping new songs. Last Beat Saver scrape was at {lastBSScrape.ToString()}.");
             var bsReader = FeedReaders[BeatSaverReader.NameKey] as BeatSaverReader;
             BeatSaverReader.ScrapeBeatSaver(200, true);
             ScrapedDataProvider.BeatSaverSongs.WriteFile();
+            int newBeatSaverSongs = ScrapedDataProvider.BeatSaverSongs.Data.Count - lastBeatSaverCount;
+            Logger.Info($"Scraped {(newBeatSaverSongs).ToString()} new song{(newBeatSaverSongs == 1 ? "" : "s")} from Beat Saver.");
 
             if ((DateTime.Now - lastSSScrape).TotalHours > 3)
+            {
+                Logger.Info($"Scraping new ScoreSaber difficulties. Last ScoreSaber scrape was at {lastSSScrape.ToString()}.");
+                int newScoreSaberSongs = ScrapedDataProvider.ScoreSaberSongs.Data.Count - lastScoreSaberCount;
                 ScoreSaberReader.ScrapeScoreSaber(1000, 500, true, 2);
+                Logger.Info($"Scraped {(newScoreSaberSongs).ToString()} new difficult{(newScoreSaberSongs == 1 ? "y" : "ies")} from ScoreSaber.");
+            }
+            else
+            {
+                Logger.Info($"Last ScoreSaber scrape was at {lastSSScrape.ToString()}, skipping.");
+            }
             ScrapedDataProvider.ScoreSaberSongs.WriteFile();
         }
 
