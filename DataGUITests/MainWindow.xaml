@@ -11,10 +11,14 @@
         <CollectionViewSource x:Key="SongViewSource" d:DesignSource="{d:DesignInstance {x:Type domain:Song}, CreateList=True}"/>
     </Window.Resources>
     <Grid DataContext="{StaticResource SongViewSource}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="100" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
         <Grid.Resources>
             <Style TargetType="DataGridCell" x:Name="SongNameCell" />
         </Grid.Resources>
-        <DataGrid x:Name="SongGrid" HorizontalAlignment="Left" Margin="10,10,10,10" VerticalAlignment="Top"
+        <DataGrid Grid.Row="1" x:Name="SongGrid" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" Margin="10,10,10,10" 
                   ItemsSource="{ Binding }" AutoGenerateColumns="True" EnableRowVirtualization="True">
         </DataGrid>
                   
