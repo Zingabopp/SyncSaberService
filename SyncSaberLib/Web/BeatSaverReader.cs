@@ -443,6 +443,11 @@ namespace SyncSaberLib.Web
             {
                 return GetSongsByUploaderId(criteria);
             }
+
+            if(type == SearchType.hash)
+            {
+                return new List<SongInfo>() { GetSongByHash(criteria) };
+            }
             StringBuilder url;
             url = new StringBuilder(Feeds[BeatSaverFeeds.SEARCH].BaseUrl);
             url.Replace(SEARCHTYPEKEY, type.ToString());
@@ -482,6 +487,41 @@ namespace SyncSaberLib.Web
             catch(AggregateException ae)
             {
                 ae.WriteExceptions($"Exception while trying to get details for {key}");
+            }
+            catch (Exception ex)
+            {
+                Logger.Exception("Exception getting page", ex);
+            }
+            song = ParseSongsFromPage(pageText).FirstOrDefault();
+            song.ScrapedAt = DateTime.Now;
+            return ScrapedDataProvider.GetOrCreateSong(song);
+        }
+
+        public static SongInfo GetSongByHash(string hash)
+        {
+
+            string url = BEATSAVER_GETBYHASH_BASE_URL + hash;
+            string pageText = "";
+            BeatSaverSong song;
+            try
+            {
+                var pageTask = WebUtils.TryGetStringAsync(url);
+                pageTask.Wait();
+                pageText = pageTask.Result;
+                if (string.IsNullOrEmpty(pageText))
+                {
+                    Logger.Warning($"Unable to get web page at {url}");
+                    return null;
+                }
+            }
+            catch (HttpRequestException)
+            {
+                Logger.Error($"HttpRequestException while trying to populate fields for {hash}");
+                return null;
+            }
+            catch (AggregateException ae)
+            {
+                ae.WriteExceptions($"Exception while trying to get details for {hash}");
             }
             catch (Exception ex)
             {

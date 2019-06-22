@@ -34,13 +34,10 @@ namespace SyncSaberLib.Web
         #region Constants
         public static readonly string NameKey = "ScoreSaberReader";
         public static readonly string SourceKey = "ScoreSaber";
-        //private static readonly string USERNAMEKEY = "{USERNAME}";
         private static readonly string PAGENUMKEY = "{PAGENUM}";
         //private static readonly string CATKEY = "{CAT}";
         private static readonly string RANKEDKEY = "{RANKKEY}";
         private static readonly string LIMITKEY = "{LIMIT}";
-        private const string DefaultLoginUri = "https://bsaber.com/wp-login.php?jetpack-sso-show-default-form=1";
-        private static readonly Uri FeedRootUri = new Uri("https://bsaber.com");
         private const string INVALID_FEED_SETTINGS_MESSAGE = "The IFeedSettings passed is not a ScoreSaberFeedSettings.";
         private const string TOP_RANKED_KEY = "Top Ranked";
         private const string TRENDING_KEY = "Trending";
