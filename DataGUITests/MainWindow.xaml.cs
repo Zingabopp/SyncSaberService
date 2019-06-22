@@ -30,25 +30,36 @@ namespace DataGUITests
         private SongDataContext _context;
         private int skip = 0;
         private IIncludableQueryable<Song, ICollection<ScoreSaberDifficulty>> currentQuery;
-        System.Linq.Expressions.Expression<Func<Song, bool>> currentExpression;
+        private CollectionViewSource songViewSource;
         public MainWindow()
         {
             InitializeComponent();
-            currentExpression = (s) => s != null;
-            System.Linq.Expressions.Expression<Func<Song, bool>> newExpression = (s) => s.ScoreSaberDifficulties.Count > 5;
-            var test = System.Linq.Expressions.Expression.And(currentExpression.Reduce(), newExpression.ReduceExtensions());
+
             ScrapedDataProvider.Initialize(false);
             _context = ScrapedDataProvider.SongData;
-            CollectionViewSource songViewSource = ((System.Windows.Data.CollectionViewSource)(this.FindResource("SongViewSource")));
-            currentQuery = _context.Songs.Include(s => s.Difficulties).Include(s => s.BeatmapCharacteristics).Include(s => s.ScoreSaberDifficulties);
+            songViewSource = ((System.Windows.Data.CollectionViewSource)(this.FindResource("SongViewSource")));
+            currentQuery = _context.Songs.Include(s => s.Difficulties).Include(s => s.BeatmapCharacteristics).Include(s => s.Uploader).Include(s => s.ScoreSaberDifficulties);
             _context.Difficulties.Load();
+            _context.Characteristics.Load();
             //currentQuery.Where(s => s.ScoreSaberDifficulties.Count() > 5).Skip(skip).Take(10).Load();
-            currentQuery.Where(currentExpression).Skip(skip).Take(10).Load();
+            currentQuery.Where(s => s.BeatmapCharacteristics.Count > 0).Skip(skip).Take(10).Load();
             //_context.ScoreSaberDifficulties.Load();
-
+            var characteristics = _context.Songs.Where(s => s.BeatmapCharacteristics.Count > 0).SelectMany(s => s.BeatmapCharacteristics.Select(c => c.Characteristic.CharacteristicName)).Distinct().ToList();
             songViewSource.Source = _context.Songs.Local.ToObservableCollection();
+            songViewSource.View.Filter = SongMatches;
+            //songViewSource.Filter += ShowOnlyRecent;
             button.Content = _context.Songs.Local.Count.ToString();
             //SongGrid.ItemsSource = _context.Songs.Local.ToObservableCollection();
+        }
+
+        private bool SongMatches(object item)
+        {
+            if (item is Song song && song.ScoreSaberDifficulties != null)
+            {
+                bool retVal = song.ScoreSaberDifficulties.Any(d => d.Ranked == true);
+                return retVal;
+            }
+            return false;
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)
@@ -56,6 +67,34 @@ namespace DataGUITests
             skip += 10;
             currentQuery.Where(s => s.ScoreSaberDifficulties.Count() > 5).Skip(skip).Take(10).Load();
             button.Content = _context.Songs.Local.Count.ToString();
+            songViewSource.View.Refresh();
+            
+        }
+
+        private void ShowOnlyRankedFilter(object sender, FilterEventArgs e)
+        {
+            if (e.Item is Song song)
+            {
+                if (song.ScoreSaberDifficulties != null && song.ScoreSaberDifficulties.Any(d => d.Ranked == true))
+                    e.Accepted = true;
+                else
+                    e.Accepted = false;
+            }
+            else
+                e.Accepted = false;
+        }
+
+        private void ShowOnlyRecent(object sender, FilterEventArgs e)
+        {
+            if (e.Item is Song song)
+            {
+                if ((DateTime.Now - song.Uploaded) < new TimeSpan(200, 0, 0, 0))
+                    e.Accepted = true;
+                else
+                    e.Accepted = false;
+            }
+            else
+                e.Accepted = false;
         }
     }
 

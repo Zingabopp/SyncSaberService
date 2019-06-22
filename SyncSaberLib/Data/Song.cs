@@ -96,6 +96,16 @@ namespace SyncSaberLib.Data
     {
         [NotMapped]
         public static Dictionary<string, Characteristic> AvailableCharacteristics = new Dictionary<string, Characteristic>();
+        static Characteristic()
+        {
+            AvailableCharacteristics = new Dictionary<string, Characteristic>
+            {
+                { "Standard", new Characteristic() { CharacteristicId = 0, CharacteristicName = "Standard" } },
+                { "NoArrows", new Characteristic() { CharacteristicId = 1, CharacteristicName = "NoArrows" } },
+                { "OneSaber", new Characteristic() { CharacteristicId = 2, CharacteristicName = "OneSaber" } },
+                { "Lightshow", new Characteristic() { CharacteristicId = 3, CharacteristicName = "Lightshow" } }
+            };
+        }
         public static ICollection<Characteristic> ConvertCharacteristics(ICollection<string> characteristics)
         {
             List<Characteristic> retList = new List<Characteristic>();
@@ -108,6 +118,11 @@ namespace SyncSaberLib.Data
             }
 
             return retList;
+        }
+
+        public override string ToString()
+        {
+            return CharacteristicName;
         }
 
         [Key]
@@ -126,6 +141,11 @@ namespace SyncSaberLib.Data
 
         public string SongId { get; set; }
         public Song Song { get; set; }
+
+        public override string ToString()
+        {
+            return Characteristic.CharacteristicName;
+        }
     }
 
     [Table("songdifficulties")]
@@ -136,22 +156,34 @@ namespace SyncSaberLib.Data
 
         public string SongId { get; set; }
         public Song Song { get; set; }
+
+        public override string ToString()
+        {
+            return Difficulty?.DifficultyName;
+        }
     }
 
     [Table("difficulties")]
     public class Difficulty
     {
+        /// <summary>
+        /// Use a dictionary of created Difficulties so it doesn't keep creating the same ones.
+        /// </summary>
         [NotMapped]
         public static Dictionary<int, Difficulty> AvailableDifficulties;
+        /// <summary>
+        /// Initialize the standard Difficulties so they have the right ID.
+        /// </summary>
         static Difficulty()
         {
-            AvailableDifficulties = new Dictionary<int, Difficulty>();
-            AvailableDifficulties.Add(0, new Difficulty() { DifficultyId = 0, DifficultyName = "Easy" });
-            AvailableDifficulties.Add(1, new Difficulty() { DifficultyId = 0, DifficultyName = "Normal" });
-            AvailableDifficulties.Add(2, new Difficulty() { DifficultyId = 0, DifficultyName = "Hard" });
-            AvailableDifficulties.Add(3, new Difficulty() { DifficultyId = 0, DifficultyName = "Expert" });
-            AvailableDifficulties.Add(4, new Difficulty() { DifficultyId = 0, DifficultyName = "ExpertPlus" });
-
+            AvailableDifficulties = new Dictionary<int, Difficulty>
+            {
+                { 0, new Difficulty() { DifficultyId = 0, DifficultyName = "Easy" } },
+                { 1, new Difficulty() { DifficultyId = 1, DifficultyName = "Normal" } },
+                { 2, new Difficulty() { DifficultyId = 2, DifficultyName = "Hard" } },
+                { 3, new Difficulty() { DifficultyId = 3, DifficultyName = "Expert" } },
+                { 4, new Difficulty() { DifficultyId = 4, DifficultyName = "ExpertPlus" } }
+            };
         }
         public int DifficultyId { get; set; }
         public string DifficultyName { get; set; }
@@ -172,14 +204,26 @@ namespace SyncSaberLib.Data
             }
             return difficulties;
         }
+
+        public override string ToString()
+        {
+            return DifficultyName;
+        }
     }
 
     [Table("uploaders")]
     public class Uploader
     {
+        [Key]
         public string UploaderId { get; set; }
+        [Key]
         public string UploaderName { get; set; }
         [ForeignKey("UploaderRefId")]
         public virtual ICollection<Song> Songs { get; set; }
+
+        public override string ToString()
+        {
+            return UploaderName;
+        }
     }
 }
