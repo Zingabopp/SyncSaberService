@@ -190,6 +190,8 @@ namespace SyncSaberLib
             for(int i = 0; i < ae.InnerExceptions.Count; i++)
             {
                 Logger.Exception($"Exception {i}:\n", ae.InnerExceptions[i]);
+                if (ae.InnerExceptions[i] is AggregateException ex)
+                    WriteExceptions(ex, ""); // TODO: This could get very long
             }
         }
     }

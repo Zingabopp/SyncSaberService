@@ -90,6 +90,7 @@ namespace SyncSaberLib.Web
         /// <returns></returns>
         public static string GetPageText(string url)
         {
+            // TODO: Change to use httpClient.GetAsync(url) so status codes can be handled and passed back
             Task<string> pageReadTask;
             //lock (lockObject)
             pageReadTask = httpClient.GetStringAsync(url);

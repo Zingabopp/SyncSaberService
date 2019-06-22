@@ -91,7 +91,7 @@ namespace SyncSaberLib.Web
                 //Cookies = GetBSaberCookies(_username, _password);
                 //AddCookies(Cookies, FeedRootUri);
                 for (int i = 0; i < Feeds.Keys.Count; i++)
-                    _earliestEmptyPage.AddOrUpdate((int) Feeds.Keys.ElementAt(i), 9999);
+                    _earliestEmptyPage.AddOrUpdate((int)Feeds.Keys.ElementAt(i), 9999);
                 Ready = true;
             }
         }
@@ -153,7 +153,7 @@ namespace SyncSaberLib.Web
             byte[] requestData = Encoding.UTF8.GetBytes(requestString);
             CookieContainer cc = new CookieContainer();
             Logger.Debug("Requesting cookies");
-            var request = (HttpWebRequest) WebRequest.Create(loginUri);
+            var request = (HttpWebRequest)WebRequest.Create(loginUri);
             request.Proxy = null;
             request.AllowAutoRedirect = false;
             request.CookieContainer = cc;
@@ -162,7 +162,7 @@ namespace SyncSaberLib.Web
             request.ContentLength = requestData.Length;
             using (Stream s = request.GetRequestStream())
                 s.Write(requestData, 0, requestData.Length);
-            HttpWebResponse response = (HttpWebResponse) request.GetResponse(); // Needs this to populate cookies
+            HttpWebResponse response = (HttpWebResponse)request.GetResponse(); // Needs this to populate cookies
 
             return cc;
         }
@@ -209,7 +209,7 @@ namespace SyncSaberLib.Web
                 XmlNodeList xmlNodeList = xmlDocument.DocumentElement.SelectNodes("/rss/channel/item");
                 foreach (object obj in xmlNodeList)
                 {
-                    XmlNode node = (XmlNode) obj;
+                    XmlNode node = (XmlNode)obj;
                     if (node["DownloadURL"] == null || node["SongTitle"] == null)
                     {
                         Logger.Debug("Not a song! Skipping!");
@@ -268,7 +268,8 @@ namespace SyncSaberLib.Web
                         {
                             songsOnPage.Add(currentSong);
                         }
-                    }else if(!string.IsNullOrEmpty(bSong.hash))
+                    }
+                    else if (!string.IsNullOrEmpty(bSong.hash))
                     {
                         if (ScrapedDataProvider.TryGetSongByHash(bSong.hash, out SongInfo currentSong))
                         {
@@ -292,7 +293,7 @@ namespace SyncSaberLib.Web
 
         public string GetPageUrl(int feedIndex, int page)
         {
-            return GetPageUrl(Feeds[(BeastSaberFeeds) feedIndex].BaseUrl, page);
+            return GetPageUrl(Feeds[(BeastSaberFeeds)feedIndex].BaseUrl, page);
         }
 
         [Obsolete("Don't seem to need this with BeastSaber anymore.")]
@@ -333,10 +334,19 @@ namespace SyncSaberLib.Web
             ConcurrentQueue<SongInfo> songList = new ConcurrentQueue<SongInfo>();
             //ConcurrentDictionary<int, SongInfo> songDict = new ConcurrentDictionary<int, SongInfo>();
             Queue<FeedPageInfo> pageQueue = new Queue<FeedPageInfo>();
-            var actionBlock = new ActionBlock<FeedPageInfo>(info => {
+            var actionBlock = new ActionBlock<FeedPageInfo>(info =>
+            {
                 //bool cancelJob = false;
-                var pageText = GetPageText(info.feedUrl);
-                var songsFound = GetSongsFromPage(pageText);
+                string pageText = "";
+                try
+                {
+                    pageText = GetPageText(info.feedUrl);
+                }
+                catch (HttpRequestException)
+                { }
+                var songsFound = new List<SongInfo>();
+                if (!string.IsNullOrEmpty(pageText))
+                    songsFound = GetSongsFromPage(pageText);
                 if (songsFound.Count() == 0)
                 {
                     Logger.Debug($"No songs found on page {info.pageIndex}");
@@ -353,7 +363,8 @@ namespace SyncSaberLib.Web
                     }
 
                 }
-            }, new ExecutionDataflowBlockOptions {
+            }, new ExecutionDataflowBlockOptions
+            {
                 BoundedCapacity = _maxConcurrency, // So pages don't get overqueued when a page with no songs is found
                 MaxDegreeOfParallelism = _maxConcurrency
             });
@@ -373,7 +384,8 @@ namespace SyncSaberLib.Web
                 }
                 string feedUrl = GetPageUrl(Feeds[_settings.Feed].BaseUrl, pageIndex);
 
-                FeedPageInfo pageInfo = new FeedPageInfo {
+                FeedPageInfo pageInfo = new FeedPageInfo
+                {
                     feedToDownload = _settings.FeedIndex,
                     feedUrl = feedUrl,
                     pageIndex = pageIndex
@@ -456,7 +468,7 @@ namespace SyncSaberLib.Web
     {
         public string FeedName { get { return BeastSaberReader.Feeds[Feed].Name; } }
         public int FeedIndex { get; set; }
-        public BeastSaberFeeds Feed { get { return (BeastSaberFeeds) FeedIndex; } set { FeedIndex = (int) value; } }
+        public BeastSaberFeeds Feed { get { return (BeastSaberFeeds)FeedIndex; } set { FeedIndex = (int)value; } }
         public bool UseSongKeyAsOutputFolder { get; set; }
         public bool searchOnline { get; set; }
         public int MaxPages;
