@@ -13,7 +13,6 @@ namespace SyncSaberLib.Data
 {
     public class BeatSaverScrape : IScrapedDataModel<List<BeatSaverSong>, BeatSaverSong>
     {
-        private bool _initialized;
         private readonly object dataLock = new object();
         //[JsonProperty("Data")]
         //public List<SongInfoEnhanced> Data { get; private set; }
@@ -21,7 +20,7 @@ namespace SyncSaberLib.Data
         public BeatSaverScrape()
         {
             DefaultPath = Path.Combine(DATA_DIRECTORY.FullName, "BeatSaverScrape.json");
-            _initialized = false;
+            Initialized = false;
             Data = new List<BeatSaverSong>();
 
         }
@@ -37,7 +36,7 @@ namespace SyncSaberLib.Data
             //JsonSerializer serializer = new JsonSerializer();
             //if (test.Type == Newtonsoft.Json.Linq.JTokenType.Array)
             //    Data = test.ToObject<List<SongInfo>>();
-            _initialized = true;
+            Initialized = true;
             CurrentFile = new FileInfo(filePath);
         }
         /*

@@ -13,11 +13,10 @@ namespace SyncSaberLib.Data
 {
     public class ScoreSaberScrape : IScrapedDataModel<List<ScoreSaberSong>, ScoreSaberSong>
     {
-        private bool _initialized;
         private readonly object dataLock = new object();
         public ScoreSaberScrape()
         {
-            _initialized = false;
+            Initialized = false;
             DefaultPath = Path.Combine(DATA_DIRECTORY.FullName, "ScoreSaberScrape.json");
         }
 
@@ -32,7 +31,7 @@ namespace SyncSaberLib.Data
             //JsonSerializer serializer = new JsonSerializer();
             //if (test.Type == Newtonsoft.Json.Linq.JTokenType.Array)
             //    Data = test.ToObject<List<SongInfo>>();
-            _initialized = true;
+            Initialized = true;
             CurrentFile = new FileInfo(filePath);
         }
         /*

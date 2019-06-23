@@ -12,24 +12,24 @@ namespace SyncSaberLib.Web
     public static class WebUtils
     {
         private static bool _initialized = false;
-        private static object lockObject = new object();
+        private static readonly object lockObject = new object();
         private static HttpClientHandler _httpClientHandler;
-        public static HttpClientHandler httpClientHandler
+        public static HttpClientHandler HttpClientHandler
         {
             get
             {
                 if (_httpClientHandler == null)
                 {
                     _httpClientHandler = new HttpClientHandler();
-                    httpClientHandler.MaxConnectionsPerServer = 10;
-                    httpClientHandler.UseCookies = true;
-                    httpClientHandler.AllowAutoRedirect = true; // Needs to be false to detect Beat Saver song download rate limit
+                    HttpClientHandler.MaxConnectionsPerServer = 10;
+                    HttpClientHandler.UseCookies = true;
+                    HttpClientHandler.AllowAutoRedirect = true; // Needs to be false to detect Beat Saver song download rate limit
                 }
                 return _httpClientHandler;
             }
         }
         private static HttpClient _httpClient;
-        public static HttpClient httpClient
+        public static HttpClient HttpClient
         {
             get
             {
@@ -37,7 +37,7 @@ namespace SyncSaberLib.Web
                 {
                     if (_httpClient == null)
                     {
-                        _httpClient = new HttpClient(httpClientHandler);
+                        _httpClient = new HttpClient(HttpClientHandler);
                         lock (_httpClient)
                         {
                             _httpClient.Timeout = new TimeSpan(0, 0, 10);
@@ -62,7 +62,8 @@ namespace SyncSaberLib.Web
 
         public static RateLimit ParseRateLimit(Dictionary<string, string> headers)
         {
-            return new RateLimit() {
+            return new RateLimit()
+            {
                 CallsRemaining = int.Parse(headers[RATE_LIMIT_REMAINING_KEY]),
                 TimeToReset = UnixTimeStampToDateTime(double.Parse(headers[RATE_LIMIT_RESET_KEY])) - DateTime.Now,
                 CallsPerReset = int.Parse(headers[RATE_LIMIT_TOTAL_KEY])
@@ -74,13 +75,28 @@ namespace SyncSaberLib.Web
             if (_initialized == false)
             {
                 _initialized = true;
-                httpClientHandler.MaxConnectionsPerServer = maxConnectionsPerServer;
-                httpClientHandler.UseCookies = true;
-                _httpClient = new HttpClient(httpClientHandler);
+                HttpClientHandler.MaxConnectionsPerServer = maxConnectionsPerServer;
+                HttpClientHandler.UseCookies = true;
+                _httpClient = new HttpClient(HttpClientHandler);
             }
         }
 
-
+        /// <summary>
+        /// Retrieves a web page as an HttpResponseMessage.
+        /// </summary>
+        /// <param name="url"></param>
+        /// <exception cref="HttpRequestException"></exception>
+        /// <returns></returns>
+        public static HttpResponseMessage GetPage(string url)
+        {
+            Task<HttpResponseMessage> pageGetTask;
+            //lock (lockObject)
+            pageGetTask = HttpClient.GetAsync(url);
+            pageGetTask.Wait();
+            HttpResponseMessage response = pageGetTask.Result;
+            //Logger.Debug(pageText.Result);
+            return response;
+        }
 
         /// <summary>
         /// Downloads the page and returns it as a string.
@@ -88,16 +104,33 @@ namespace SyncSaberLib.Web
         /// <param name="url"></param>
         /// <exception cref="HttpRequestException"></exception>
         /// <returns></returns>
+        [Obsolete("Use GetPage instead.")]
         public static string GetPageText(string url)
         {
             // TODO: Change to use httpClient.GetAsync(url) so status codes can be handled and passed back
             Task<string> pageReadTask;
             //lock (lockObject)
-            pageReadTask = httpClient.GetStringAsync(url);
+            pageReadTask = HttpClient.GetStringAsync(url);
             pageReadTask.Wait();
             string pageText = pageReadTask.Result;
             //Logger.Debug(pageText.Result);
             return pageText;
+        }
+
+        /// <summary>
+        /// Retrieves a web page as an HttpResponseMessage as an asynchronous operation.
+        /// </summary>
+        /// <param name="url"></param>
+        /// <exception cref="HttpRequestException"></exception>
+        /// <returns></returns>
+        public static async Task<HttpResponseMessage> GetPageAsync(string url)
+        {
+            //lock (lockObject)
+
+            HttpResponseMessage response = await HttpClient.GetAsync(url);
+            //Logger.Debug(pageText.Result);
+            //Logger.Debug($"Got page text for {url}");
+            return response;
         }
 
         /// <summary>
@@ -106,11 +139,12 @@ namespace SyncSaberLib.Web
         /// <param name="url"></param>
         /// <exception cref="HttpRequestException"></exception>
         /// <returns></returns>
+        [Obsolete("Use GetPageAsync instead")]
         public static async Task<string> GetPageTextAsync(string url)
         {
             //lock (lockObject)
-
-            string pageText = await httpClient.GetStringAsync(url);
+            
+            string pageText = await HttpClient.GetStringAsync(url);
             //Logger.Debug(pageText.Result);
             //Logger.Debug($"Got page text for {url}");
             return pageText;
@@ -118,12 +152,12 @@ namespace SyncSaberLib.Web
 
         public static void AddCookies(CookieContainer newCookies, Uri uri)
         {
-            lock (httpClientHandler)
+            lock (HttpClientHandler)
             {
-                if (httpClientHandler.CookieContainer == null)
-                    httpClientHandler.CookieContainer = newCookies;
+                if (HttpClientHandler.CookieContainer == null)
+                    HttpClientHandler.CookieContainer = newCookies;
                 else
-                    httpClientHandler.CookieContainer.Add(newCookies.GetCookies(uri));
+                    HttpClientHandler.CookieContainer.Add(newCookies.GetCookies(uri));
             }
         }
 
@@ -135,18 +169,18 @@ namespace SyncSaberLib.Web
         public async static Task<bool> DownloadFileAsync(string downloadUrl, string path, bool overwrite = true)
         {
             var success = true;
-            var response = await WebUtils.httpClient.GetAsync(downloadUrl);
+            var response = await WebUtils.HttpClient.GetAsync(downloadUrl).ConfigureAwait(false);
 
             response.EnsureSuccessStatusCode();
 
-            
-            await response.Content.ReadAsFileAsync(path, overwrite);
+
+            await response.Content.ReadAsFileAsync(path, overwrite).ConfigureAwait(false);
             return success;
         }
 
         public async static Task<string> TryGetStringAsync(string url)
         {
-            HttpResponseMessage response = await httpClient.GetAsync(url);
+            HttpResponseMessage response = await HttpClient.GetAsync(url);
             if (response.IsSuccessStatusCode)
             {
                 return await response.Content.ReadAsStringAsync();
@@ -160,6 +194,48 @@ namespace SyncSaberLib.Web
         public int CallsRemaining;
         public TimeSpan TimeToReset;
         public int CallsPerReset;
+    }
+
+    public class HttpGetException : Exception
+    {
+        public HttpStatusCode HttpStatusCode { get; private set; }
+        public string Url { get; private set; }
+
+        public HttpGetException()
+            : base()
+        {
+            base.Data.Add("StatusCode", HttpStatusCode.BadRequest);
+            base.Data.Add("Url", string.Empty);
+        }
+
+        public HttpGetException(string message)
+            : base(message)
+        {
+
+            base.Data.Add("StatusCode", HttpStatusCode.BadRequest);
+            base.Data.Add("Url", string.Empty);
+        }
+
+        public HttpGetException(string message, Exception inner)
+            : base(message, inner)
+        {
+            base.Data.Add("StatusCode", HttpStatusCode.BadRequest);
+            base.Data.Add("Url", string.Empty);
+        }
+
+        public HttpGetException(HttpStatusCode code, string url)
+            : base()
+        {
+            base.Data.Add("StatusCode", code);
+            base.Data.Add("Url", url);
+        }
+
+        public HttpGetException(HttpStatusCode code, string url, string message)
+            : base(message)
+        {
+            base.Data.Add("StatusCode", code);
+            base.Data.Add("Url", url);
+        }
     }
 
     // From https://stackoverflow.com/questions/45711428/download-file-with-webclient-or-httpclient
@@ -178,7 +254,8 @@ namespace SyncSaberLib.Web
             {
                 fileStream = new FileStream(pathname, FileMode.Create, FileAccess.Write, FileShare.None);
                 return content.CopyToAsync(fileStream).ContinueWith(
-                    (copyTask) => {
+                    (copyTask) =>
+                    {
                         fileStream.Close();
                     });
             }

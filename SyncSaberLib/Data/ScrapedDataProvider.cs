@@ -13,8 +13,7 @@ namespace SyncSaberLib.Data
 {
     public static class ScrapedDataProvider
     {
-        private static bool _initialized = false;
-        private const string SCRAPED_DATA_URL = "https://raw.githubusercontent.com/andruzzzhka/BeatSaberScrappedData/master/combinedScrappedData.json";
+        public static bool Initialized { get; private set; }
         public static readonly string ASSEMBLY_PATH = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
         public static readonly DirectoryInfo DATA_DIRECTORY = new DirectoryInfo(Path.Combine(ASSEMBLY_PATH, "ScrapedData"));
 
@@ -52,7 +51,7 @@ namespace SyncSaberLib.Data
                     Songs.AddOrUpdate(diff.hash, newSong);
                 }
             }
-            _initialized = true;
+            Initialized = true;
         }
 
         public static List<SongInfo> ReadScrapedFile(string filePath)

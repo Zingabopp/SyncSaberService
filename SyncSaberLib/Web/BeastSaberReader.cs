@@ -229,10 +229,9 @@ namespace SyncSaberLib.Web
                         }
                         else
                         {
-
                             string songIndex = !string.IsNullOrEmpty(songKey) ? songKey : downloadUrl.Substring(downloadUrl.LastIndexOf('/') + 1);
-                            string mapper = !string.IsNullOrEmpty(authorName) ? authorName : GetMapperFromBsaber(node.InnerText);
-                            string songUrl = !string.IsNullOrEmpty(downloadUrl) ? downloadUrl : BeatSaverDownloadURL_Base + songIndex;
+                            //string mapper = !string.IsNullOrEmpty(authorName) ? authorName : GetMapperFromBsaber(node.InnerText);
+                            //string songUrl = !string.IsNullOrEmpty(downloadUrl) ? downloadUrl : BeatSaverDownloadURL_Base + songIndex;
 
                             if (ScrapedDataProvider.TryGetSongByKey(songIndex, out SongInfo currentSong))
                                 songsOnPage.Add(currentSong);

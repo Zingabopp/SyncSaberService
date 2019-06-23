@@ -75,7 +75,7 @@ namespace SyncSaberLib.Web
                 throw new InvalidCastException(INVALID_FEED_SETTINGS_MESSAGE);
             List<SongInfo> songs = new List<SongInfo>();
             int maxSongs = settings.MaxSongs > 0 ? settings.MaxSongs : settings.SongsPerPage * settings.SongsPerPage;
-            switch ((ScoreSaberFeeds) settings.FeedIndex)
+            switch ((ScoreSaberFeeds)settings.FeedIndex)
             {
                 case ScoreSaberFeeds.TRENDING:
 
@@ -141,9 +141,11 @@ namespace SyncSaberLib.Web
         public List<SongInfo> GetTopPPSongs(ScoreSaberFeedSettings settings)
         {
             // "https://scoresaber.com/api.php?function=get-leaderboards&cat={CATKEY}&limit={LIMITKEY}&page={PAGENUMKEY}&ranked={RANKEDKEY}"
-            int songsPerPage = 1000;
+            int songsPerPage = settings.SongsPerPage;
             int pageNum = 1;
-            bool useMaxPages = settings.MaxPages != 0;
+            int maxPages = (int)Math.Ceiling(settings.MaxSongs / ((float)songsPerPage));
+            if (settings.MaxPages > 0)
+                maxPages = maxPages < settings.MaxPages ? maxPages : settings.MaxPages; // Take the lower limit.
             List<SongInfo> songs = new List<SongInfo>();
 
             StringBuilder url = new StringBuilder(Feeds[settings.Feed].BaseUrl);
@@ -154,9 +156,16 @@ namespace SyncSaberLib.Web
             };
             GetPageUrl(ref url, urlReplacements);
 
-            string pageText = GetPageText(url.ToString());
+            string pageText = "";
+            var response = GetPage(url.ToString());
+            if (response.IsSuccessStatusCode)
+                pageText = response.Content.ReadAsStringAsync().Result;
+            else
+            {
+                Logger.Error($"Error getting text from {url.ToString()}, HTTP Status Code is: {response.StatusCode.ToString()}: {response.ReasonPhrase}");
+            }
 
-            JObject result = new JObject();
+            JObject result;
             try
             {
                 result = JObject.Parse(pageText);
@@ -171,7 +180,7 @@ namespace SyncSaberLib.Web
             do
             {
                 pageNum++;
-                if (pageNum > settings.MaxPages)
+                if (pageNum > maxPages)
                     break;
                 url.Clear();
                 url.Append(Feeds[settings.Feed].BaseUrl);
@@ -179,7 +188,7 @@ namespace SyncSaberLib.Web
                 GetPageUrl(ref url, urlReplacements);
                 Logger.Trace($"Adding pageReadTask {url.ToString()}");
                 pageReadTasks.Add(GetSongsFromPageAsync(url.ToString()));
-                if (useMaxPages && (pageNum >= settings.MaxPages))
+                if (pageNum >= maxPages)
                     continueLooping = false;
             } while (continueLooping);
 
@@ -194,8 +203,18 @@ namespace SyncSaberLib.Web
 
         public async Task<List<SongInfo>> GetSongsFromPageAsync(string url)
         {
-            string pageText = await GetPageTextAsync(url).ConfigureAwait(false);
-            List<SongInfo> songs = GetSongsFromPage(pageText);
+            var response = await GetPageAsync(url).ConfigureAwait(false);
+            List<SongInfo> songs;
+            if (response.IsSuccessStatusCode)
+            {
+                var pageText = await response.Content.ReadAsStringAsync();
+                songs = GetSongsFromPage(pageText);
+            }
+            else
+            {
+                Logger.Error($"Error getting page {url}, response was {response.StatusCode.ToString()}: {response.ReasonPhrase}");
+                songs = new List<SongInfo>();
+            }
             return songs;
         }
 
@@ -256,7 +275,7 @@ namespace SyncSaberLib.Web
 
         public Playlist[] PlaylistsForFeed(int feedIndex)
         {
-            switch ((ScoreSaberFeeds) feedIndex)
+            switch ((ScoreSaberFeeds)feedIndex)
             {
                 case ScoreSaberFeeds.TOP_RANKED:
                     return new Playlist[] { _topRanked };
@@ -360,7 +379,7 @@ namespace SyncSaberLib.Web
     {
         public int SongsPerPage = 100;
         public string FeedName { get { return ScoreSaberReader.Feeds[Feed].Name; } }
-        public ScoreSaberFeeds Feed { get { return (ScoreSaberFeeds) FeedIndex; } set { FeedIndex = (int) value; } }
+        public ScoreSaberFeeds Feed { get { return (ScoreSaberFeeds)FeedIndex; } set { FeedIndex = (int)value; } }
         public int FeedIndex { get; set; }
         public bool UseSongKeyAsOutputFolder { get; set; }
         public bool searchOnline { get; set; }

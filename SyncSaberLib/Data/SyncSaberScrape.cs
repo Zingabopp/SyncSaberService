@@ -16,9 +16,6 @@ namespace SyncSaberLib.Data
     {
         private static readonly string ASSEMBLY_PATH = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
 
-        [JsonIgnore]
-        private bool _initialized;
-
         public SyncSaberScrape()
         {
             Data = new List<SongInfo>();
@@ -36,7 +33,7 @@ namespace SyncSaberLib.Data
             //JsonSerializer serializer = new JsonSerializer();
             //if (test.Type == Newtonsoft.Json.Linq.JTokenType.Array)
             //    Data = test.ToObject<List<SongInfo>>();
-            _initialized = true;
+            Initialized = true;
             CurrentFile = new FileInfo(filePath);
         }
 

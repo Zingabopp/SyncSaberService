@@ -83,7 +83,7 @@ namespace SyncSaberLib.Data
                 return false;
             Task<string> pageReadTask;
             //lock (lockObject)
-            pageReadTask = WebUtils.httpClient.GetStringAsync(url);
+            pageReadTask = WebUtils.HttpClient.GetStringAsync(url);
             pageReadTask.Wait();
             string pageText = pageReadTask.Result;
             JObject result = new JObject();
@@ -145,7 +145,7 @@ namespace SyncSaberLib.Data
             string pageText = "";
             try
             {
-                pageText = await WebUtils.httpClient.GetStringAsync(url);
+                pageText = await WebUtils.HttpClient.GetStringAsync(url);
             }
             catch (TaskCanceledException)
             {

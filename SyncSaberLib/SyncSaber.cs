@@ -31,7 +31,7 @@ namespace SyncSaberLib
         public static string VersionCheck()
         {
             string retStr = "";
-            var getPage = WebUtils.httpClient.GetAsync("https://raw.githubusercontent.com/Zingabopp/SyncSaberService/master/Status");
+            var getPage = WebUtils.HttpClient.GetAsync("https://raw.githubusercontent.com/Zingabopp/SyncSaberService/master/Status");
             getPage.Wait();
 
             if (getPage.Result.StatusCode != HttpStatusCode.OK)

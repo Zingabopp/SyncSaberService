@@ -31,6 +31,8 @@ namespace SyncSaberConsole
 
             WebUtils.Initialize(5);
 
+            var song = ScrapedDataProvider.Songs.Values.Where(s => s.ScoreSaberInfo.Any(d => d.Value.uid == 155732)).FirstOrDefault();
+
             var found = ScrapedDataProvider.TryGetSongByKey("3f57", out SongInfo badSong, false);
             var CustomSongsPath = Path.Combine(Config.BeatSaberPath, @"Beat Saber_Data\CustomLevels"); 
             var tempFolder = new DirectoryInfo(Path.Combine(Path.GetTempPath(), badSong.key + ".zip"));
@@ -53,7 +55,7 @@ namespace SyncSaberConsole
             //var jobTask = job.RunJobAsync();
             //jobTask.Wait();
             bsScrape.AddOrUpdate(null);
-            var resp = WebUtils.httpClient.GetAsync("https://beatsaver.com/api/maps/detail/b");
+            var resp = WebUtils.HttpClient.GetAsync("https://beatsaver.com/api/maps/detail/b");
             Task.WaitAll(resp);
 
             var rateHeaders = resp.Result.Headers.Where(h => h.Key.StartsWith("Rate-Limit")).ToDictionary(x => x.Key, x => x.Value.FirstOrDefault());
@@ -93,7 +95,7 @@ namespace SyncSaberConsole
                 ScrapedDataProvider.Initialize();
                 Logger.Info($"Scrapes loaded, {ScrapedDataProvider.BeatSaverSongs.Data.Count} BeatSaverSongs and {ScrapedDataProvider.ScoreSaberSongs.Data.Count} ScoreSaber difficulties loaded");
                 //DoFullScrape();
-                //Tests();
+                Tests();
                 try
                 {
                     if (args.Length > 0)
@@ -225,8 +227,9 @@ namespace SyncSaberConsole
                         {
                             //ss.DownloadBeastSaberFeed(2, Web.BeastSaberReader.GetMaxBeastSaberPages(2));
                             ss.DownloadSongsFromFeed(ScoreSaberReader.NameKey, new ScoreSaberFeedSettings((int) ScoreSaberFeeds.TOP_RANKED) {
-                                MaxSongs = Config.MaxScoreSaberSongs,
-                                searchOnline = false
+                                MaxSongs = 1000,//Config.MaxScoreSaberSongs,
+                                SongsPerPage = 10,
+                                searchOnline = true
                             });
                         }
                         catch (AggregateException ae)
