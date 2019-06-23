@@ -341,18 +341,32 @@ namespace SyncSaberLib.Web
                 {
                     pageText = GetPageText(info.feedUrl);
                 }
+                catch (HttpGetException ex)
+                {
+                    if (ex.HttpStatusCode == HttpStatusCode.NotFound)
+                    {
+                        Logger.Error($"Page not found {ex.Url}");
+                    }
+                }
                 catch (HttpRequestException)
                 { }
                 var songsFound = new List<SongInfo>();
                 if (!string.IsNullOrEmpty(pageText))
                     songsFound = GetSongsFromPage(pageText);
+                if(songsFound.Count() > 0)
+                {
+                    Logger.Debug($"{songsFound.Count()} songs found, incrementing EarliestEmptyPage");
+                    lock (_earliestEmptyPage)
+                    {
+                        int newEarliest = info.pageIndex + _maxConcurrency + 1;
+                        if (_earliestEmptyPage[_settings.FeedIndex] < newEarliest)
+                            _earliestEmptyPage[_settings.FeedIndex] = newEarliest;
+                    }
+                }
                 if (songsFound.Count() == 0)
                 {
                     Logger.Debug($"No songs found on page {info.pageIndex}");
-                    lock (_earliestEmptyPage)
-                    {
-                        _earliestEmptyPage[_settings.FeedIndex] = info.pageIndex;
-                    }
+                    
                 }
                 else
                 {
@@ -369,18 +383,15 @@ namespace SyncSaberLib.Web
             });
             lock (_earliestEmptyPage)
             {
-                _earliestEmptyPage[_settings.FeedIndex] = 9999;
+                _earliestEmptyPage[_settings.FeedIndex] = _maxConcurrency + 1;
             }
-            int earliestEmptyPage = 9999;
+            int earliestEmptyPage = _maxConcurrency + 1;
             // Keep queueing pages to check until max pages is reached, or pageIndex is greater than earliestEmptyPage
             do
             {
                 pageIndex++; // Increment page index first because it starts with 1.
 
-                lock (_earliestEmptyPage)
-                {
-                    earliestEmptyPage = _earliestEmptyPage[_settings.FeedIndex];
-                }
+                
                 string feedUrl = GetPageUrl(Feeds[_settings.Feed].BaseUrl, pageIndex);
 
                 FeedPageInfo pageInfo = new FeedPageInfo
@@ -390,8 +401,13 @@ namespace SyncSaberLib.Web
                     pageIndex = pageIndex
                 };
                 actionBlock.SendAsync(pageInfo).Wait();
-                Logger.Debug($"Queued page {pageIndex} for reading. EarliestEmptyPage is {earliestEmptyPage}");
+                
                 //Logger.Debug($"FeedURL is {feedUrl}");
+                lock (_earliestEmptyPage)
+                {
+                    earliestEmptyPage = _earliestEmptyPage[_settings.FeedIndex];
+                }
+                Logger.Debug($"Queued page {pageIndex} for reading. EarliestEmptyPage is now {earliestEmptyPage}");
             }
             while ((pageIndex < _settings.MaxPages || _settings.MaxPages == 0) && pageIndex <= earliestEmptyPage);
 

@@ -304,6 +304,35 @@ namespace SyncSaberLib
             //foreach (Playlist playlist in playlists)
             //playlist.WritePlaylist();
         }
+        public enum LocalSongStatus
+        {
+            MISSING = 0,
+            EXISTS = 1,
+            IN_HISTORY = 2
+        }
+
+        public LocalSongStatus CheckLocalSong(SongInfo song, string songDirectory, bool checkSongHashFile = true)
+        {
+            bool songExists = false;
+            if (checkSongHashFile)
+            {
+                var existingSongs = SyncSaber.existingSongs.Data.Where((KeyValuePair<string, HashData> h) => h.Value.songHash.ToUpper() == song.hash);
+                //bool songExists = existingSongs.Data.Values.Where(h => h.songHash.ToUpper() == song.hash).Count() > 0;
+                songExists = existingSongs.Any(s => Directory.Exists(s.Key));
+            }
+            if (!songExists)
+            {
+                songExists = Directory.Exists(songDirectory);
+            }
+            if (songExists)
+                return LocalSongStatus.EXISTS;
+            //else
+            //Logger.Warning($"Skipping {song.songName}, it's in the HashMap");
+
+            if (_songDownloadHistory.Contains(song.key))
+                return LocalSongStatus.IN_HISTORY;
+            return LocalSongStatus.MISSING;
+        }
 
         /// <summary>
         /// Downloads the songs in the provided Dictionary. Returns a list of SongInfo for songs that met the criteria (even if they were skipped).
@@ -330,30 +359,49 @@ namespace SyncSaberLib
                     outputPath = Path.Combine(CustomSongsPath, $"{song.key} ({MakeSafeFilename(song.songName)} - {MakeSafeFilename(song.authorName)})");
                 else
                     outputPath = CustomSongsPath;
-                bool songExists = existingSongs.Data.Values.Where(h => h.songHash.ToUpper() == song.hash).Count() > 0;
-                if (!songExists)
-                {
-                    songExists = Directory.Exists(outputPath);
-                }
-                //else
-                //Logger.Warning($"Skipping {song.songName}, it's in the HashMap");
+                var localSongStatus = CheckLocalSong(song, outputPath);
+                //bool songExists = existingSongs.Data.Values.Where(h => h.songHash.ToUpper() == song.hash).Count() > 0;
+                //if (!songExists)
+                //{
+                //    songExists = Directory.Exists(outputPath);
+                //}
+                ////else
+                ////Logger.Warning($"Skipping {song.songName}, it's in the HashMap");
 
-                bool songInHistory = _songDownloadHistory.Contains(song.key);
-                if ((songExists && songInHistory) || !songInHistory)
+                //bool songInHistory = _songDownloadHistory.Contains(song.key);
+                switch (localSongStatus)
                 {
-                    matchedSongs.Add(song);
-                }
-                if (songExists || songInHistory)
-                {
-                    if (songExists)
+                    case LocalSongStatus.MISSING:
+                        matchedSongs.Add(song);
+                        DownloadJob job = new DownloadJob(song, tempPath, outputPath);
+                        jobs.AddJob(job);
+                        break;
+                    case LocalSongStatus.EXISTS:
+                        matchedSongs.Add(song);
                         skipped.exists.Add(song);
-                    else
+                        break;
+                    case LocalSongStatus.IN_HISTORY:
                         skipped.history.Add(song);
-                    //Logger.Debug($"Skipping song - SongExists: {songExists}, SongInHistory: {songInHistory}");
-                    continue; // We already have the song or don't want it, skip
+                        break;
+                    default:
+                        break;
                 }
-                DownloadJob job = new DownloadJob(song, tempPath, outputPath);
-                jobs.AddJob(job);
+
+                //if (localSongStatus != LocalSongStatus.IN_HISTORY)
+                //{
+                //    matchedSongs.Add(song);
+                //}
+
+                //if (songExists || songInHistory)
+                //{
+                //    if (songExists)
+                //        skipped.exists.Add(song);
+                //    else
+                //        skipped.history.Add(song);
+                //    //Logger.Debug($"Skipping song - SongExists: {songExists}, SongInHistory: {songInHistory}");
+                //    continue; // We already have the song or don't want it, skip
+                //}
+                
             }
             jobs.RunJobs().Wait();
             return matchedSongs;

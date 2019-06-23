@@ -157,12 +157,14 @@ namespace SyncSaberLib.Web
             GetPageUrl(ref url, urlReplacements);
 
             string pageText = "";
-            var response = GetPage(url.ToString());
-            if (response.IsSuccessStatusCode)
-                pageText = response.Content.ReadAsStringAsync().Result;
-            else
+            using (var response = GetPage(url.ToString()))
             {
-                Logger.Error($"Error getting text from {url.ToString()}, HTTP Status Code is: {response.StatusCode.ToString()}: {response.ReasonPhrase}");
+                if (response.IsSuccessStatusCode)
+                    pageText = response.Content.ReadAsStringAsync().Result;
+                else
+                {
+                    Logger.Error($"Error getting text from {url.ToString()}, HTTP Status Code is: {response.StatusCode.ToString()}: {response.ReasonPhrase}");
+                }
             }
 
             JObject result;
@@ -207,7 +209,7 @@ namespace SyncSaberLib.Web
             List<SongInfo> songs;
             if (response.IsSuccessStatusCode)
             {
-                var pageText = await response.Content.ReadAsStringAsync();
+                var pageText = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
                 songs = GetSongsFromPage(pageText);
             }
             else

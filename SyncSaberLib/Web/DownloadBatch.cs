@@ -12,7 +12,7 @@ namespace SyncSaberLib.Web
 {
     class DownloadBatch
     {
-        public async Task WorkDownloadQueue()
+        public async Task WorkDownloadQueueAsync()
         {
             BatchComplete = false;
             int maxConcurrentDownloads = Config.MaxConcurrentDownloads; // Set it here so it doesn't error
@@ -42,11 +42,11 @@ namespace SyncSaberLib.Web
             {
                 var job = _songDownloadQueue.Pop();
                 Logger.Trace($"Adding job for {job.Song.key}");
-                await actionBlock.SendAsync(job);
+                await actionBlock.SendAsync(job).ConfigureAwait(false);
             }
 
             actionBlock.Complete();
-            await actionBlock.Completion;
+            await actionBlock.Completion.ConfigureAwait(false);
             Logger.Trace($"Actionblock complete");
             BatchComplete = true;
         }
@@ -82,7 +82,7 @@ namespace SyncSaberLib.Web
 
         public async Task RunJobs()
         {
-            await WorkDownloadQueue();
+            await WorkDownloadQueueAsync().ConfigureAwait(false);
         }
 
         public void AddJob(DownloadJob job)

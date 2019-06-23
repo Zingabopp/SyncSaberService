@@ -77,7 +77,7 @@ namespace SyncSaberLib.Web
             //Task<bool> dwnl = DownloadFile("http://releases.ubuntu.com/18.04.2/ubuntu-18.04.2-desktop-amd64.iso", "test.iso");
             try
             {
-                successful = await dwnl;
+                successful = await dwnl.ConfigureAwait(false);
             }catch(AggregateException ae)
             {
                 ae.WriteExceptions($"Error downloading song {_song.key} {_song.songName} by {_song.authorName}.\n");
@@ -89,7 +89,7 @@ namespace SyncSaberLib.Web
                 Logger.Debug($"Downloaded {Song.key}-{Song.songName} by {Song.authorName} successfully");
                 try
                 {
-                    successful = await ExtractZipAsync(_localZip.FullName, _songDir.FullName, TempPath); ;
+                    successful = await ExtractZipAsync(_localZip.FullName, _songDir.FullName, TempPath).ConfigureAwait(false);
                 }
                 catch (AggregateException ae)
                 {
@@ -135,7 +135,7 @@ namespace SyncSaberLib.Web
             Task downloadAsync = WebUtils.DownloadFileAsync(url, path, true);
             try
             {
-                await downloadAsync;
+                await downloadAsync.ConfigureAwait(false);
             }
             catch (Exception) { }
             
@@ -217,7 +217,7 @@ namespace SyncSaberLib.Web
                             Logger.Warning($"Timeout waiting for {zipPath} to be released for extraction.");
                         using (ZipArchive zipFile = ZipFile.OpenRead(zipPath))
                             zipFile.ExtractToDirectory(tempDir.FullName, true);
-                    });
+                    }).ConfigureAwait(false);
                 }
                 catch (Exception ex)
                 {

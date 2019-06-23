@@ -145,7 +145,7 @@ namespace SyncSaberLib.Data
             string pageText = "";
             try
             {
-                pageText = await WebUtils.HttpClient.GetStringAsync(url);
+                pageText = await WebUtils.HttpClient.GetStringAsync(url).ConfigureAwait(false);
             }
             catch (TaskCanceledException)
             {
@@ -484,7 +484,7 @@ namespace SyncSaberLib.Data
                     populateTasks.Add(songs.ElementAt(i).PopulateFieldsAsync());
             }
 
-            await Task.WhenAll(populateTasks);
+            await Task.WhenAll(populateTasks).ConfigureAwait(false);
             Logger.Warning("Finished PopulateAsync?");
         }
     }

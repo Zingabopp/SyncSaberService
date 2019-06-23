@@ -108,11 +108,18 @@ namespace SyncSaberLib.Web
         public static string GetPageText(string url)
         {
             // TODO: Change to use httpClient.GetAsync(url) so status codes can be handled and passed back
-            Task<string> pageReadTask;
+            //Task<string> pageReadTask;
             //lock (lockObject)
-            pageReadTask = HttpClient.GetStringAsync(url);
-            pageReadTask.Wait();
-            string pageText = pageReadTask.Result;
+            string pageText = string.Empty;
+            using (HttpResponseMessage pageReadTask = GetPage(url))
+            {//HttpClient.GetStringAsync(url);
+                //pageReadTask.Wait();
+                if(!pageReadTask.IsSuccessStatusCode)
+                {
+                    throw new HttpGetException(pageReadTask.StatusCode, url, $"Exception getting page ({url}): {pageReadTask.ReasonPhrase}");
+                }
+                pageText = pageReadTask.Content.ReadAsStringAsync().Result;
+            }
             //Logger.Debug(pageText.Result);
             return pageText;
         }
@@ -127,7 +134,7 @@ namespace SyncSaberLib.Web
         {
             //lock (lockObject)
 
-            HttpResponseMessage response = await HttpClient.GetAsync(url);
+            HttpResponseMessage response = await HttpClient.GetAsync(url).ConfigureAwait(false);
             //Logger.Debug(pageText.Result);
             //Logger.Debug($"Got page text for {url}");
             return response;
@@ -144,7 +151,7 @@ namespace SyncSaberLib.Web
         {
             //lock (lockObject)
             
-            string pageText = await HttpClient.GetStringAsync(url);
+            string pageText = await HttpClient.GetStringAsync(url).ConfigureAwait(false);
             //Logger.Debug(pageText.Result);
             //Logger.Debug($"Got page text for {url}");
             return pageText;
@@ -180,10 +187,10 @@ namespace SyncSaberLib.Web
 
         public async static Task<string> TryGetStringAsync(string url)
         {
-            HttpResponseMessage response = await HttpClient.GetAsync(url);
+            HttpResponseMessage response = await HttpClient.GetAsync(url).ConfigureAwait(false);
             if (response.IsSuccessStatusCode)
             {
-                return await response.Content.ReadAsStringAsync();
+                return await response.Content.ReadAsStringAsync().ConfigureAwait(false);
             }
             return string.Empty;
         }
@@ -228,13 +235,17 @@ namespace SyncSaberLib.Web
         {
             base.Data.Add("StatusCode", code);
             base.Data.Add("Url", url);
+            HttpStatusCode = code;
+            Url = url;
         }
 
-        public HttpGetException(HttpStatusCode code, string url, string message)
+            public HttpGetException(HttpStatusCode code, string url, string message)
             : base(message)
         {
             base.Data.Add("StatusCode", code);
             base.Data.Add("Url", url);
+            HttpStatusCode = code;
+            Url = url;
         }
     }
 
