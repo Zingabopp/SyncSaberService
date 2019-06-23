@@ -46,7 +46,7 @@ namespace DataGUITests
             _context.Difficulties.Load();
             _context.Characteristics.Load();
             //currentQuery.Where(s => s.ScoreSaberDifficulties.Count() > 5).Skip(skip).Take(10).Load();
-            currentQuery.Where(s => s.BeatmapCharacteristics.Count > 0).Skip(skip).Take(10).Load();
+            currentQuery.Skip(skip).Take(10).Load();
             //_context.ScoreSaberDifficulties.Load();
             var characteristics = _context.Songs.
                 Where(s => s.BeatmapCharacteristics.Count > 0).
@@ -54,7 +54,8 @@ namespace DataGUITests
                     Select(c => c.Characteristic.CharacteristicName)).
                 Distinct().ToList();
             songViewSource.Source = _context.Songs.Local.ToObservableCollection();
-            songViewSource.View.Filter = SongMatches;
+            var grid = SongGrid;
+            //songViewSource.View.Filter = SongMatches;
             button.Content = _context.Songs.Local.Count.ToString();
             //SongGrid.ItemsSource = _context.Songs.Local.ToObservableCollection();
         }
@@ -72,7 +73,7 @@ namespace DataGUITests
         private void Button_Click(object sender, RoutedEventArgs e)
         {
             skip += 10;
-            currentQuery.Where(s => s.ScoreSaberDifficulties.Count() > 5).Skip(skip).Take(10).Load();
+            currentQuery.Skip(skip).Take(10).Load();
             button.Content = _context.Songs.Local.Count.ToString();
             songViewSource.View.Refresh();
 
