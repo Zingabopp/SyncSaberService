@@ -31,6 +31,10 @@ namespace SyncSaberConsole
 
             WebUtils.Initialize(5);
 
+            var bsReader = new BeatSaverReader();
+            //var bsSongs = bsReader.GetSongsFromFeed(new BeatSaverFeedSettings((int)BeatSaverFeeds.LATEST) { MaxPages = 10, searchOnline = true });
+            var authorSongs = BeatSaverReader.GetSongsByAuthor("ruckasdfus");
+
             var song = ScrapedDataProvider.Songs.Values.Where(s => s.ScoreSaberInfo.Any(d => d.Value.uid == 155732)).FirstOrDefault();
 
             var found = ScrapedDataProvider.TryGetSongByKey("3f57", out SongInfo badSong, false);

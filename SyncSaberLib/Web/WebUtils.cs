@@ -91,8 +91,18 @@ namespace SyncSaberLib.Web
         {
             Task<HttpResponseMessage> pageGetTask;
             //lock (lockObject)
-            pageGetTask = HttpClient.GetAsync(url);
-            pageGetTask.Wait();
+            bool goodUrl = Uri.TryCreate(url, UriKind.Absolute, out Uri result);
+            if (!goodUrl)
+                throw new ArgumentException($"Error in GetPage, invalid URL: {url}");
+            pageGetTask = HttpClient.GetAsync(result);
+            try
+            {
+                pageGetTask.Wait();
+            }
+            catch (InvalidOperationException ex)
+            {
+                Logger.Exception($"Error getting page {url}", ex);
+            }
             HttpResponseMessage response = pageGetTask.Result;
             //Logger.Debug(pageText.Result);
             return response;
@@ -102,10 +112,11 @@ namespace SyncSaberLib.Web
         /// Downloads the page and returns it as a string.
         /// </summary>
         /// <param name="url"></param>
+        /// <exception cref="HttpGetException">Thrown when Http response code is not a success.</exception>
         /// <exception cref="HttpRequestException"></exception>
         /// <returns></returns>
         [Obsolete("Use GetPage instead.")]
-        public static string GetPageText(string url)
+        public static string GetPageText(string url, bool exceptionOnHttpNotSuccessful = true)
         {
             // TODO: Change to use httpClient.GetAsync(url) so status codes can be handled and passed back
             //Task<string> pageReadTask;
@@ -114,11 +125,13 @@ namespace SyncSaberLib.Web
             using (HttpResponseMessage pageReadTask = GetPage(url))
             {//HttpClient.GetStringAsync(url);
                 //pageReadTask.Wait();
-                if(!pageReadTask.IsSuccessStatusCode)
+                if (!pageReadTask.IsSuccessStatusCode)
                 {
-                    throw new HttpGetException(pageReadTask.StatusCode, url, $"Exception getting page ({url}): {pageReadTask.ReasonPhrase}");
+                    if (exceptionOnHttpNotSuccessful)
+                        throw new HttpGetException(pageReadTask.StatusCode, url, $"Exception getting page ({url}): {pageReadTask.ReasonPhrase}");
                 }
-                pageText = pageReadTask.Content.ReadAsStringAsync().Result;
+                else
+                    pageText = pageReadTask.Content.ReadAsStringAsync().Result;
             }
             //Logger.Debug(pageText.Result);
             return pageText;
@@ -150,7 +163,7 @@ namespace SyncSaberLib.Web
         public static async Task<string> GetPageTextAsync(string url)
         {
             //lock (lockObject)
-            
+
             string pageText = await HttpClient.GetStringAsync(url).ConfigureAwait(false);
             //Logger.Debug(pageText.Result);
             //Logger.Debug($"Got page text for {url}");
@@ -239,8 +252,8 @@ namespace SyncSaberLib.Web
             Url = url;
         }
 
-            public HttpGetException(HttpStatusCode code, string url, string message)
-            : base(message)
+        public HttpGetException(HttpStatusCode code, string url, string message)
+        : base(message)
         {
             base.Data.Add("StatusCode", code);
             base.Data.Add("Url", url);

@@ -838,6 +838,21 @@ namespace SyncSaberLib
             }
         }
 
+        /// <summary>
+        /// Creates a new KeyData object with the provided keyName and keyValue;
+        /// </summary>
+        /// <param name="keyName"></param>
+        /// <param name="keyValue"></param>
+        /// <returns></returns>
+        public static KeyData CreateKeyData(string keyName, string keyValue)
+        {
+            var data = new KeyData(keyName)
+            {
+                Value = keyValue
+            };
+            return data;
+        }
+
         public static string AsString(int padding = 0)
         {
             string pad = "";

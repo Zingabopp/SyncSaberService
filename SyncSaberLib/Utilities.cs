@@ -27,19 +27,7 @@ namespace SyncSaberLib
             return retStr.ToString();
         }
 
-        /// <summary>
-        /// Creates a new KeyData object with the provided keyName and keyValue;
-        /// </summary>
-        /// <param name="keyName"></param>
-        /// <param name="keyValue"></param>
-        /// <returns></returns>
-        public static KeyData CreateKeyData(string keyName, string keyValue)
-        {
-            var data = new KeyData(keyName) {
-                Value = keyValue
-            };
-            return data;
-        }
+        
 
         /// <summary>
         /// Tries to parse a string as a bool, returns false if it fails.
@@ -112,15 +100,19 @@ namespace SyncSaberLib
                     }
                     catch (Exception)
                     {
-                        string oldFilePath = Path.Combine(Config.BeatSaberPath, "FilesToDelete");
-                        if (!Directory.Exists(oldFilePath))
+                        try
                         {
-                            Directory.CreateDirectory(oldFilePath);
+                            string oldFilePath = Path.Combine(target.FullName, "FilesToDelete");
+                            if (!Directory.Exists(oldFilePath))
+                            {
+                                Directory.CreateDirectory(oldFilePath);
+                            }
+                            File.Move(newPath, Path.Combine(oldFilePath, fileInfo.Name));
                         }
-                        File.Move(newPath, Path.Combine(oldFilePath, fileInfo.Name));
+                        catch (Exception) { } // TODO: This is dirty code
                     }
                 }
-                // TODO: Check for file lock
+                // Check for file lock
                 var time = Stopwatch.StartNew();
                 bool waitTimeout = false;
                 while (IsFileLocked(fileInfo.FullName) && !waitTimeout)

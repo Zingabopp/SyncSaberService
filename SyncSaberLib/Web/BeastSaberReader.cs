@@ -252,31 +252,39 @@ namespace SyncSaberLib.Web
                     Logger.Exception("Unable to parse JSON from text", ex);
                 }
 
-                result["songs"].Populate(bSongs);
-
-                foreach (var bSong in bSongs)
+                var songs = result["songs"];
+                foreach (var bSong in songs)
                 {
-                    if (string.IsNullOrEmpty(bSong.song_key) && string.IsNullOrEmpty(bSong.hash))
+                    // Try to get the song hash from BeastSaber
+                    string songHash = bSong["hash"]?.Value<string>();
+                    if (!string.IsNullOrEmpty(songHash))
                     {
-                        continue; // Not a song
-                    }
-                    totalSongsForPage++;
-                    if (!string.IsNullOrEmpty(bSong.song_key))
-                    {
-                        if (ScrapedDataProvider.TryGetSongByKey(bSong.song_key, out SongInfo currentSong))
+                        if (ScrapedDataProvider.TryGetSongByHash(songHash, out SongInfo currentSong))
                         {
                             songsOnPage.Add(currentSong);
                         }
                     }
-                    else if (!string.IsNullOrEmpty(bSong.hash))
+                    else
                     {
-                        if (ScrapedDataProvider.TryGetSongByHash(bSong.hash, out SongInfo currentSong))
+                        // Unable to get song hash, try getting song_key from BeastSaber
+                        string songKey = bSong["song_key"]?.Value<string>();
+                        if (!string.IsNullOrEmpty(songKey))
                         {
-                            songsOnPage.Add(currentSong);
+                            if (ScrapedDataProvider.TryGetSongByKey(songKey, out SongInfo currentSong))
+                            {
+                                songsOnPage.Add(currentSong);
+                            }
+                            else
+                            {
+                                Logger.Debug($"ScrapedDataProvider could not find song: {bSong.Value<string>()}");
+                            }
+                        }
+                        else
+                        {
+                            Logger.Debug($"Not a song, skipping: {bSong.ToString()}");
                         }
                     }
                 }
-
             }
             //Task.WaitAll(populateTasks.ToArray());
             Logger.Debug($"{songsOnPage.Count} songs on the page");
@@ -353,7 +361,7 @@ namespace SyncSaberLib.Web
                 var songsFound = new List<SongInfo>();
                 if (!string.IsNullOrEmpty(pageText))
                     songsFound = GetSongsFromPage(pageText);
-                if(songsFound.Count() > 0)
+                if (songsFound.Count() > 0)
                 {
                     Logger.Debug($"{songsFound.Count()} songs found, incrementing EarliestEmptyPage");
                     lock (_earliestEmptyPage)
@@ -366,7 +374,7 @@ namespace SyncSaberLib.Web
                 if (songsFound.Count() == 0)
                 {
                     Logger.Debug($"No songs found on page {info.pageIndex}");
-                    
+
                 }
                 else
                 {
@@ -391,7 +399,7 @@ namespace SyncSaberLib.Web
             {
                 pageIndex++; // Increment page index first because it starts with 1.
 
-                
+
                 string feedUrl = GetPageUrl(Feeds[_settings.Feed].BaseUrl, pageIndex);
 
                 FeedPageInfo pageInfo = new FeedPageInfo
@@ -401,7 +409,7 @@ namespace SyncSaberLib.Web
                     pageIndex = pageIndex
                 };
                 actionBlock.SendAsync(pageInfo).Wait();
-                
+
                 //Logger.Debug($"FeedURL is {feedUrl}");
                 lock (_earliestEmptyPage)
                 {
