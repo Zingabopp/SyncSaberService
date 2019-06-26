@@ -29,7 +29,7 @@
                 <DataGridTextColumn x:Name="SongKeyColumn" Header="Key" Binding="{Binding Key}"/>
                 <DataGridTextColumn x:Name="RankedColumn" Header="Ranked" Binding="{Binding ScoreSaberDifficulties, Converter={StaticResource SongRankedConverter}}"/>
                 <DataGridTextColumn x:Name="ScoreSaberDiffsColumn" Header="ScoreSaberDiffs" Binding="{Binding ScoreSaberDifficulties, Converter={StaticResource ScoreSaberCount}}"/>
-                <DataGridTextColumn x:Name="NameColumn" Header="Name" Binding="{Binding Difficulties[0]}"/>
+                <DataGridTextColumn x:Name="NameColumn" Header="Name" Binding="{Binding SongName}"/>
                 <DataGridTextColumn x:Name="DescriptionColumn" Header="Description" Visibility="Hidden" Binding="{Binding Description}"/>
                 <DataGridTextColumn x:Name="HashColumn" Header="Hash" Binding="{Binding Hash}"/>
                 <DataGridTextColumn x:Name="UploadedColumn" Header="Uploaded" Binding="{Binding Uploaded}"/>

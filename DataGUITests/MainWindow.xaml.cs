@@ -29,6 +29,7 @@ namespace DataGUITests
     {
         private SongDataContext _context;
         private int skip = 0;
+        private int take = 0;
         private IIncludableQueryable<Song, ICollection<ScoreSaberDifficulty>> currentQuery;
         private readonly CollectionViewSource songViewSource;
         public MainWindow()
@@ -46,7 +47,8 @@ namespace DataGUITests
             _context.Difficulties.Load();
             _context.Characteristics.Load();
             //currentQuery.Where(s => s.ScoreSaberDifficulties.Count() > 5).Skip(skip).Take(10).Load();
-            currentQuery.Where(s => s.BeatmapCharacteristics.Count > 0).Skip(skip).Take(10).Load();
+            take = 10;
+            currentQuery.Where(s => s.BeatmapCharacteristics.Count > 0).Skip(skip).Take(take).Load();
             //_context.ScoreSaberDifficulties.Load();
             var characteristics = _context.Songs.
                 Where(s => s.BeatmapCharacteristics.Count > 0).
@@ -71,8 +73,20 @@ namespace DataGUITests
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            skip += 10;
-            currentQuery.Where(s => s.ScoreSaberDifficulties.Count() > 5).Skip(skip).Take(10).Load();
+            //skip += 10;
+            take += 1000;
+            _context.Dispose();
+            _context = new SongDataContext();
+            songViewSource.Source = _context.Songs.Local.ToObservableCollection();
+            songViewSource.View.Filter = SongMatches;
+            currentQuery = _context.Songs.
+                Include(s => s.Difficulties).
+                Include(s => s.BeatmapCharacteristics).
+                Include(s => s.Uploader).
+                Include(s => s.ScoreSaberDifficulties);
+            _context.Difficulties.Load();
+            _context.Characteristics.Load();
+            currentQuery.Where(s => s.ScoreSaberDifficulties.Count() > 5).Skip(skip).Take(take).Load();
             button.Content = _context.Songs.Local.Count.ToString();
             songViewSource.View.Refresh();
 

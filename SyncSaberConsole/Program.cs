@@ -34,6 +34,10 @@ namespace SyncSaberConsole
 
             WebUtils.Initialize(5);
 
+            var fewSongs = ScrapedDataProvider.BeatSaverSongs.Data.Skip(1000).Take(20).ToList();
+            var json = JsonConvert.SerializeObject(fewSongs);
+            File.WriteAllText("BeatSaverSongsTest.json", json);
+
             var matchedSongs = ScrapedDataProvider.SongData.Songs
                 .Include(song => song.ScoreSaberDifficulties)
                 .Where(s => s.ScoreSaberDifficulties.Any(d => d.Ranked == true)).ToList();
