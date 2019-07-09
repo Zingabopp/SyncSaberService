@@ -1,0 +1,105 @@
+
+{
+
+    "metadata": {
+        "difficulties": {
+            "easy": true,
+            "expert": true,
+            "expertPlus": true,
+            "hard": true,
+            "normal": true
+        },
+        "characteristics": [
+            {
+                "name": "Standard",
+                "difficulties": {
+                    "easy": {
+                        "duration": 511,
+                        "length": 180,
+                        "bombs": 0,
+                        "notes": 198,
+                        "obstacles": 23,
+                        "njs": 11
+                    },
+                    "normal": {
+                        "duration": 511,
+                        "length": 180,
+                        "bombs": 0,
+                        "notes": 280,
+                        "obstacles": 25,
+                        "njs": 11
+                    },
+                    "hard": {
+                        "duration": 511,
+                        "length": 180,
+                        "bombs": 0,
+                        "notes": 382,
+                        "obstacles": 20,
+                        "njs": 12
+                    },
+                    "expert": {
+                        "duration": 511,
+                        "length": 180,
+                        "bombs": 0,
+                        "notes": 533,
+                        "obstacles": 20,
+                        "njs": 14
+                    },
+                    "expertPlus": {
+                        "duration": 511,
+                        "length": 180,
+                        "bombs": 2,
+                        "notes": 704,
+                        "obstacles": 25,
+                        "njs": 15
+                    }
+                }
+            },
+            {
+                "name": "OneSaber",
+                "difficulties": {
+                    "easy": null,
+                    "normal": null,
+                    "hard": null,
+                    "expert": {
+                        "duration": 511,
+                        "length": 180,
+                        "bombs": 0,
+                        "notes": 450,
+                        "obstacles": 44,
+                        "njs": 14
+                    },
+                    "expertPlus": null
+                }
+            }
+        ],
+        "levelAuthorName": "Skyler Wallace",
+        "songAuthorName": "Urban Cone",
+        "songName": "Come Back To Me",
+        "songSubName": "ft. Tove Lo",
+        "bpm": 170
+    },
+    "stats": {
+        "downloads": 3379,
+        "plays": 0,
+        "downVotes": 1,
+        "upVotes": 57,
+        "heat": 790.2998286,
+        "rating": 0.8412931449578613
+    },
+    "description": "170 BPM / 3:06 Runtime\nEasy - 198 Notes\nNormal - 280 Notes\nHard - 382 Notes\nExpert - 533 Notes\nExpert (Single Saber) / 450 Notes\nExpert+ / 704 Notes",
+    "deletedAt": null,
+    "_id": "5d0522979e94c50006de797b",
+    "key": "5317",
+    "name": "Come Back To Me (ft. Tove Lo) - Urban Cone (All Difficulties & Single Saber)",
+    "uploader": {
+        "_id": "5cff0b7298cc5a672c84ea67",
+        "username": "skylerwallace"
+    },
+    "hash": "aaa14fb7dcaeda7a688db77617045a247baa151d",
+    "uploaded": "2019-06-15T16:53:43.826Z",
+    "converted": true,
+    "downloadURL": "/api/download/key/5317",
+    "coverURL": "/cdn/5317/aaa14fb7dcaeda7a688db77617045a247baa151d.jpg"
+
+}

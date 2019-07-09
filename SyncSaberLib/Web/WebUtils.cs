@@ -40,7 +40,7 @@ namespace SyncSaberLib.Web
                         _httpClient = new HttpClient(HttpClientHandler);
                         lock (_httpClient)
                         {
-                            _httpClient.Timeout = new TimeSpan(0, 0, 10);
+                            _httpClient.Timeout = new TimeSpan(0, 0, 30);
                         }
                     }
                 }

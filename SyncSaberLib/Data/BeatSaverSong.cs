@@ -393,6 +393,10 @@ namespace SyncSaberLib.Data
         /// </summary>
         [JsonProperty("hash")]
         public string hash { get { return _hash; } set { _hash = value.ToUpper(); } }
+
+        [JsonProperty("converted")]
+        public bool converted { get; set; }
+
         [JsonProperty("downloadURL")]
         public string downloadURL { get; set; }
         [JsonProperty("coverURL")]
@@ -418,7 +422,7 @@ namespace SyncSaberLib.Data
         public Dictionary<string, bool> difficulties;
 
         [JsonProperty("characteristics")]
-        public List<string> characteristics;
+        public List<BeatmapCharacteristic> characteristics;
 
         [JsonProperty("songName")]
         public string songName;
@@ -434,6 +438,31 @@ namespace SyncSaberLib.Data
 
         [JsonProperty("bpm")]
         public float bpm;
+    }
+
+    public class BeatmapCharacteristic
+    {
+        [JsonProperty("name")]
+        public string name { get; set; }
+        [JsonProperty("difficulties")]
+        public Dictionary<string, DifficultyCharacteristics> difficulties { get; set; }
+    }
+
+    [Serializable]
+    public class DifficultyCharacteristics
+    {
+        [JsonProperty("duration")]
+        public double duration { get; set; }
+        [JsonProperty("length")]
+        public int length { get; set; }
+        [JsonProperty("bombs")]
+        public int bombs { get; set; }
+        [JsonProperty("notes")]
+        public int notes { get; set; }
+        [JsonProperty("obstacles")]
+        public int obstacles { get; set; }
+        [JsonProperty("njs")]
+        public float njs { get; set; }
     }
 
     public class SongStats

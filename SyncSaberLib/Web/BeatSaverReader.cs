@@ -36,6 +36,7 @@ namespace SyncSaberLib.Web
         private const string INVALIDFEEDSETTINGSMESSAGE = "The IFeedSettings passed is not a BeatSaverFeedSettings.";
         private const string BEATSAVER_DETAILS_BASE_URL = "https://beatsaver.com/api/maps/detail/";
         private const string BEATSAVER_GETBYHASH_BASE_URL = "https://beatsaver.com/api/maps/by-hash/";
+        private const string BEATSAVER_NIGHTLYDUMP_URL = "https://beatsaver.com/api/download/dumps/maps";
 
         private static ConcurrentDictionary<string, string> _authors = new ConcurrentDictionary<string, string>();
         // { (BeatSaverFeeds)99, new FeedInfo("search-by-author", "https://beatsaver.com/api/songs/search/user/" + AUTHORKEY) }
@@ -97,9 +98,33 @@ namespace SyncSaberLib.Web
             int feedIndex = (int)BeatSaverFeeds.LATEST;
             bool useMaxPages = maxPages != 0;
             int latestVersion = 0;
+            DateTime lastScraped = DateTime.MinValue;
             if (ScrapedDataProvider.Songs.Values.Count > 0)
+            {
                 latestVersion = ScrapedDataProvider.Songs.Values.Max(s => s.BeatSaverInfo?.KeyAsInt ?? 0);
+
+            }
+
             List<BeatSaverSong> songs = new List<BeatSaverSong>();
+            //if (lastScraped < DateTime.Now - new TimeSpan(7,0,0,0))
+            //{
+            //    Logger.Info("Local BeatSaver scrape is outdated or doesn't exist, replacing with full scrape.");
+            //    using(var response = WebUtils.GetPage(BEATSAVER_NIGHTLYDUMP_URL))
+            //    {
+            //        if(response.IsSuccessStatusCode)
+            //        {
+            //            var serializer = new JsonSerializer();
+            //            using(var sr = new StreamReader(response.Content.ReadAsStreamAsync().Result))
+            //            {
+            //                using (var jsonTextReader = new JsonTextReader(sr))
+            //                {
+            //                    return serializer.Deserialize<List<BeatSaverSong>>(jsonTextReader);
+            //                }
+            //            }
+            //        }
+            //    }
+            //}
+            
             string pageText = GetPageText(GetPageUrl(feedIndex));
             JObject result = new JObject();
             try { result = JObject.Parse(pageText); }

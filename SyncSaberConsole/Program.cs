@@ -19,8 +19,8 @@ namespace SyncSaberConsole
     {
         private static void DoFullScrape()
         {
-            BeatSaverReader.ScrapeBeatSaver(400, false);
-            ScrapedDataProvider.BeatSaverSongs.WriteFile();
+            //BeatSaverReader.ScrapeBeatSaver(400, false);
+            //ScrapedDataProvider.BeatSaverSongs.WriteFile();
             ScoreSaberReader.ScrapeScoreSaber(5000, 13000, false);
             ScrapedDataProvider.ScoreSaberSongs.WriteFile();
         }
