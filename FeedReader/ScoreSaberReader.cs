@@ -37,6 +37,7 @@ namespace FeedReader
         public string Name { get { return NameKey; } }
         public string Source { get { return SourceKey; } }
         public bool Ready { get; private set; }
+        public bool StoreRawData { get; set; }
 
         private static Dictionary<ScoreSaberFeeds, FeedInfo> _feeds;
         public static Dictionary<ScoreSaberFeeds, FeedInfo> Feeds
@@ -57,7 +58,7 @@ namespace FeedReader
             }
         }
 
-        public Dictionary<string, string> GetSongsFromFeed(IFeedSettings _settings)
+        public Dictionary<string, ScrapedSong> GetSongsFromFeed(IFeedSettings _settings)
         {
             return GetSongsFromFeedAsync(_settings).Result;
         }
@@ -70,7 +71,7 @@ namespace FeedReader
             }
         }
 
-        public async Task<Dictionary<string, string>> GetSongsFromScoreSaber(ScoreSaberFeedSettings settings)
+        public async Task<Dictionary<string, ScrapedSong>> GetSongsFromScoreSaberAsync(ScoreSaberFeedSettings settings)
         {
             // "https://scoresaber.com/api.php?function=get-leaderboards&cat={CATKEY}&limit={LIMITKEY}&page={PAGENUMKEY}&ranked={RANKEDKEY}"
             int songsPerPage = settings.SongsPerPage;
@@ -79,7 +80,7 @@ namespace FeedReader
             int maxPages = settings.MaxPages;
             if (settings.MaxPages > 0)
                 maxPages = maxPages < settings.MaxPages ? maxPages : settings.MaxPages; // Take the lower limit.
-            Dictionary<string, string> songs = new Dictionary<string, string>();
+            Dictionary<string, ScrapedSong> songs = new Dictionary<string, ScrapedSong>();
             StringBuilder url = new StringBuilder(Feeds[settings.Feed].BaseUrl);
             Dictionary<string, string> urlReplacements = new Dictionary<string, string>() {
                 {LIMITKEY, songsPerPage.ToString() },
@@ -111,9 +112,8 @@ namespace FeedReader
             foreach (var song in GetSongsFromPageText(pageText))
             {
                 if (!songs.ContainsKey(song.Hash) && songs.Count < settings.MaxSongs)
-                    songs.Add(song.Hash, "");
+                    songs.Add(song.Hash, song);
             }
-            List<Task<List<SongDownload>>> pageReadTasks = new List<Task<List<SongDownload>>>();
             bool continueLooping = true;
             do
             {
@@ -133,7 +133,7 @@ namespace FeedReader
                 {
                     diffCount++;
                     if (!songs.ContainsKey(song.Hash) && songs.Count < settings.MaxSongs)
-                        songs.Add(song.Hash, "");
+                        songs.Add(song.Hash, song);
                 }
                 if (diffCount == 0)
                     continueLooping = false;
@@ -147,10 +147,10 @@ namespace FeedReader
         }
 
 
-        public async Task<List<SongDownload>> GetSongsFromPageAsync(string url)
+        public async Task<List<ScrapedSong>> GetSongsFromPageAsync(string url)
         {
             var response = await GetPageAsync(url).ConfigureAwait(false);
-            List<SongDownload> songs;
+            List<ScrapedSong> songs;
             if (response.IsSuccessStatusCode)
             {
                 var pageText = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
@@ -159,12 +159,12 @@ namespace FeedReader
             else
             {
                 //Logger.Error($"Error getting page {url}, response was {response.StatusCode.ToString()}: {response.ReasonPhrase}");
-                songs = new List<SongDownload>();
+                songs = new List<ScrapedSong>();
             }
             return songs;
         }
 
-        public static List<SongDownload> GetSongsFromPageText(string pageText)
+        public List<ScrapedSong> GetSongsFromPageText(string pageText)
         {
             JObject result = new JObject();
             try
@@ -176,7 +176,7 @@ namespace FeedReader
             {
                 //Logger.Exception("Unable to parse JSON from text", ex);
             }
-            List<SongDownload> songs = new List<SongDownload>();
+            List<ScrapedSong> songs = new List<ScrapedSong>();
 
             var songJSONAry = result["songs"]?.ToArray();
             if (songJSONAry == null)
@@ -188,7 +188,7 @@ namespace FeedReader
                 var hash = song["id"]?.Value<string>();
 
                 if (!string.IsNullOrEmpty(hash))
-                    songs.Add(new SongDownload(hash));
+                    songs.Add(new ScrapedSong(hash) { RawData = StoreRawData ? song.ToString(Newtonsoft.Json.Formatting.None) : string.Empty });
             }
             return songs;
         }
@@ -198,41 +198,31 @@ namespace FeedReader
 
         }
 
-        public async Task<Dictionary<string, string>> GetSongsFromFeedAsync(IFeedSettings _settings)
+        public async Task<Dictionary<string, ScrapedSong>> GetSongsFromFeedAsync(IFeedSettings _settings)
         {
             PrepareReader();
             if (!(_settings is ScoreSaberFeedSettings settings))
                 throw new InvalidCastException(INVALID_FEED_SETTINGS_MESSAGE);
-            List<SongDownload> songs = new List<SongDownload>();
-            Dictionary<string, string> retDict = new Dictionary<string, string>();
+            Dictionary<string, ScrapedSong> retDict = new Dictionary<string, ScrapedSong>();
             int maxSongs = settings.MaxSongs > 0 ? settings.MaxSongs : settings.SongsPerPage * settings.SongsPerPage;
             switch (settings.Feed)
             {
                 case ScoreSaberFeeds.TRENDING:
-                    retDict = await GetSongsFromScoreSaber(settings);
+                    retDict = await GetSongsFromScoreSaberAsync(settings);
                     break;
                 case ScoreSaberFeeds.LATEST_RANKED:
                     settings.RankedOnly = true;
-                    retDict = await GetSongsFromScoreSaber(settings);
+                    retDict = await GetSongsFromScoreSaberAsync(settings);
                     break;
                 case ScoreSaberFeeds.TOP_PLAYED:
-                    retDict = await GetSongsFromScoreSaber(settings);
+                    retDict = await GetSongsFromScoreSaberAsync(settings);
                     break;
                 case ScoreSaberFeeds.TOP_RANKED:
                     settings.RankedOnly = true;
-                    retDict = await GetSongsFromScoreSaber(settings);
+                    retDict = await GetSongsFromScoreSaberAsync(settings);
                     break;
                 default:
                     break;
-            }
-
-
-            foreach (var song in songs)
-            {
-                if (!retDict.ContainsKey(song.Hash))
-                {
-                    retDict.Add(song.Hash, song.DownloadUrl);
-                }
             }
             return retDict;
         }

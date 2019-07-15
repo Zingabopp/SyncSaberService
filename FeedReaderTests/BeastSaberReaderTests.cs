@@ -3,6 +3,7 @@ using System.Collections;
 using System.Linq;
 using System.IO;
 using FeedReader;
+using Newtonsoft.Json.Linq;
 
 namespace FeedReaderTests
 {
@@ -12,14 +13,29 @@ namespace FeedReaderTests
         [TestMethod]
         public void GetSongsFromPage_XML_Test()
         {
-            var reader = new BeastSaberReader("Zingabopp", 3);
+            var reader = new BeastSaberReader("Zingabopp", 3) { StoreRawData = true };
             var text = File.ReadAllText("Data\\BeastSaberXMLPage.xml");
             var songList = reader.GetSongsFromPageText(text, BeastSaberReader.ContentType.XML);
             Assert.IsTrue(songList.Count == 50);
             var firstHash = "74575254ae759f3f836eb521b4b80093ca52cd3d".ToUpper();
+            var firstKey = "56ff";
+            var firstLevelAuthor = "Rustic";
+            var firstTitle = "Xilent – Code Blood";
+            var firstDownloadUrl = "https://beatsaver.com/api/download/key/56ff";
             var firstUrl = "https://beatsaver.com/api/download/key/56ff";
-            Assert.IsTrue(songList.First().Hash == firstHash);
-            Assert.IsTrue(songList.First().DownloadUrl == firstUrl);
+            var firstSong = songList.First();
+            Assert.IsTrue(firstSong.Hash == firstHash);
+            Assert.IsTrue(firstSong.DownloadUrl == firstUrl);
+            // Raw Data test
+            JToken firstRawData = JToken.Parse(firstSong.RawData);
+            Assert.IsTrue(firstRawData["Hash"]?.Value<string>().ToUpper() == firstHash);
+            Assert.IsTrue(firstRawData["SongKey"]?.Value<string>() == firstKey);
+            Assert.IsTrue(firstRawData["LevelAuthorName"]?.Value<string>() == firstLevelAuthor);
+            Assert.IsTrue(firstRawData["SongTitle"]?.Value<string>() == firstTitle);
+            Assert.IsTrue(firstRawData["DownloadURL"]?.Value<string>() == firstDownloadUrl);
+
+
+
             var lastHash = "e3487474b70d969927e459a1590e93b7ad25a436".ToUpper();
             var lastUrl = "https://beatsaver.com/api/download/key/5585";
             Assert.IsTrue(songList.Last().Hash == lastHash);
@@ -80,7 +96,7 @@ namespace FeedReaderTests
             var songList = reader.GetSongsFromFeed(settings);
             Assert.IsTrue(songList.Count == maxSongs);
             Assert.IsFalse(songList.Any(s => string.IsNullOrEmpty(s.Key)));
-            Assert.IsFalse(songList.Any(s => string.IsNullOrEmpty(s.Value)));
+            Assert.IsFalse(songList.Any(s => string.IsNullOrEmpty(s.Value.DownloadUrl)));
         }
 
 
@@ -99,9 +115,9 @@ namespace FeedReaderTests
         [TestMethod]
         public void GetSongsFromFeedAsync_Followings_Test()
         {
-            var reader = new BeastSaberReader("Zingabopp", 3);
+            var reader = new BeastSaberReader("Zingabopp", 3) { StoreRawData = true };
             int maxSongs = 60;
-            var settings = new BeastSaberFeedSettings((int)BeastSaberFeeds.FOLLOWING) { MaxSongs = maxSongs, searchOnline = true };
+            var settings = new BeastSaberFeedSettings((int)BeastSaberFeeds.FOLLOWING) { MaxSongs = maxSongs };
             var songList = reader.GetSongsFromFeedAsync(settings).Result;
             Assert.IsTrue(songList.Count == maxSongs);
             //Assert.IsFalse(songList.Count > maxSongs);
@@ -111,13 +127,16 @@ namespace FeedReaderTests
         [TestMethod]
         public void GetSongsFromFeedAsync_CuratorRecommended_Test()
         {
-            var reader = new BeastSaberReader("Zingabopp", 3);
+            var reader = new BeastSaberReader("Zingabopp", 3) { StoreRawData = true };
             int maxSongs = 60;
             var settings = new BeastSaberFeedSettings((int)BeastSaberFeeds.CURATOR_RECOMMENDED) { MaxSongs = maxSongs, searchOnline = true };
             var songList = reader.GetSongsFromFeedAsync(settings).Result;
             Assert.IsTrue(songList.Count == maxSongs);
             Assert.IsFalse(songList.Any(s => string.IsNullOrEmpty(s.Key)));
-            Assert.IsFalse(songList.Any(s => string.IsNullOrEmpty(s.Value)));
+            Assert.IsFalse(songList.Any(s => string.IsNullOrEmpty(s.Value.DownloadUrl)));
+            var firstSong = songList.First().Value;
+            var firstRawData = JToken.Parse(firstSong.RawData);
+            Assert.IsTrue(firstRawData["hash"]?.Value<string>().ToUpper() == firstSong.Hash);
         }
 
     }

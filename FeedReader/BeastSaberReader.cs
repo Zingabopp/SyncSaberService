@@ -29,12 +29,18 @@ namespace FeedReader
         private const string BeatSaverDownloadURL_Base = "https://beatsaver.com/api/download/key/";
         private static readonly Uri FeedRootUri = new Uri("https://bsaber.com");
         public const int SONGS_PER_XML_PAGE = 50;
-        public const int SONGS_PER_JSON_PAGE = 20;
+        public const int SONGS_PER_JSON_PAGE = 50;
+        private const string XML_TITLE_KEY = "SongTitle";
+        private const string XML_DOWNLOADURL_KEY = "DownloadURL";
+        private const string XML_HASH_KEY = "Hash";
+        private const string XML_AUTHOR_KEY = "LevelAuthorName";
+        private const string XML_SONGKEY_KEY = "SongKey";
         #endregion
 
         public string Name { get { return NameKey; } }
         public string Source { get { return SourceKey; } }
         public bool Ready { get; private set; }
+        public bool StoreRawData { get; set; }
 
         private string _username, _password, _loginUri;
         private int _maxConcurrency;
@@ -55,8 +61,8 @@ namespace FeedReader
                     _feeds = new Dictionary<BeastSaberFeeds, FeedInfo>()
                     {
                         { (BeastSaberFeeds)0, new FeedInfo("followings", "https://bsaber.com/members/" + USERNAMEKEY + "/wall/followings/feed/?acpage=" + PAGENUMKEY) },
-                        { (BeastSaberFeeds)1, new FeedInfo("bookmarks", "https://bsaber.com/wp-json/bsaber-api/songs/?bookmarked_by=" + USERNAMEKEY + "&page=" + PAGENUMKEY )},
-                        { (BeastSaberFeeds)2, new FeedInfo("curator recommended", "https://bsaber.com/wp-json/bsaber-api/songs/?bookmarked_by=curatorrecommended&page=" + PAGENUMKEY) }
+                        { (BeastSaberFeeds)1, new FeedInfo("bookmarks", "https://bsaber.com/wp-json/bsaber-api/songs/?bookmarked_by=" + USERNAMEKEY + "&page=" + PAGENUMKEY + "&count=" + SONGS_PER_JSON_PAGE)},
+                        { (BeastSaberFeeds)2, new FeedInfo("curator recommended", "https://bsaber.com/wp-json/bsaber-api/songs/?bookmarked_by=curatorrecommended&page=" + PAGENUMKEY + "&count=" + SONGS_PER_JSON_PAGE) }
                     };
                 }
                 return _feeds;
@@ -107,15 +113,15 @@ namespace FeedReader
         /// <param name="pageText"></param>
         /// <exception cref="XmlException">Invalid XML in pageText</exception>
         /// <returns></returns>
-        public List<SongDownload> GetSongsFromPageText(string pageText, ContentType contentType)
+        public List<ScrapedSong> GetSongsFromPageText(string pageText, ContentType contentType)
         {
-            List<SongDownload> songsOnPage = new List<SongDownload>();
+            List<ScrapedSong> songsOnPage = new List<ScrapedSong>();
             //if (pageText.ToLower().StartsWith(@"<?xml"))
             if (contentType == ContentType.XML)
             {
                 songsOnPage = ParseXMLPage(pageText);
             }
-            else if(contentType == ContentType.JSON) // Page is JSON
+            else if (contentType == ContentType.JSON) // Page is JSON
             {
                 songsOnPage = ParseJsonPage(pageText);
             }
@@ -123,10 +129,10 @@ namespace FeedReader
             return songsOnPage;
         }
 
-        public List<SongDownload> ParseXMLPage(string pageText)
+        public List<ScrapedSong> ParseXMLPage(string pageText)
         {
             bool retry = false;
-            var songsOnPage = new List<SongDownload>();
+            var songsOnPage = new List<ScrapedSong>();
             XmlDocument xmlDocument = new XmlDocument();
             do
             {
@@ -163,11 +169,11 @@ namespace FeedReader
                 else
                 {
                     // TODO: Not really using any of this except the hash.
-                    string songName = node["SongTitle"].InnerText;
-                    string downloadUrl = node["DownloadURL"]?.InnerText;
-                    string hash = node["Hash"]?.InnerText?.ToUpper();
-                    string authorName = node["LevelAuthorName"]?.InnerText;
-                    string songKey = node["SongKey"]?.InnerText;
+                    string songName = node[XML_TITLE_KEY].InnerText;
+                    string downloadUrl = node[XML_DOWNLOADURL_KEY]?.InnerText;
+                    string hash = node[XML_HASH_KEY]?.InnerText?.ToUpper();
+                    string authorName = node[XML_AUTHOR_KEY]?.InnerText;
+                    string songKey = node[XML_SONGKEY_KEY]?.InnerText;
                     if (downloadUrl.Contains("dl.php"))
                     {
                         //Logger.Warning("Skipping BeastSaber download with old url format!");
@@ -178,17 +184,34 @@ namespace FeedReader
                         //string mapper = !string.IsNullOrEmpty(authorName) ? authorName : GetMapperFromBsaber(node.InnerText);
                         //string songUrl = !string.IsNullOrEmpty(downloadUrl) ? downloadUrl : BeatSaverDownloadURL_Base + songIndex;
                         if (!string.IsNullOrEmpty(hash))
-                            songsOnPage.Add(new SongDownload(hash, downloadUrl));
+                        {
+                            JObject jObject = null;
+                            if (StoreRawData)
+                            {
+                                jObject = new JObject();
+                                jObject.Add(XML_TITLE_KEY, songName);
+                                jObject.Add(XML_DOWNLOADURL_KEY, downloadUrl);
+                                jObject.Add(XML_HASH_KEY, hash);
+                                jObject.Add(XML_AUTHOR_KEY, authorName);
+                                jObject.Add(XML_SONGKEY_KEY, songKey);
+                            }
+
+                            songsOnPage.Add(new ScrapedSong(hash)
+                            {
+                                DownloadUrl = downloadUrl,
+                                RawData = jObject != null ? jObject.ToString(Newtonsoft.Json.Formatting.None) : string.Empty
+                            });
+                        }
                     }
                 }
             }
             return songsOnPage;
         }
 
-        public List<SongDownload> ParseJsonPage(string pageText)
+        public List<ScrapedSong> ParseJsonPage(string pageText)
         {
             JObject result = new JObject();
-            var songsOnPage = new List<SongDownload>();
+            var songsOnPage = new List<ScrapedSong>();
             try
             {
                 result = JObject.Parse(pageText);
@@ -212,7 +235,11 @@ namespace FeedReader
                 }
                 if (!string.IsNullOrEmpty(songHash))
                 {
-                    songsOnPage.Add(new SongDownload(songHash, downloadUrl));
+                    songsOnPage.Add(new ScrapedSong(songHash)
+                    {
+                        DownloadUrl = downloadUrl,
+                        RawData = StoreRawData ? bSong.ToString(Newtonsoft.Json.Formatting.None) : string.Empty
+                    });
                 }
                 //else
                 //{
@@ -254,9 +281,9 @@ namespace FeedReader
 
         private const string INVALIDFEEDSETTINGSMESSAGE = "The IFeedSettings passed is not a BeastSaberFeedSettings.";
 
-        public async Task<Dictionary<string, string>> GetSongsFromFeedAsync(IFeedSettings settings)
+        public async Task<Dictionary<string, ScrapedSong>> GetSongsFromFeedAsync(IFeedSettings settings)
         {
-            Dictionary<string, string> retDict = new Dictionary<string, string>();
+            Dictionary<string, ScrapedSong> retDict = new Dictionary<string, ScrapedSong>();
             if (!(settings is BeastSaberFeedSettings _settings))
                 throw new InvalidCastException(INVALIDFEEDSETTINGSMESSAGE);
             if (_settings.FeedIndex != 2 && string.IsNullOrEmpty(_username?.Trim()))
@@ -265,7 +292,7 @@ namespace FeedReader
                 throw new ArgumentException("Cannot access this feed without a valid username.");
             }
             int pageIndex = 0;
-            List<SongDownload> newSongs = null;
+            List<ScrapedSong> newSongs = null;
             int maxPages = _settings.MaxPages;
             bool maxPagesSet = false;
             if (maxPages == 0 && _settings.MaxSongs == 0)
@@ -329,7 +356,7 @@ namespace FeedReader
                     else
                     {
                         if (retDict.Count < settings.MaxSongs)
-                            retDict.Add(song.Hash, song.DownloadUrl);
+                            retDict.Add(song.Hash, song);
                     }
                 }
                 //Logger.Debug($"FeedURL is {feedUrl}");
@@ -348,7 +375,7 @@ namespace FeedReader
         /// <exception cref="InvalidCastException">Thrown when the passed IFeedSettings isn't a BeastSaberFeedSettings.</exception>
         /// <exception cref="ArgumentException">Thrown when trying to access a feed that requires a username and the username wasn't provided.</exception>
         /// <returns></returns>
-        public Dictionary<string, string> GetSongsFromFeed(IFeedSettings settings)
+        public Dictionary<string, ScrapedSong> GetSongsFromFeed(IFeedSettings settings)
         {
             PrepareReader();
             if (!(settings is BeastSaberFeedSettings _settings))
@@ -359,7 +386,7 @@ namespace FeedReader
                 throw new ArgumentException("Cannot access this feed without a valid username.");
             }
             var retDict = GetSongsFromFeedAsync(settings).Result;
-            
+
             return retDict;
         }
     }

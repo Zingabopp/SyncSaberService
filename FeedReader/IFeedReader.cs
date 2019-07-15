@@ -10,6 +10,7 @@ namespace FeedReader
         string Name { get; } // Name of the reader
         string Source { get; } // Name of the site
         bool Ready { get; } // Reader is ready
+        bool StoreRawData { get; set; } // Save the raw data in ScrapedSong
 
         /// <summary>
         /// Anything that needs to happen before the Reader is ready.
@@ -21,9 +22,9 @@ namespace FeedReader
         /// </summary>
         /// <param name="settings"></param>
         /// <returns></returns>
-        Dictionary<string, string> GetSongsFromFeed(IFeedSettings settings);
+        Dictionary<string, ScrapedSong> GetSongsFromFeed(IFeedSettings settings);
 
-        Task<Dictionary<string, string>> GetSongsFromFeedAsync(IFeedSettings settings);
+        Task<Dictionary<string, ScrapedSong>> GetSongsFromFeedAsync(IFeedSettings settings);
     }
 
     public interface IFeedSettings
