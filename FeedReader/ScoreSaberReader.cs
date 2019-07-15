@@ -57,6 +57,38 @@ namespace FeedReader
                 return _feeds;
             }
         }
+        public async Task<Dictionary<string, ScrapedSong>> GetSongsFromFeedAsync(IFeedSettings settings)
+        {
+            return await GetSongsFromFeedAsync(settings, CancellationToken.None);
+        }
+        public async Task<Dictionary<string, ScrapedSong>> GetSongsFromFeedAsync(IFeedSettings _settings, CancellationToken cancellationToken)
+        {
+            PrepareReader();
+            if (!(_settings is ScoreSaberFeedSettings settings))
+                throw new InvalidCastException(INVALID_FEED_SETTINGS_MESSAGE);
+            Dictionary<string, ScrapedSong> retDict = new Dictionary<string, ScrapedSong>();
+            int maxSongs = settings.MaxSongs > 0 ? settings.MaxSongs : settings.SongsPerPage * settings.SongsPerPage;
+            switch (settings.Feed)
+            {
+                case ScoreSaberFeeds.TRENDING:
+                    retDict = await GetSongsFromScoreSaberAsync(settings);
+                    break;
+                case ScoreSaberFeeds.LATEST_RANKED:
+                    settings.RankedOnly = true;
+                    retDict = await GetSongsFromScoreSaberAsync(settings);
+                    break;
+                case ScoreSaberFeeds.TOP_PLAYED:
+                    retDict = await GetSongsFromScoreSaberAsync(settings);
+                    break;
+                case ScoreSaberFeeds.TOP_RANKED:
+                    settings.RankedOnly = true;
+                    retDict = await GetSongsFromScoreSaberAsync(settings);
+                    break;
+                default:
+                    break;
+            }
+            return retDict;
+        }
 
         public Dictionary<string, ScrapedSong> GetSongsFromFeed(IFeedSettings _settings)
         {
@@ -198,35 +230,7 @@ namespace FeedReader
 
         }
 
-        public async Task<Dictionary<string, ScrapedSong>> GetSongsFromFeedAsync(IFeedSettings _settings)
-        {
-            PrepareReader();
-            if (!(_settings is ScoreSaberFeedSettings settings))
-                throw new InvalidCastException(INVALID_FEED_SETTINGS_MESSAGE);
-            Dictionary<string, ScrapedSong> retDict = new Dictionary<string, ScrapedSong>();
-            int maxSongs = settings.MaxSongs > 0 ? settings.MaxSongs : settings.SongsPerPage * settings.SongsPerPage;
-            switch (settings.Feed)
-            {
-                case ScoreSaberFeeds.TRENDING:
-                    retDict = await GetSongsFromScoreSaberAsync(settings);
-                    break;
-                case ScoreSaberFeeds.LATEST_RANKED:
-                    settings.RankedOnly = true;
-                    retDict = await GetSongsFromScoreSaberAsync(settings);
-                    break;
-                case ScoreSaberFeeds.TOP_PLAYED:
-                    retDict = await GetSongsFromScoreSaberAsync(settings);
-                    break;
-                case ScoreSaberFeeds.TOP_RANKED:
-                    settings.RankedOnly = true;
-                    retDict = await GetSongsFromScoreSaberAsync(settings);
-                    break;
-                default:
-                    break;
-            }
-            return retDict;
-        }
-    }
+         }
 
     public class ScoreSaberFeedSettings : IFeedSettings
     {

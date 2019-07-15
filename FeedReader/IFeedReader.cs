@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace FeedReader
@@ -18,13 +19,14 @@ namespace FeedReader
         void PrepareReader();
 
         /// <summary>
-        /// Retrieves the songs from a feed and returns them as a Dictionary. Key is the song hash, value is the full download URL.
+        /// Retrieves the songs from a feed and returns them as a Dictionary. Key is the song hash.
         /// </summary>
         /// <param name="settings"></param>
         /// <returns></returns>
         Dictionary<string, ScrapedSong> GetSongsFromFeed(IFeedSettings settings);
 
         Task<Dictionary<string, ScrapedSong>> GetSongsFromFeedAsync(IFeedSettings settings);
+        Task<Dictionary<string, ScrapedSong>> GetSongsFromFeedAsync(IFeedSettings settings, CancellationToken cancellationToken);
     }
 
     public interface IFeedSettings

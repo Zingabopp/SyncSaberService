@@ -283,6 +283,11 @@ namespace FeedReader
 
         public async Task<Dictionary<string, ScrapedSong>> GetSongsFromFeedAsync(IFeedSettings settings)
         {
+            return await GetSongsFromFeedAsync(settings, CancellationToken.None);
+        }
+
+        public async Task<Dictionary<string, ScrapedSong>> GetSongsFromFeedAsync(IFeedSettings settings, CancellationToken cancellationToken)
+        {
             Dictionary<string, ScrapedSong> retDict = new Dictionary<string, ScrapedSong>();
             if (!(settings is BeastSaberFeedSettings _settings))
                 throw new InvalidCastException(INVALIDFEEDSETTINGSMESSAGE);
