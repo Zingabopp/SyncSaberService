@@ -1,0 +1,267 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using Newtonsoft.Json.Linq;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
+using static FeedReader.WebUtils;
+
+namespace FeedReader
+{
+    public class ScoreSaberReader : IFeedReader
+    {
+        /// API Examples:
+        /// https://scoresaber.com/api.php?function=get-leaderboards&cat=3&limit=50&page=1&ranked=1 // Sorted by PP
+        /// https://scoresaber.com/api.php?function=get-leaderboards&cat=3&limit=10&page=1&search=honesty&ranked=1
+        /// cat options:
+        /// 0 = trending
+        /// 1 = date ranked
+        /// 2 = scores set
+        /// 3 = star rating
+        /// 4 = author
+        #region Constants
+        public static readonly string NameKey = "ScoreSaberReader";
+        public static readonly string SourceKey = "ScoreSaber";
+        private static readonly string PAGENUMKEY = "{PAGENUM}";
+        //private static readonly string CATKEY = "{CAT}";
+        private static readonly string RANKEDKEY = "{RANKKEY}";
+        private static readonly string LIMITKEY = "{LIMIT}";
+        private const string INVALID_FEED_SETTINGS_MESSAGE = "The IFeedSettings passed is not a ScoreSaberFeedSettings.";
+        private const string TOP_RANKED_KEY = "Top Ranked";
+        private const string TRENDING_KEY = "Trending";
+        private const string TOP_PLAYED_KEY = "Top Played";
+        private const string LATEST_RANKED_KEY = "Latest Ranked";
+        #endregion
+
+        public string Name { get { return NameKey; } }
+        public string Source { get { return SourceKey; } }
+        public bool Ready { get; private set; }
+
+        private static Dictionary<ScoreSaberFeeds, FeedInfo> _feeds;
+        public static Dictionary<ScoreSaberFeeds, FeedInfo> Feeds
+        {
+            get
+            {
+                if (_feeds == null)
+                {
+                    _feeds = new Dictionary<ScoreSaberFeeds, FeedInfo>()
+                    {
+                        { (ScoreSaberFeeds)0, new FeedInfo(TRENDING_KEY, $"https://scoresaber.com/api.php?function=get-leaderboards&cat=0&limit={LIMITKEY}&page={PAGENUMKEY}&ranked={RANKEDKEY}") },
+                        { (ScoreSaberFeeds)1, new FeedInfo(LATEST_RANKED_KEY, $"https://scoresaber.com/api.php?function=get-leaderboards&cat=1&limit={LIMITKEY}&page={PAGENUMKEY}&ranked={RANKEDKEY}") },
+                        { (ScoreSaberFeeds)2, new FeedInfo(TOP_PLAYED_KEY, $"https://scoresaber.com/api.php?function=get-leaderboards&cat=2&limit={LIMITKEY}&page={PAGENUMKEY}&ranked={RANKEDKEY}") },
+                        { (ScoreSaberFeeds)3, new FeedInfo(TOP_RANKED_KEY, $"https://scoresaber.com/api.php?function=get-leaderboards&cat=3&limit={LIMITKEY}&page={PAGENUMKEY}&ranked={RANKEDKEY}") }
+                    };
+                }
+                return _feeds;
+            }
+        }
+
+        public Dictionary<string, string> GetSongsFromFeed(IFeedSettings _settings)
+        {
+            return GetSongsFromFeedAsync(_settings).Result;
+        }
+
+        public void GetPageUrl(ref StringBuilder baseUrl, Dictionary<string, string> replacements)
+        {
+            foreach (var key in replacements.Keys)
+            {
+                baseUrl.Replace(key, replacements[key]);
+            }
+        }
+
+        public async Task<Dictionary<string, string>> GetSongsFromScoreSaber(ScoreSaberFeedSettings settings)
+        {
+            // "https://scoresaber.com/api.php?function=get-leaderboards&cat={CATKEY}&limit={LIMITKEY}&page={PAGENUMKEY}&ranked={RANKEDKEY}"
+            int songsPerPage = settings.SongsPerPage;
+            int pageNum = 1;
+            //int maxPages = (int)Math.Ceiling(settings.MaxSongs / ((float)songsPerPage));
+            int maxPages = settings.MaxPages;
+            if (settings.MaxPages > 0)
+                maxPages = maxPages < settings.MaxPages ? maxPages : settings.MaxPages; // Take the lower limit.
+            Dictionary<string, string> songs = new Dictionary<string, string>();
+            StringBuilder url = new StringBuilder(Feeds[settings.Feed].BaseUrl);
+            Dictionary<string, string> urlReplacements = new Dictionary<string, string>() {
+                {LIMITKEY, songsPerPage.ToString() },
+                {PAGENUMKEY, pageNum.ToString()},
+                {RANKEDKEY, settings.RankedOnly ? "1" : "0" }
+            };
+            GetPageUrl(ref url, urlReplacements);
+
+            string pageText = "";
+            using (var response = await GetPageAsync(url.ToString()))
+            {
+                if (response.IsSuccessStatusCode)
+                    pageText = await response.Content.ReadAsStringAsync();
+                else
+                {
+                    //Logger.Error($"Error getting text from {url.ToString()}, HTTP Status Code is: {response.StatusCode.ToString()}: {response.ReasonPhrase}");
+                }
+            }
+
+            JObject result;
+            try
+            {
+                result = JObject.Parse(pageText);
+            }
+            catch (Exception ex)
+            {
+                //Logger.Exception("Unable to parse JSON from text", ex);
+            }
+            foreach (var song in GetSongsFromPageText(pageText))
+            {
+                if (!songs.ContainsKey(song.Hash) && songs.Count < settings.MaxSongs)
+                    songs.Add(song.Hash, "");
+            }
+            List<Task<List<SongDownload>>> pageReadTasks = new List<Task<List<SongDownload>>>();
+            bool continueLooping = true;
+            do
+            {
+                pageNum++;
+                int diffCount = 0;
+                if ((maxPages > 0 && pageNum > maxPages) || songs.Count >= settings.MaxSongs)
+                    break;
+                url.Clear();
+                url.Append(Feeds[settings.Feed].BaseUrl);
+                if (!urlReplacements.ContainsKey(PAGENUMKEY))
+                    urlReplacements.Add(PAGENUMKEY, pageNum.ToString());
+                else
+                    urlReplacements[PAGENUMKEY] = pageNum.ToString();
+                GetPageUrl(ref url, urlReplacements);
+                //Logger.Trace($"Adding pageReadTask {url.ToString()}");
+                foreach (var song in await GetSongsFromPageAsync(url.ToString()))
+                {
+                    diffCount++;
+                    if (!songs.ContainsKey(song.Hash) && songs.Count < settings.MaxSongs)
+                        songs.Add(song.Hash, "");
+                }
+                if (diffCount == 0)
+                    continueLooping = false;
+                //pageReadTasks.Add(GetSongsFromPageAsync(url.ToString()));
+                if ((maxPages > 0 && pageNum >= maxPages) || songs.Count >= settings.MaxSongs)
+                    continueLooping = false;
+            } while (continueLooping);
+
+
+            return songs;
+        }
+
+
+        public async Task<List<SongDownload>> GetSongsFromPageAsync(string url)
+        {
+            var response = await GetPageAsync(url).ConfigureAwait(false);
+            List<SongDownload> songs;
+            if (response.IsSuccessStatusCode)
+            {
+                var pageText = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+                songs = GetSongsFromPageText(pageText);
+            }
+            else
+            {
+                //Logger.Error($"Error getting page {url}, response was {response.StatusCode.ToString()}: {response.ReasonPhrase}");
+                songs = new List<SongDownload>();
+            }
+            return songs;
+        }
+
+        public static List<SongDownload> GetSongsFromPageText(string pageText)
+        {
+            JObject result = new JObject();
+            try
+            {
+                result = JObject.Parse(pageText);
+
+            }
+            catch (Exception ex)
+            {
+                //Logger.Exception("Unable to parse JSON from text", ex);
+            }
+            List<SongDownload> songs = new List<SongDownload>();
+
+            var songJSONAry = result["songs"]?.ToArray();
+            if (songJSONAry == null)
+            {
+                //Logger.Error("Invalid page text: 'songs' field not found.");
+            }
+            foreach (var song in songJSONAry)
+            {
+                var hash = song["id"]?.Value<string>();
+
+                if (!string.IsNullOrEmpty(hash))
+                    songs.Add(new SongDownload(hash));
+            }
+            return songs;
+        }
+
+        public void PrepareReader()
+        {
+
+        }
+
+        public async Task<Dictionary<string, string>> GetSongsFromFeedAsync(IFeedSettings _settings)
+        {
+            PrepareReader();
+            if (!(_settings is ScoreSaberFeedSettings settings))
+                throw new InvalidCastException(INVALID_FEED_SETTINGS_MESSAGE);
+            List<SongDownload> songs = new List<SongDownload>();
+            Dictionary<string, string> retDict = new Dictionary<string, string>();
+            int maxSongs = settings.MaxSongs > 0 ? settings.MaxSongs : settings.SongsPerPage * settings.SongsPerPage;
+            switch (settings.Feed)
+            {
+                case ScoreSaberFeeds.TRENDING:
+                    retDict = await GetSongsFromScoreSaber(settings);
+                    break;
+                case ScoreSaberFeeds.LATEST_RANKED:
+                    settings.RankedOnly = true;
+                    retDict = await GetSongsFromScoreSaber(settings);
+                    break;
+                case ScoreSaberFeeds.TOP_PLAYED:
+                    retDict = await GetSongsFromScoreSaber(settings);
+                    break;
+                case ScoreSaberFeeds.TOP_RANKED:
+                    settings.RankedOnly = true;
+                    retDict = await GetSongsFromScoreSaber(settings);
+                    break;
+                default:
+                    break;
+            }
+
+
+            foreach (var song in songs)
+            {
+                if (!retDict.ContainsKey(song.Hash))
+                {
+                    retDict.Add(song.Hash, song.DownloadUrl);
+                }
+            }
+            return retDict;
+        }
+    }
+
+    public class ScoreSaberFeedSettings : IFeedSettings
+    {
+        public int SongsPerPage = 100;
+        public string FeedName { get { return ScoreSaberReader.Feeds[Feed].Name; } }
+        public ScoreSaberFeeds Feed { get { return (ScoreSaberFeeds)FeedIndex; } set { FeedIndex = (int)value; } }
+        public int FeedIndex { get; set; }
+        public bool UseSongKeyAsOutputFolder { get; set; }
+        public bool searchOnline { get; set; }
+        public bool RankedOnly { get; set; }
+        public int MaxPages;
+        public int MaxSongs { get; set; }
+        public ScoreSaberFeedSettings(int feedIndex)
+        {
+            searchOnline = false;
+            FeedIndex = feedIndex;
+            UseSongKeyAsOutputFolder = true;
+        }
+    }
+
+    public enum ScoreSaberFeeds
+    {
+        TRENDING = 0,
+        LATEST_RANKED = 1,
+        TOP_PLAYED = 2,
+        TOP_RANKED = 3,
+    }
+}

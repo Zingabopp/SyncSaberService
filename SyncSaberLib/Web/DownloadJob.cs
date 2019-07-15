@@ -48,7 +48,7 @@ namespace SyncSaberLib.Web
             get { return _song; }
         }
         private FileInfo _localZip;
-        private DirectoryInfo _songDir;
+        public DirectoryInfo SongDirectory { get; private set; }
         public JobResult Result { get; private set; }
 
         /// <summary>
@@ -63,7 +63,7 @@ namespace SyncSaberLib.Web
             _song = song;
             TempPath = $"temp\\temp-{Song.key}"; // Folder the zip file is extracted to.
             _localZip = new FileInfo(downloadPath);
-            _songDir = new DirectoryInfo(songDirectory);
+            SongDirectory = new DirectoryInfo(songDirectory);
             if (!_localZip.Directory.Exists)
                 _localZip.Directory.Create();
 
@@ -89,11 +89,11 @@ namespace SyncSaberLib.Web
                 Logger.Debug($"Downloaded {Song.key}-{Song.songName} by {Song.authorName} successfully");
                 try
                 {
-                    successful = await ExtractZipAsync(_localZip.FullName, _songDir.FullName, TempPath).ConfigureAwait(false);
+                    successful = await ExtractZipAsync(_localZip.FullName, SongDirectory.FullName, TempPath).ConfigureAwait(false);
                 }
                 catch (AggregateException ae)
                 {
-                    ae.WriteExceptions($"Error extracting zip {_localZip.FullName} to {TempPath}, with the files to be moved to {_songDir.FullName}.\n");
+                    ae.WriteExceptions($"Error extracting zip {_localZip.FullName} to {TempPath}, with the files to be moved to {SongDirectory.FullName}.\n");
                     successful = false;
                 }
  

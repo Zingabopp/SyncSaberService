@@ -99,6 +99,7 @@ namespace SyncSaberConsole
                 ScrapedDataProvider.Initialize();
                 Logger.Info($"Scrapes loaded, {ScrapedDataProvider.BeatSaverSongs.Data.Count} BeatSaverSongs and {ScrapedDataProvider.ScoreSaberSongs.Data.Count} ScoreSaber difficulties loaded");
                 //DoFullScrape();
+               
                 //Tests();
                 try
                 {

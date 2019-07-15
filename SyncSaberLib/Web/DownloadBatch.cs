@@ -59,6 +59,7 @@ namespace SyncSaberLib.Web
             {
                 case DownloadJob.JobResult.SUCCESS:
                     Logger.Info($"Finished job {song.key}-{song.songName} by {song.authorName} successfully.");
+                    Logger.Info($"Song {song.key} downloaded to {job.SongDirectory.FullName}");
                     break;
                 case DownloadJob.JobResult.TIMEOUT:
                     Logger.Warning($"Job {song.key} failed due to download timeout.");

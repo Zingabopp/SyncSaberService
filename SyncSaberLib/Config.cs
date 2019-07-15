@@ -1,13 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.IO;
-using IniParser;
+﻿using IniParser;
 using IniParser.Model;
-using System.Reflection;
 using Microsoft.Win32;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Reflection;
 using static SyncSaberLib.Utilities;
 
 namespace SyncSaberLib
@@ -147,6 +145,20 @@ namespace SyncSaberLib
                 get
                 {
                     return CreateKeyData("SyncFavoriteMappersFeed", "1");
+                }
+            }
+            public static KeyData OculusQuest
+            {
+                get
+                {
+                    return CreateKeyData("OculusQuest", "False");
+                }
+            }
+            public static KeyData QuestSongsPath
+            {
+                get
+                {
+                    return CreateKeyData("QuestSongsPath", "");
                 }
             }
 
@@ -524,7 +536,38 @@ namespace SyncSaberLib
             }
         }
 
+        public static bool OculusQuest
+        {
+            get
+            {
+                return Settings.GetBool(SettingKeys.OculusQuest);
+            }
+            set
+            {
+                Settings[SettingKeys.OculusQuest.KeyName] = value.ToString();
+                Write();
+            }
+        }
 
+        public static string QuestSongsPath
+        {
+            get
+            {
+                KeyData setting = SettingKeys.QuestSongsPath;
+                string path = Settings.GetString(setting);
+
+
+                return path;
+            }
+            set
+            {
+                var questDir = new DirectoryInfo(value);
+                if (!questDir.Exists)
+                    Logger.Warning($"Quest songs directory doesn't exist: {questDir.FullName}");
+                Settings[SettingKeys.QuestSongsPath.KeyName] = questDir.FullName;
+                Write();
+            }
+        }
         #endregion
 
         public static void ReadAllSettings()
@@ -532,6 +575,8 @@ namespace SyncSaberLib
             object setting = null;
             setting = BeatSaberPath;
             setting = BeastSaberUsername;
+            setting = OculusQuest;
+            setting = QuestSongsPath;
 
             setting = SyncCuratorRecommendedFeed;
             setting = SyncBookmarksFeed;
@@ -553,7 +598,7 @@ namespace SyncSaberLib
             setting = MaxConcurrentDownloads;
             setting = MaxConcurrentPageChecks;
             setting = LoggingLevel;
-            
+
         }
 
         public static LogLevel StrToLogLevel(string lvlStr)
@@ -591,12 +636,12 @@ namespace SyncSaberLib
 
             RegistryKey steamKey = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry64); // Doesn't work in 32 bit mode without this
             steamKey = steamKey?.OpenSubKey(STEAM_REG_KEY);
-            string path = (string) steamKey?.GetValue("InstallLocation", string.Empty);
+            string path = (string)steamKey?.GetValue("InstallLocation", string.Empty);
             if (string.IsNullOrEmpty(path))
             {
                 RegistryKey oculusKey = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry64);
                 oculusKey = oculusKey?.OpenSubKey(OCULUS_REG_KEY);
-                path = (string) oculusKey?.GetValue("InitialAppLibrary", string.Empty);
+                path = (string)oculusKey?.GetValue("InitialAppLibrary", string.Empty);
                 if (!string.IsNullOrEmpty(path))
                 {
                     path = Path.Combine(path, @"Software\hyperbolic-magnetism-beat-saber");
@@ -670,7 +715,7 @@ namespace SyncSaberLib
         /// <returns></returns>
         public static bool Initialize()
         {
-            
+
             bool successful = true;
             bool changed = false;
 

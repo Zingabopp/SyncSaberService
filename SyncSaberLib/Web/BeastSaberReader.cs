@@ -4,17 +4,14 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text.RegularExpressions;
 using System.Xml;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Net;
 using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Threading.Tasks.Dataflow;
 using System.Net.Http;
-using static SyncSaberLib.Utilities;
 using SyncSaberLib.Data;
 using static SyncSaberLib.Web.WebUtils;
 
@@ -494,8 +491,16 @@ namespace SyncSaberLib.Web
         public BeastSaberFeeds Feed { get { return (BeastSaberFeeds)FeedIndex; } set { FeedIndex = (int)value; } }
         public bool UseSongKeyAsOutputFolder { get; set; }
         public bool searchOnline { get; set; }
-        public int MaxPages;
-        public int MaxSongs { get; set; }
+        public int MaxPages { get; set; }
+        private int _maxSongs;
+        public int MaxSongs
+        {
+            get { return _maxSongs; }
+            set
+            {
+                _maxSongs = value;
+            }
+        }
         public BeastSaberFeedSettings(int feedIndex, int _maxPages = 0)
         {
             MaxSongs = BeastSaberReader.SONGS_PER_PAGE * _maxPages;
