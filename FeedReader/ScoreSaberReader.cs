@@ -21,6 +21,7 @@ namespace FeedReader
         /// 3 = star rating
         /// 4 = author
         #region Constants
+        private const string BEATSAVER_DOWNLOAD_URL_BASE = "http://beatsaver.com/api/download/hash/";
         public static readonly string NameKey = "ScoreSaberReader";
         public static readonly string SourceKey = "ScoreSaber";
         private static readonly string PAGENUMKEY = "{PAGENUM}";
@@ -220,7 +221,9 @@ namespace FeedReader
                 var hash = song["id"]?.Value<string>();
 
                 if (!string.IsNullOrEmpty(hash))
-                    songs.Add(new ScrapedSong(hash) { RawData = StoreRawData ? song.ToString(Newtonsoft.Json.Formatting.None) : string.Empty });
+                    songs.Add(new ScrapedSong(hash)
+                    {DownloadUrl = BEATSAVER_DOWNLOAD_URL_BASE + hash,
+                     RawData = StoreRawData ? song.ToString(Newtonsoft.Json.Formatting.None) : string.Empty });
             }
             return songs;
         }
