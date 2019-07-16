@@ -20,7 +20,7 @@ namespace FeedReader
 {
     public class BeatSaverReader : IFeedReader
     {
-        public static FeedReaderLoggerBase Logger = new FeedReaderLogger(LoggingController.DefaultLogger);
+        public static FeedReaderLoggerBase Logger = new FeedReaderLogger(LoggingController.DefaultLogController);
         public static string NameKey => "BeatSaverReader";
         public string Name { get { return NameKey; } }
         public static readonly string SourceKey = "BeatSaver";
@@ -98,7 +98,7 @@ namespace FeedReader
                     {
                         if (newSongs == null || newSongs.Count == 0)
                         {
-                            newSongs = GetSongsByAuthor(author);
+                            newSongs = await GetSongsByAuthorAsync(author);
                             songSource = "Beat Saver";
                         }
                         songs.AddRange(newSongs);
@@ -107,7 +107,7 @@ namespace FeedReader
                     break;
                 // Newest
                 case BeatSaverFeeds.LATEST:
-                    songs.AddRange(GetNewestSongs(settings));
+                    songs.AddRange(await GetNewestSongsAsync(settings));
                     break;
                 // Top
                 case BeatSaverFeeds.HOT:
@@ -148,10 +148,10 @@ namespace FeedReader
             bool useMaxPages = settings.MaxPages != 0;
             List<ScrapedSong> songs = new List<ScrapedSong>();
             string pageText = string.Empty;
-            using (var response = GetPage(GetPageUrl(feedIndex)))
+            using (var response = await GetPageAsync(GetPageUrl(feedIndex)))
             {
                 if (response.IsSuccessStatusCode)
-                    pageText = response.Content.ReadAsStringAsync().Result;
+                    pageText = await response.Content.ReadAsStringAsync();
                 else
                     return songs;
             }
@@ -193,7 +193,7 @@ namespace FeedReader
             } while (continueLooping);
             try
             {
-                Task.WaitAll(pageReadTasks.ToArray());
+                await Task.WhenAll(pageReadTasks.ToArray());
             }
             catch (Exception ex)
             {
@@ -201,7 +201,7 @@ namespace FeedReader
             }
             foreach (var job in pageReadTasks)
             {
-                songs.AddRange(job.Result);
+                songs.AddRange(await job);
             }
             return songs;
         }
@@ -232,6 +232,14 @@ namespace FeedReader
             return songs;
         }
 
+        public static async Task<List<ScrapedSong>> GetSongsByAuthorAsync(string uploader)
+        {
+            string mapperId = await GetAuthorIDAsync(uploader);
+            if (string.IsNullOrEmpty(mapperId))
+                return new List<ScrapedSong>();
+            return await GetSongsByUploaderIdAsync(mapperId);
+        }
+
         /// <summary>
         /// Searches Beat Saver and retrieves all songs by the provided uploader name.
         /// </summary>
@@ -239,14 +247,11 @@ namespace FeedReader
         /// <returns></returns>
         public static List<ScrapedSong> GetSongsByAuthor(string uploader)
         {
-            string mapperId = GetAuthorID(uploader);
-            if (string.IsNullOrEmpty(mapperId))
-                return new List<ScrapedSong>();
-            return GetSongsByUploaderId(mapperId);
+            return GetSongsByAuthorAsync(uploader).Result;
         }
 
-        [Obsolete("Check this")]
-        public static List<ScrapedSong> GetSongsByUploaderId(string authorId)
+
+        public static async Task<List<ScrapedSong>> GetSongsByUploaderIdAsync(string authorId)
         {
             int feedIndex = 0;
             List<ScrapedSong> songs = new List<ScrapedSong>();
@@ -254,7 +259,7 @@ namespace FeedReader
             string url = GetPageUrl(feedIndex, 0, new Dictionary<string, string>() { { AUTHORIDKEY, authorId } });
             try
             {
-                pageText = GetPageText(url);
+                pageText = await GetPageTextAsync(url).ConfigureAwait(false);
             }
             catch (HttpGetException ex)
             {
@@ -295,23 +300,33 @@ namespace FeedReader
                 pageNum++;
             } while (pageNum <= lastPage);
 
-            Task.WaitAll(pageReadTasks.ToArray());
+            await Task.WhenAll(pageReadTasks.ToArray());
             foreach (var job in pageReadTasks)
             {
-                songs.AddRange(job.Result);
+                songs.AddRange(await job);
             }
             return songs;
         }
-
-        public static List<ScrapedSong> GetSongsFromPage(string url)
+        [Obsolete("Check this")]
+        public static List<ScrapedSong> GetSongsByUploaderId(string authorId)
         {
-            string pageText = GetPageText(url);
+            return GetSongsByUploaderIdAsync(authorId).Result;
+        }
+
+        public static async Task<List<ScrapedSong>> GetSongsFromPageAsync(string url)
+        {
+            string pageText = await GetPageTextAsync(url).ConfigureAwait(false);
             var songs = new List<ScrapedSong>();
             foreach (var song in ParseSongsFromPage(pageText))
             {
                 songs.Add(song);
             }
             return songs;
+        }
+
+        public static List<ScrapedSong> GetSongsFromPage(string url)
+        {
+            return GetSongsFromPageAsync(url).Result;
         }
 
         public static List<ScrapedSong> ParseSongsFromPage(string pageText)
@@ -499,59 +514,70 @@ namespace FeedReader
             return song;
         }
 
-        public static string GetAuthorID(string authorName)
+        public static async Task<string> GetAuthorIDAsync(string authorName)
         {
+            if (_authors.ContainsKey(authorName))
+                return _authors[authorName];
+            string mapperId = string.Empty;
 
-            string mapperId = _authors.GetOrAdd(authorName, (a) =>
+            int page = 0;
+            int? totalResults;
+            string searchURL, pageText;
+            JObject result;
+            JToken matchingSong;
+            JToken[] songJSONAry;
+            do
             {
-                int page = 0;
-                int? totalResults;
-                string searchURL, pageText;
-                JObject result;
-                JToken matchingSong;
-                JToken[] songJSONAry;
-                do
+                Logger.Debug($"Checking page {page + 1} for the author ID.");
+                searchURL = Feeds[BeatSaverFeeds.SEARCH].BaseUrl.Replace(SEARCHKEY, authorName).Replace(PAGEKEY, (page * SONGSPERUSERPAGE).ToString());
+                pageText = await GetPageTextAsync(searchURL).ConfigureAwait(false);
+                result = new JObject();
+                try { result = JObject.Parse(pageText); }
+                catch (Exception ex)
                 {
-                    Logger.Debug($"Checking page {page + 1} for the author ID.");
-                    searchURL = Feeds[BeatSaverFeeds.SEARCH].BaseUrl.Replace(SEARCHKEY, a).Replace(PAGEKEY, (page * SONGSPERUSERPAGE).ToString());
-                    pageText = GetPageText(searchURL);
-                    result = new JObject();
-                    try { result = JObject.Parse(pageText); }
-                    catch (Exception ex)
-                    {
-                        Logger.Exception("Unable to parse JSON from text", ex); 
-                    }
-                    totalResults = result["totalDocs"]?.Value<int>(); // TODO: Check this
-                    if (totalResults == null || totalResults == 0)
-                    {
-                        Logger.Warning($"No songs by {a} found, is the name spelled correctly?");
-                        return string.Empty;
-                    }
-                    songJSONAry = result["docs"].ToArray();
-                    matchingSong = songJSONAry.FirstOrDefault(c => c["uploader"]?.Value<string>()?.ToLower() == a.ToLower());
-
-                    page++;
-                    searchURL = Feeds[BeatSaverFeeds.SEARCH].BaseUrl.Replace(SEARCHKEY, a).Replace(PAGEKEY, (page * SONGSPERUSERPAGE).ToString());
-                } while ((matchingSong == null) && page * SONGSPERUSERPAGE < totalResults);
-
-
-                if (matchingSong == null)
+                    Logger.Exception("Unable to parse JSON from text", ex);
+                }
+                totalResults = result["totalDocs"]?.Value<int>(); // TODO: Check this
+                if (totalResults == null || totalResults == 0)
                 {
-                    Logger.Warning($"No songs by {a} found, is the name spelled correctly?");
+                    Logger.Warning($"No songs by {authorName} found, is the name spelled correctly?");
                     return string.Empty;
                 }
-                return matchingSong["uploaderId"].Value<string>();
-            });
+                songJSONAry = result["docs"].ToArray();
+                matchingSong = (JObject)songJSONAry.FirstOrDefault(c => c["uploader"]?["username"]?.Value<string>()?.ToLower() == authorName.ToLower());
+
+                page++;
+                searchURL = Feeds[BeatSaverFeeds.SEARCH].BaseUrl.Replace(SEARCHKEY, authorName).Replace(PAGEKEY, (page * SONGSPERUSERPAGE).ToString());
+            } while ((matchingSong == null) && page * SONGSPERUSERPAGE < totalResults);
+
+
+            if (matchingSong == null)
+            {
+                Logger.Warning($"No songs by {authorName} found, is the name spelled correctly?");
+                return string.Empty;
+            }
+            mapperId = matchingSong["uploader"]["_id"].Value<string>();
+            _authors.TryAdd(authorName, mapperId);
+
             return mapperId;
         }
 
-        public static List<string> GetAuthorNamesByID(string mapperId)
+        public static string GetAuthorID(string authorName)
+        {
+            return GetAuthorIDAsync(authorName).Result;
+        }
+
+        public static async Task<List<string>> GetAuthorNamesByIDAsync(string mapperId)
         {
             List<string> authorNames = new List<string>();
-            List<ScrapedSong> songs = GetSongsByUploaderId(mapperId);
+            List<ScrapedSong> songs = await GetSongsByUploaderIdAsync(mapperId);
             authorNames = songs.Select(s => s.MapperName).Distinct().ToList();
             //authorNames.ForEach(n => Logger.Warning($"Found authorName: {n}"));
             return authorNames;
+        }
+        public static List<string> GetAuthorNamesByID(string mapperId)
+        {
+            return GetAuthorNamesByIDAsync(mapperId).Result;
         }
 
     }

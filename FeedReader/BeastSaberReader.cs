@@ -37,7 +37,7 @@ namespace FeedReader
         private const string XML_AUTHOR_KEY = "LevelAuthorName";
         private const string XML_SONGKEY_KEY = "SongKey";
         #endregion
-        public static FeedReaderLoggerBase Logger = new FeedReaderLogger(LoggingController.DefaultLogger);
+        public static FeedReaderLoggerBase Logger = new FeedReaderLogger(LoggingController.DefaultLogController);
         public string Name { get { return NameKey; } }
         public string Source { get { return SourceKey; } }
         public bool Ready { get; private set; }

@@ -6,10 +6,10 @@ namespace FeedReader.Logging
 {
     public class LoggingController
     {
-        public static LoggingController DefaultLogger { get; protected set; }
+        public static LoggingController DefaultLogController { get; protected set; }
         static LoggingController()
         {
-            DefaultLogger = new LoggingController()
+            DefaultLogController = new LoggingController()
             {
                 LoggerName = "FeedReader",
                 ShortSource = true,
