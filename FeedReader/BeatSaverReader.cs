@@ -13,12 +13,14 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Net.Http;
+using FeedReader.Logging;
 using static FeedReader.WebUtils;
 
 namespace FeedReader
 {
     public class BeatSaverReader : IFeedReader
     {
+        public static FeedReaderLoggerBase Logger = new FeedReaderLogger(LoggingController.DefaultLogger);
         public static string NameKey => "BeatSaverReader";
         public string Name { get { return NameKey; } }
         public static readonly string SourceKey = "BeatSaver";
@@ -79,13 +81,7 @@ namespace FeedReader
             return url.Replace(PAGEKEY, pageIndex.ToString()).ToString();
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="_settings"></param>
-        /// <exception cref="InvalidCastException">Thrown when the passed IFeedSettings isn't a BeatSaverFeedSettings</exception>
-        /// <returns></returns>
-        public Dictionary<string, ScrapedSong> GetSongsFromFeed(IFeedSettings _settings)
+        public async Task<Dictionary<string, ScrapedSong>> GetSongsFromFeedAsync(IFeedSettings _settings, CancellationToken cancellationToken)
         {
             PrepareReader();
             if (!(_settings is BeatSaverFeedSettings settings))
@@ -106,7 +102,7 @@ namespace FeedReader
                             songSource = "Beat Saver";
                         }
                         songs.AddRange(newSongs);
-                        //Logger.Info($"Found {newSongs.Count} songs uploaded by {author} from {songSource}");
+                        Logger.Info($"Found {newSongs.Count} songs uploaded by {author} from {songSource}");
                     }
                     break;
                 // Newest
@@ -123,32 +119,42 @@ namespace FeedReader
             Dictionary<string, ScrapedSong> retDict = new Dictionary<string, ScrapedSong>();
             foreach (var song in songs)
             {
-                if (retDict.ContainsKey(song.Hash))
-                {/*
-                    if (retDict[song.keyAsInt].SongVersion < song.SongVersion)
-                    {
-                        Logger.Debug($"Song with ID {song.keyAsInt} already exists, updating");
-                        retDict[song.keyAsInt] = song;
-                    }
-                    else
-                    {
-                        Logger.Debug($"Song with ID {song.keyAsInt} is already the newest version");
-                    }*/
-                }
-                else
+                if (!retDict.ContainsKey(song.Hash))
                 {
                     retDict.Add(song.Hash, song);
                 }
             }
             return retDict;
         }
+        public async Task<Dictionary<string, ScrapedSong>> GetSongsFromFeedAsync(IFeedSettings settings)
+        {
+            return await GetSongsFromFeedAsync(settings, CancellationToken.None);
+        }
 
-        public List<ScrapedSong> GetNewestSongs(BeatSaverFeedSettings settings)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="_settings"></param>
+        /// <exception cref="InvalidCastException">Thrown when the passed IFeedSettings isn't a BeatSaverFeedSettings</exception>
+        /// <returns></returns>
+        public Dictionary<string, ScrapedSong> GetSongsFromFeed(IFeedSettings _settings)
+        {
+            return GetSongsFromFeedAsync(_settings).Result;
+        }
+
+        public async Task<List<ScrapedSong>> GetNewestSongsAsync(BeatSaverFeedSettings settings)
         {
             int feedIndex = 1;
             bool useMaxPages = settings.MaxPages != 0;
             List<ScrapedSong> songs = new List<ScrapedSong>();
-            string pageText = GetPageText(GetPageUrl(feedIndex));
+            string pageText = string.Empty;
+            using (var response = GetPage(GetPageUrl(feedIndex)))
+            {
+                if (response.IsSuccessStatusCode)
+                    pageText = response.Content.ReadAsStringAsync().Result;
+                else
+                    return songs;
+            }
 
             JObject result = new JObject();
             try
@@ -157,17 +163,17 @@ namespace FeedReader
             }
             catch (Exception ex)
             {
-                //Logger.Exception("Unable to parse JSON from text", ex);
+                Logger.Exception("Unable to parse JSON from text", ex);
             }
             string mapperId = string.Empty;
             int? numSongs = result["totalDocs"]?.Value<int>();
             int? lastPage = result["lastPage"]?.Value<int>();
             if (numSongs == null || lastPage == null || numSongs == 0)
             {
-                //Logger.Warning($"Error checking Beat Saver's Latest feed.");
+                Logger.Warning($"Error checking Beat Saver's Latest feed.");
                 return songs;
             }
-            //Logger.Info($"Checking Beat Saver's Latest feed, {numSongs} songs available");
+            Logger.Info($"Checking Beat Saver's Latest feed, {numSongs} songs available");
             int songCount = 0;
             int pageNum = 0;
             List<Task<List<ScrapedSong>>> pageReadTasks = new List<Task<List<ScrapedSong>>>();
@@ -177,7 +183,7 @@ namespace FeedReader
             {
                 songCount = songs.Count;
                 url = GetPageUrl(feedIndex, pageNum);
-                //Logger.Debug($"Creating task for {url}");
+                Logger.Debug($"Creating task for {url}");
                 pageReadTasks.Add(GetSongsFromPageAsync(url, true));
                 pageNum++;
                 if ((pageNum > lastPage))
@@ -191,13 +197,18 @@ namespace FeedReader
             }
             catch (Exception ex)
             {
-                //Logger.Error($"Error waiting for pageReadTasks");
+                Logger.Error($"Error waiting for pageReadTasks");
             }
             foreach (var job in pageReadTasks)
             {
                 songs.AddRange(job.Result);
             }
             return songs;
+        }
+
+        public List<ScrapedSong> GetNewestSongs(BeatSaverFeedSettings settings)
+        {
+            return GetNewestSongsAsync(settings).Result;
         }
 
         public static async Task<List<ScrapedSong>> GetSongsFromPageAsync(string url, bool useDateLimit = false)
@@ -207,7 +218,7 @@ namespace FeedReader
             try
             {
                 pageText = await GetPageTextAsync(url).ConfigureAwait(false);
-                //Logger.Debug($"Successful got pageText from {url}");
+                Logger.Debug($"Successful got pageText from {url}");
                 foreach (var song in ParseSongsFromPage(pageText))
                 {
                     songs.Add(song);
@@ -215,7 +226,7 @@ namespace FeedReader
             }
             catch (Exception ex)
             {
-                //Logger.Error($"Error getting page text from {url}");
+                Logger.Error($"Error getting page text from {url}");
             }
 
             return songs;
@@ -247,12 +258,12 @@ namespace FeedReader
             }
             catch (HttpGetException ex)
             {
-                //Logger.Error($"Error getting songs by UploaderId, {ex.Url} responded with {ex.HttpStatusCode.ToString()}");
+                Logger.Error($"Error getting songs by UploaderId, {ex.Url} responded with {ex.HttpStatusCode.ToString()}");
                 return songs;
             }
             catch (Exception ex)
             {
-                //Logger.Exception($"Error getting songs by UploaderId, {authorId}, from {url}", ex);
+                Logger.Exception($"Error getting songs by UploaderId, {authorId}, from {url}", ex);
             }
 
             JObject result = new JObject();
@@ -262,7 +273,7 @@ namespace FeedReader
             }
             catch (Exception ex)
             {
-                //Logger.Exception("Unable to parse JSON from text", ex);
+                Logger.Exception("Unable to parse JSON from text", ex);
             }
             //string mapperId = GetAuthorID(authorId);
             //var scrapedResults = ScrapedDataProvider.BeatSaverScrape.Where(s => s.EnhancedInfo.uploaderId.ToString() == authorId.ToLower() || authorNames.Contains(s.authorName));
@@ -271,7 +282,7 @@ namespace FeedReader
             int? numSongs = result["totalDocs"]?.Value<int>(); // Check this
             int? lastPage = result["lastPage"]?.Value<int>();
             if (numSongs == null) numSongs = 0;
-            //Logger.Info($"Found {numSongs} songs by {authorId} on Beat Saver");
+            Logger.Info($"Found {numSongs} songs by {authorId} on Beat Saver");
             int songCount = 0;
             int pageNum = 0;
             List<Task<List<ScrapedSong>>> pageReadTasks = new List<Task<List<ScrapedSong>>>();
@@ -279,7 +290,7 @@ namespace FeedReader
             {
                 songCount = songs.Count;
                 url = GetPageUrl(feedIndex, pageNum, new Dictionary<string, string>() { { AUTHORIDKEY, authorId } });
-                //Logger.Debug($"Creating task for {url}");
+                Logger.Debug($"Creating task for {url}");
                 pageReadTasks.Add(GetSongsFromPageAsync(url));
                 pageNum++;
             } while (pageNum <= lastPage);
@@ -313,7 +324,7 @@ namespace FeedReader
             }
             catch (Exception ex)
             {
-                //Logger.Exception("Unable to parse JSON from text", ex);
+                Logger.Exception("Unable to parse JSON from text", ex);
             }
             List<ScrapedSong> songs = new List<ScrapedSong>();
             ScrapedSong newSong;
@@ -341,7 +352,7 @@ namespace FeedReader
             if (songJSONAry == null)
             {
 
-                //Logger.Error("Invalid page text: 'songs' field not found.");
+                Logger.Error("Invalid page text: 'songs' field not found.");
             }
 
             foreach (JObject song in songJSONAry)
@@ -364,12 +375,16 @@ namespace FeedReader
             //JSONObject song = (JSONObject) aKeyValue;
             string songKey = song["key"]?.Value<string>();
             string songHash = song["hash"]?.Value<string>().ToUpper();
+            var songName = song["name"]?.Value<string>();
+            var mapperName = song["uploader"]?["username"]?.Value<string>();
             if (string.IsNullOrEmpty(songHash))
                 throw new ArgumentException("Unable to find hash for the provided song, is this a valid song JObject?");
             string songUrl = !string.IsNullOrEmpty(songKey) ? BEATSAVER_DOWNLOAD_URL_BASE + songKey : string.Empty;
             var newSong = new ScrapedSong(songHash)
             {
                 DownloadUrl = songUrl,
+                SongName = songName,
+                MapperName = mapperName,
                 RawData = song.ToString()
             };
             return newSong;
@@ -427,22 +442,23 @@ namespace FeedReader
                 pageText = pageTask.Result;
                 if (string.IsNullOrEmpty(pageText))
                 {
-                    //Logger.Warning($"Unable to get web page at {url}");
+                    Logger.Warning($"Unable to get web page at {url}");
                     return null;
                 }
             }
             catch (HttpRequestException)
             {
-                //Logger.Error($"HttpRequestException while trying to populate fields for {key}");
+                Logger.Error($"HttpRequestException while trying to populate fields for {key}");
                 return null;
             }
             catch (AggregateException ae)
             {
+                // TODO: Put this back
                 //ae.WriteExceptions($"Exception while trying to get details for {key}");
             }
             catch (Exception ex)
             {
-                //Logger.Exception("Exception getting page", ex);
+                Logger.Exception("Exception getting page", ex);
             }
             song = ParseSongsFromPage(pageText).FirstOrDefault();
             return song;
@@ -461,22 +477,23 @@ namespace FeedReader
                 pageText = pageTask.Result;
                 if (string.IsNullOrEmpty(pageText))
                 {
-                    //Logger.Warning($"Unable to get web page at {url}");
+                    Logger.Warning($"Unable to get web page at {url}");
                     return null;
                 }
             }
             catch (HttpRequestException)
             {
-                //Logger.Error($"HttpRequestException while trying to populate fields for {hash}");
+                Logger.Error($"HttpRequestException while trying to populate fields for {hash}");
                 return null;
             }
             catch (AggregateException ae)
             {
+                //TODO: Put this back
                 //ae.WriteExceptions($"Exception while trying to get details for {hash}");
             }
             catch (Exception ex)
             {
-                //Logger.Exception("Exception getting page", ex);
+                Logger.Exception("Exception getting page", ex);
             }
             song = ParseSongsFromPage(pageText).FirstOrDefault();
             return song;
@@ -495,25 +512,24 @@ namespace FeedReader
                 JToken[] songJSONAry;
                 do
                 {
-                    //Logger.Debug($"Checking page {page + 1} for the author ID.");
+                    Logger.Debug($"Checking page {page + 1} for the author ID.");
                     searchURL = Feeds[BeatSaverFeeds.SEARCH].BaseUrl.Replace(SEARCHKEY, a).Replace(PAGEKEY, (page * SONGSPERUSERPAGE).ToString());
                     pageText = GetPageText(searchURL);
                     result = new JObject();
                     try { result = JObject.Parse(pageText); }
                     catch (Exception ex)
                     {
-                        //Logger.Exception("Unable to parse JSON from text", ex); 
+                        Logger.Exception("Unable to parse JSON from text", ex); 
                     }
                     totalResults = result["totalDocs"]?.Value<int>(); // TODO: Check this
                     if (totalResults == null || totalResults == 0)
                     {
-                        //Logger.Warning($"No songs by {a} found, is the name spelled correctly?");
+                        Logger.Warning($"No songs by {a} found, is the name spelled correctly?");
                         return string.Empty;
                     }
                     songJSONAry = result["docs"].ToArray();
                     matchingSong = songJSONAry.FirstOrDefault(c => c["uploader"]?.Value<string>()?.ToLower() == a.ToLower());
 
-                    //Logger.Debug($"Creating task for {url}");
                     page++;
                     searchURL = Feeds[BeatSaverFeeds.SEARCH].BaseUrl.Replace(SEARCHKEY, a).Replace(PAGEKEY, (page * SONGSPERUSERPAGE).ToString());
                 } while ((matchingSong == null) && page * SONGSPERUSERPAGE < totalResults);
@@ -521,7 +537,7 @@ namespace FeedReader
 
                 if (matchingSong == null)
                 {
-                    //Logger.Warning($"No songs by {a} found, is the name spelled correctly?");
+                    Logger.Warning($"No songs by {a} found, is the name spelled correctly?");
                     return string.Empty;
                 }
                 return matchingSong["uploaderId"].Value<string>();
@@ -533,7 +549,7 @@ namespace FeedReader
         {
             List<string> authorNames = new List<string>();
             List<ScrapedSong> songs = GetSongsByUploaderId(mapperId);
-            authorNames = songs.Select(s => s.authorName).Distinct().ToList();
+            authorNames = songs.Select(s => s.MapperName).Distinct().ToList();
             //authorNames.ForEach(n => Logger.Warning($"Found authorName: {n}"));
             return authorNames;
         }

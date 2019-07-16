@@ -6,11 +6,13 @@ using System.Threading.Tasks;
 using System.IO;
 using System.Net.Http;
 using System.Net;
+using FeedReader.Logging;
 
 namespace FeedReader
 {
     public static class WebUtils
     {
+        public static FeedReaderLoggerBase Logger = new FeedReaderLogger(LoggingController.DefaultLogger);
         private static bool _initialized = false;
         private static readonly object lockObject = new object();
         private static HttpClientHandler _httpClientHandler;
@@ -101,7 +103,7 @@ namespace FeedReader
             }
             catch (InvalidOperationException ex)
             {
-                //Logger.Exception($"Error getting page {url}", ex);
+               Logger.Exception($"Error getting page {url}", ex);
             }
             HttpResponseMessage response = pageGetTask.Result;
             //Logger.Debug(pageText.Result);

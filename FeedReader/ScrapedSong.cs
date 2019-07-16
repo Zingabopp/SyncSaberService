@@ -13,7 +13,8 @@ namespace FeedReader
             set { _hash = value?.ToUpper(); }
         }
         public string DownloadUrl { get; set; }
-
+        public string SongName { get; set; }
+        public string MapperName { get; set; }
         public string RawData { get; set; }
 
         public ScrapedSong() { }
