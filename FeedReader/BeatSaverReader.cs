@@ -96,11 +96,11 @@ namespace FeedReader
                     string songSource = string.Empty;
                     foreach (var author in settings.Authors)
                     {
-                        if (newSongs == null || newSongs.Count == 0)
-                        {
-                            newSongs = await GetSongsByAuthorAsync(author);
-                            songSource = "Beat Saver";
-                        }
+                        //if (newSongs == null || newSongs.Count == 0)
+                        //{
+                        newSongs = await GetSongsByAuthorAsync(author);
+                        songSource = "Beat Saver";
+                        //}
                         songs.AddRange(newSongs);
                         Logger.Info($"Found {newSongs.Count} songs uploaded by {author} from {songSource}");
                     }
