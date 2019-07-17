@@ -130,6 +130,12 @@ namespace FeedReader
             return songsOnPage;
         }
 
+        /// <summary>
+        /// Most of this yoinked from Brian's SyncSaber.
+        /// https://github.com/brian91292/SyncSaber/blob/master/SyncSaber/SyncSaber.cs#L259
+        /// </summary>
+        /// <param name="pageText"></param>
+        /// <returns></returns>
         public List<ScrapedSong> ParseXMLPage(string pageText)
         {
             bool retry = false;
@@ -276,7 +282,7 @@ namespace FeedReader
         public string GetPageUrl(string feedUrlBase, int page)
         {
             string feedUrl = feedUrlBase.Replace(USERNAMEKEY, _username).Replace(PAGENUMKEY, page.ToString());
-            Logger.Debug($"Replacing {USERNAMEKEY} with {_username} in base URL:\n   {feedUrlBase}");
+            //Logger.Debug($"Replacing {USERNAMEKEY} with {_username} in base URL:\n   {feedUrlBase}");
             return feedUrl;
         }
 
@@ -302,18 +308,20 @@ namespace FeedReader
                 Logger.Error($"Can't access feed without a valid username in the config file");
                 throw new ArgumentException("Cannot access this feed without a valid username.");
             }
-            int pageIndex = 0;
+            int pageIndex = settings.StartingPage;
             List<ScrapedSong> newSongs = null;
             int maxPages = _settings.MaxPages;
-            bool maxSongsSet = _settings.MaxSongs != 0;
-            bool maxPagesSet = maxPages != 0;
+            bool useMaxSongs = _settings.MaxSongs != 0;
+            bool useMaxPages = maxPages != 0;
+            if (useMaxPages && pageIndex > 1)
+                maxPages = maxPages + pageIndex - 1;
             do
             {
-                pageIndex++; // Increment page index first because it starts with 1.
                 if (newSongs != null)
                     newSongs.Clear();
 
                 string feedUrl = GetPageUrl(Feeds[_settings.Feed].BaseUrl, pageIndex);
+                Logger.Debug($"Checking URL: {feedUrl}");
                 string pageText = "";
 
                 ContentType contentType;
@@ -352,8 +360,9 @@ namespace FeedReader
                 }
                 //Logger.Debug($"FeedURL is {feedUrl}");
                 //Logger.Debug($"Queued page {pageIndex} for reading. EarliestEmptyPage is now {earliestEmptyPage}");
+                pageIndex++;
             }
-            while ((retDict.Count < settings.MaxSongs || !maxSongsSet) && (pageIndex <= maxPages || !maxPagesSet) && newSongs.Count > 0);
+            while ((retDict.Count < settings.MaxSongs || !useMaxSongs) && (pageIndex < maxPages || !useMaxPages) && newSongs.Count > 0);
             //while ((pageIndex < maxPages || maxPages == 0) && newSongs.Count > 0);
 
             return retDict;
@@ -382,23 +391,6 @@ namespace FeedReader
         }
     }
 
-    [Serializable]
-    public class BSaberSong
-    {
-        public string title;
-        public string song_key;
-        public string hash;
-        public string level_author_name;
-    }
-
-    public struct FeedPageInfo
-    {
-        public int feedToDownload;
-        public string feedUrl;
-        public int FeedIndex;
-        public int pageIndex;
-    }
-
     public class BeastSaberFeedSettings : IFeedSettings
     {
         /// <summary>
@@ -417,11 +409,17 @@ namespace FeedReader
         /// Maximum pages to check, will stop the reader before MaxSongs is met. Use 0 for unlimited.
         /// </summary>
         public int MaxPages { get; set; }
-        
+
+        /// <summary>
+        /// Page of the feed to start on, default is 1. For all feeds, setting '1' here is the same as starting on the first page.
+        /// </summary>
+        public int StartingPage { get; set; }
+
         public BeastSaberFeedSettings(int feedIndex, int _maxPages = 0)
         {
             FeedIndex = feedIndex;
             MaxPages = _maxPages;
+            StartingPage = 1;
         }
     }
 

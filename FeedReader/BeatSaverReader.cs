@@ -215,6 +215,7 @@ namespace FeedReader
         }
         public async Task<List<ScrapedSong>> GetBeatSaverSongsAsync(BeatSaverFeedSettings settings)
         {
+            // TODO: double checks the first page
             int feedIndex = settings.FeedIndex;
             bool useMaxPages = settings.MaxPages != 0;
             bool useMaxSongs = settings.MaxSongs != 0;
@@ -237,7 +238,6 @@ namespace FeedReader
             {
                 Logger.Exception("Unable to parse JSON from text", ex);
             }
-            string mapperId = string.Empty;
             int? numSongs = result["totalDocs"]?.Value<int>();
             int? lastPage = result["lastPage"]?.Value<int>();
             if (numSongs == null || lastPage == null || numSongs == 0)
@@ -246,21 +246,22 @@ namespace FeedReader
                 return songs;
             }
             Logger.Info($"Checking Beat Saver's {settings.FeedName} feed, {numSongs} songs available");
-            int songCount = 0;
-            int pageNum = 0;
+            int maxPages = settings.MaxPages;
+            int pageNum = Math.Max(settings.StartingPage - 1, 0);
+            if (pageNum > 0 && useMaxPages)
+                maxPages = maxPages + pageNum; // Add starting page to maxPages so we actually get songs if maxPages < starting page
             List<Task<List<ScrapedSong>>> pageReadTasks = new List<Task<List<ScrapedSong>>>();
             string url = "";
             bool continueLooping = true;
             do
             {
-                songCount = songs.Count;
                 url = GetPageUrl(feedIndex, pageNum);
                 Logger.Debug($"Creating task for {url}");
                 pageReadTasks.Add(GetSongsFromPageAsync(url));
                 pageNum++;
                 if ((pageNum > lastPage))
                     continueLooping = false;
-                if (useMaxPages && (pageNum >= settings.MaxPages))
+                if (useMaxPages && (pageNum >= maxPages))
                     continueLooping = false;
                 if (useMaxSongs && pageNum * SONGS_PER_PAGE >= settings.MaxSongs)
                     continueLooping = false;
@@ -524,9 +525,9 @@ namespace FeedReader
             song = ParseSongsFromPage(pageText).FirstOrDefault();
             return song;
         }
-        public static async Task<List<ScrapedSong>> SearchAsync(string criteria, SearchType type)
+        public static async Task<List<ScrapedSong>> SearchAsync(string criteria, SearchType type, BeatSaverFeedSettings settings = null)
         {
-
+            // TODO: Hits rate limit
             if (type == SearchType.key)
             {
                 return new List<ScrapedSong>() { await GetSongByKeyAsync(criteria).ConfigureAwait(false) };
@@ -542,22 +543,56 @@ namespace FeedReader
                 return new List<ScrapedSong>() { await GetSongByHashAsync(criteria).ConfigureAwait(false) };
             }
             StringBuilder url;
-            url = new StringBuilder(Feeds[BeatSaverFeeds.SEARCH].BaseUrl);
-            url.Replace(SEARCHTYPEKEY, type.ToString());
-            url.Replace(SEARCHKEY, criteria);
-            string pageText = string.Empty;
-            var songs = new List<ScrapedSong>();
-            using (var response = await WebUtils.GetPageAsync(url.ToString()).ConfigureAwait(false))
+            int maxSongs = 0;
+            int maxPages = 0;
+            //int lastPage;
+            //int nextPage;
+            int pageIndex = 0;
+            if(settings != null)
             {
-                if (response.IsSuccessStatusCode)
-                    pageText = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-                else
-                {
-                    Logger.Error($"Error getting song by key, {url.ToString()} responded with {response.StatusCode}:{response.ReasonPhrase}");
-                    return songs;
-                }
+                maxSongs = settings.MaxSongs;
+                maxPages = settings.MaxPages;
+                pageIndex = Math.Max(settings.StartingPage - 1, 0);
             }
-            songs = ParseSongsFromPage(pageText);
+            bool useMaxPages = maxPages > 0;
+            bool useMaxSongs = maxSongs > 0;
+            if (useMaxPages && pageIndex > 0)
+                maxPages = maxPages + pageIndex;
+            bool continueLooping = true;
+            var songs = new List<ScrapedSong>();
+            List<ScrapedSong> newSongs;
+            do
+            {
+                url = new StringBuilder(Feeds[BeatSaverFeeds.SEARCH].BaseUrl);
+                url.Replace(SEARCHTYPEKEY, type.ToString());
+                url.Replace(SEARCHKEY, criteria);
+                url.Replace(PAGEKEY, pageIndex.ToString());
+                string pageText = string.Empty;
+                using (var response = await WebUtils.GetPageAsync(url.ToString()).ConfigureAwait(false))
+                {
+                    Logger.Debug($"Checking {url.ToString()} for songs.");
+                    if (response.IsSuccessStatusCode)
+                        pageText = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+                    else
+                    {
+                        Logger.Error($"Error searching for song, {url.ToString()} responded with {response.StatusCode}:{response.ReasonPhrase}");
+                        return songs;
+                    }
+                }
+                newSongs = ParseSongsFromPage(pageText);
+                foreach(var song in newSongs)
+                {
+                    if (!useMaxSongs || songs.Count < maxSongs)
+                        songs.Add(song);
+                }
+                pageIndex++;
+                if (newSongs.Count == 0)
+                    continueLooping = false;
+                if (useMaxPages && (pageIndex >= maxPages))
+                    continueLooping = false;
+                if (useMaxSongs && pageIndex * SONGS_PER_PAGE >= maxSongs)
+                    continueLooping = false;
+            } while (continueLooping);
 
             return songs;
         }
@@ -671,10 +706,16 @@ namespace FeedReader
         /// </summary>
         public int MaxPages { get; set; }
 
+        /// <summary>
+        /// Page of the feed to start on, default is 1. For all feeds, setting '1' here is the same as starting on the first page.
+        /// </summary>
+        public int StartingPage { get; set; }
+
         public BeatSaverFeedSettings(int feedIndex)
         {
             FeedIndex = feedIndex;
             MaxPages = 0;
+            StartingPage = 1;
             SearchType = BeatSaverReader.SearchType.song;
         }
     }

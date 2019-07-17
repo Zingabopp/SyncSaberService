@@ -33,7 +33,16 @@ namespace FeedReader
     {
         string FeedName { get; } // Name of the feed
         int FeedIndex { get; } // Index of the feed 
-        int MaxSongs { get; set; } // Max number of songs to retrieve
+
+        /// <summary>
+        /// Max number of songs to retrieve, 0 for unlimited.
+        /// </summary>
+        int MaxSongs { get; set; }
+
+        /// <summary>
+        /// Page of the feed to start on, default is 1. For all feeds, setting '1' here is the same as starting on the first page.
+        /// </summary>
+        int StartingPage { get; set; }
     }
 
     /// <summary>

@@ -110,9 +110,11 @@ namespace FeedReader
         {
             // "https://scoresaber.com/api.php?function=get-leaderboards&cat={CATKEY}&limit={LIMITKEY}&page={PAGENUMKEY}&ranked={RANKEDKEY}"
             int songsPerPage = settings.SongsPerPage;
-            int pageNum = 1;
+            int pageNum = settings.StartingPage;
             //int maxPages = (int)Math.Ceiling(settings.MaxSongs / ((float)songsPerPage));
             int maxPages = settings.MaxPages;
+            if (pageNum > 1 && maxPages != 0)
+                maxPages = maxPages + pageNum - 1;
             //if (settings.MaxPages > 0)
             //    maxPages = maxPages < settings.MaxPages ? maxPages : settings.MaxPages; // Take the lower limit.
             Dictionary<string, ScrapedSong> songs = new Dictionary<string, ScrapedSong>();
@@ -270,10 +272,16 @@ namespace FeedReader
         /// </summary>
         public int SongsPerPage { get; set; }
 
+        /// <summary>
+        /// Page of the feed to start on, default is 1. For all feeds, setting '1' here is the same as starting on the first page.
+        /// </summary>
+        public int StartingPage { get; set; }
+
         public ScoreSaberFeedSettings(int feedIndex)
         {
             FeedIndex = feedIndex;
             SongsPerPage = 100;
+            StartingPage = 1;
         }
     }
 
