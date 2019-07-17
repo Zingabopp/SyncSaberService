@@ -251,7 +251,7 @@ namespace FeedReader
         public int FeedIndex { get; set; }
 
         /// <summary>
-        /// Only get ranked songs.
+        /// Only get ranked songs. Forced true for TOP_RANKED and LATEST_RANKED feeds.
         /// </summary>
         public bool RankedOnly { get; set; }
 
