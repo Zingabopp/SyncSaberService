@@ -10,6 +10,12 @@ namespace FeedReaderTests
     [TestClass]
     public class BeatSaverReaderTests
     {
+        static BeatSaverReaderTests()
+        {
+            if (!WebUtils.IsInitialized)
+                WebUtils.Initialize();
+        }
+
         [TestMethod]
         public void GetSongsFromFeed_Authors_Test()
         {

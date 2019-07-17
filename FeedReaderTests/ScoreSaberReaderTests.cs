@@ -10,6 +10,12 @@ namespace FeedReaderTests
     [TestClass]
     public class ScoreSaberReaderTests
     {
+        static ScoreSaberReaderTests()
+        {
+            if (!WebUtils.IsInitialized)
+                WebUtils.Initialize();
+        }
+
         [TestMethod]
         public void GetSongsFromFeed_Trending()
         {
@@ -24,7 +30,7 @@ namespace FeedReaderTests
         [TestMethod]
         public void GetSongsFromPageText()
         {
-            var reader = new ScoreSaberReader() { StoreRawData = true } ;
+            var reader = new ScoreSaberReader() { StoreRawData = true };
             var pageText = File.ReadAllText("Data\\ScoreSaberPage.json");
             var songList = reader.GetSongsFromPageText(pageText);
             Assert.IsTrue(songList.Count == 50);

@@ -366,14 +366,14 @@ namespace FeedReader
                     }
                     else
                     {
-                        if (retDict.Count < settings.MaxSongs)
+                        if (retDict.Count < settings.MaxSongs || settings.MaxSongs == 0)
                             retDict.Add(song.Hash, song);
                     }
                 }
                 //Logger.Debug($"FeedURL is {feedUrl}");
                 //Logger.Debug($"Queued page {pageIndex} for reading. EarliestEmptyPage is now {earliestEmptyPage}");
             }
-            while (retDict.Count < settings.MaxSongs && newSongs.Count > 0);
+            while ((retDict.Count < settings.MaxSongs || settings.MaxSongs == 0) && newSongs.Count > 0);
             //while ((pageIndex < maxPages || maxPages == 0) && newSongs.Count > 0);
 
             return retDict;

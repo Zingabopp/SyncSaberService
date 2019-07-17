@@ -13,40 +13,34 @@ namespace FeedReader
     public static class WebUtils
     {
         public static FeedReaderLoggerBase Logger = new FeedReaderLogger(LoggingController.DefaultLogController);
-        private static bool _initialized = false;
+        public static bool IsInitialized { get; private set; }
         private static readonly object lockObject = new object();
-        private static HttpClientHandler _httpClientHandler;
-        public static HttpClientHandler HttpClientHandler
-        {
-            get
-            {
-                if (_httpClientHandler == null)
-                {
-                    _httpClientHandler = new HttpClientHandler();
-                    HttpClientHandler.MaxConnectionsPerServer = 10;
-                    HttpClientHandler.UseCookies = true;
-                    HttpClientHandler.AllowAutoRedirect = true; // Needs to be false to detect Beat Saver song download rate limit
-                }
-                return _httpClientHandler;
-            }
-        }
+        //private static HttpClientHandler _httpClientHandler;
+        //public static HttpClientHandler HttpClientHandler
+        //{
+        //    get
+        //    {
+        //        if (_httpClientHandler == null)
+        //        {
+        //            _httpClientHandler = new HttpClientHandler();
+        //            HttpClientHandler.MaxConnectionsPerServer = 10;
+        //            HttpClientHandler.UseCookies = true;
+        //            HttpClientHandler.AllowAutoRedirect = true; // Needs to be false to detect Beat Saver song download rate limit
+        //        }
+        //        return _httpClientHandler;
+        //    }
+        //}
         private static HttpClient _httpClient;
-        public static HttpClient HttpClient
-        {
+        private static HttpClient HttpClient {
             get
             {
-                lock (lockObject)
-                {
-                    if (_httpClient == null)
-                    {
-                        _httpClient = new HttpClient(HttpClientHandler);
-                        lock (_httpClient)
-                        {
-                            _httpClient.Timeout = new TimeSpan(0, 0, 30);
-                        }
-                    }
-                }
+                if (!IsInitialized)
+                    throw new InvalidOperationException("WebUtils was not Initialized with an HttpClient.");
                 return _httpClient;
+            }
+            set
+            {
+                _httpClient = value;
             }
         }
 
@@ -72,14 +66,15 @@ namespace FeedReader
             };
         }
 
-        public static void Initialize(int maxConnectionsPerServer)
+        public static void Initialize(HttpClient client = null)
         {
-            if (_initialized == false)
+            if (!IsInitialized)
             {
-                _initialized = true;
-                HttpClientHandler.MaxConnectionsPerServer = maxConnectionsPerServer;
-                HttpClientHandler.UseCookies = true;
-                _httpClient = new HttpClient(HttpClientHandler);
+                if (client == null)
+                    HttpClient = new HttpClient();
+                else
+                    HttpClient = client;
+                IsInitialized = true;
             }
         }
 
@@ -172,21 +167,21 @@ namespace FeedReader
             return pageText;
         }
 
-        public static void AddCookies(CookieContainer newCookies, Uri uri)
-        {
-            lock (HttpClientHandler)
-            {
-                if (HttpClientHandler.CookieContainer == null)
-                    HttpClientHandler.CookieContainer = newCookies;
-                else
-                    HttpClientHandler.CookieContainer.Add(newCookies.GetCookies(uri));
-            }
-        }
+        //public static void AddCookies(CookieContainer newCookies, Uri uri)
+        //{
+        //    lock (HttpClientHandler)
+        //    {
+        //        if (HttpClientHandler.CookieContainer == null)
+        //            HttpClientHandler.CookieContainer = newCookies;
+        //        else
+        //            HttpClientHandler.CookieContainer.Add(newCookies.GetCookies(uri));
+        //    }
+        //}
 
-        public static void AddCookies(CookieContainer newCookies, string url)
-        {
-            AddCookies(newCookies, new Uri(url));
-        }
+        //public static void AddCookies(CookieContainer newCookies, string url)
+        //{
+        //    AddCookies(newCookies, new Uri(url));
+        //}
 
         public async static Task<bool> DownloadFileAsync(string downloadUrl, string path, bool overwrite = true)
         {
