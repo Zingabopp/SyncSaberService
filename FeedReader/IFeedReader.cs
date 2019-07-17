@@ -34,8 +34,6 @@ namespace FeedReader
         string FeedName { get; } // Name of the feed
         int FeedIndex { get; } // Index of the feed 
         int MaxSongs { get; set; } // Max number of songs to retrieve
-        bool searchOnline { get; set; } // Search online instead of using local scrapes
-        //bool UseSongKeyAsOutputFolder { get; set; } // Use the song key as the output folder name instead of the default
     }
 
     /// <summary>

@@ -245,20 +245,17 @@ namespace FeedReader
 
     public class ScoreSaberFeedSettings : IFeedSettings
     {
-        public int SongsPerPage = 100;
+        public int SongsPerPage { get; set; }
         public string FeedName { get { return ScoreSaberReader.Feeds[Feed].Name; } }
         public ScoreSaberFeeds Feed { get { return (ScoreSaberFeeds)FeedIndex; } set { FeedIndex = (int)value; } }
         public int FeedIndex { get; set; }
-        public bool UseSongKeyAsOutputFolder { get; set; }
-        public bool searchOnline { get; set; }
         public bool RankedOnly { get; set; }
-        public int MaxPages;
+        public int MaxPages { get; set; }
         public int MaxSongs { get; set; }
         public ScoreSaberFeedSettings(int feedIndex)
         {
-            searchOnline = false;
             FeedIndex = feedIndex;
-            UseSongKeyAsOutputFolder = true;
+            SongsPerPage = 100;
         }
     }
 

@@ -414,7 +414,7 @@ namespace FeedReader
 
             int numSongs = result["totalDocs"]?.Value<int>() ?? 0; // Check this
             int lastPage = result["lastPage"]?.Value<int>() ?? 0;
-            Logger.Info($"Found {numSongs} songs by {authorId} on Beat Saver");
+            Logger.Debug($"{numSongs} songs by {authorId} available on Beat Saver");
             int pageNum = 0;
             List<Task<List<ScrapedSong>>> pageReadTasks = new List<Task<List<ScrapedSong>>>();
             do
@@ -637,15 +637,11 @@ namespace FeedReader
         public string FeedName { get { return BeatSaverReader.Feeds[Feed].Name; } }
         public BeatSaverFeeds Feed { get { return (BeatSaverFeeds)FeedIndex; } set { _feedIndex = (int)value; } }
         public int FeedIndex { get { return _feedIndex; } }
-        public bool UseSongKeyAsOutputFolder { get; set; }
-        public bool searchOnline { get; set; }
         public int MaxSongs { get; set; }
 
         public BeatSaverFeedSettings(int feedIndex)
         {
-            searchOnline = false;
             _feedIndex = feedIndex;
-            UseSongKeyAsOutputFolder = true;
         }
     }
 

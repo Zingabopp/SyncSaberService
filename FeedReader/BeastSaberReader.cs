@@ -424,8 +424,6 @@ namespace FeedReader
         public string FeedName { get { return BeastSaberReader.Feeds[Feed].Name; } }
         public int FeedIndex { get; set; }
         public BeastSaberFeeds Feed { get { return (BeastSaberFeeds)FeedIndex; } set { FeedIndex = (int)value; } }
-        public bool UseSongKeyAsOutputFolder { get; set; }
-        public bool searchOnline { get; set; }
         public int MaxPages { get; set; }
         private int _maxSongs;
         public int MaxSongs
@@ -438,10 +436,8 @@ namespace FeedReader
         }
         public BeastSaberFeedSettings(int feedIndex, int _maxPages = 0)
         {
-            searchOnline = true;
             FeedIndex = feedIndex;
             MaxPages = _maxPages;
-            UseSongKeyAsOutputFolder = true;
         }
     }
 
