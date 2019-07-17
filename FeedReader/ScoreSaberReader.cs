@@ -113,8 +113,8 @@ namespace FeedReader
             int pageNum = 1;
             //int maxPages = (int)Math.Ceiling(settings.MaxSongs / ((float)songsPerPage));
             int maxPages = settings.MaxPages;
-            if (settings.MaxPages > 0)
-                maxPages = maxPages < settings.MaxPages ? maxPages : settings.MaxPages; // Take the lower limit.
+            //if (settings.MaxPages > 0)
+            //    maxPages = maxPages < settings.MaxPages ? maxPages : settings.MaxPages; // Take the lower limit.
             Dictionary<string, ScrapedSong> songs = new Dictionary<string, ScrapedSong>();
             StringBuilder url = new StringBuilder(Feeds[settings.Feed].BaseUrl);
             Dictionary<string, string> urlReplacements = new Dictionary<string, string>() {
@@ -172,7 +172,7 @@ namespace FeedReader
                 if (diffCount == 0)
                     continueLooping = false;
                 //pageReadTasks.Add(GetSongsFromPageAsync(url.ToString()));
-                if ((maxPages > 0 && pageNum >= maxPages) || songs.Count >= settings.MaxSongs)
+                if ((maxPages > 0 && pageNum >= maxPages) || (songs.Count >= settings.MaxSongs && settings.MaxSongs > 0))
                     continueLooping = false;
             } while (continueLooping);
 
@@ -245,13 +245,31 @@ namespace FeedReader
 
     public class ScoreSaberFeedSettings : IFeedSettings
     {
-        public int SongsPerPage { get; set; }
+        
         public string FeedName { get { return ScoreSaberReader.Feeds[Feed].Name; } }
         public ScoreSaberFeeds Feed { get { return (ScoreSaberFeeds)FeedIndex; } set { FeedIndex = (int)value; } }
         public int FeedIndex { get; set; }
+
+        /// <summary>
+        /// Only get ranked songs.
+        /// </summary>
         public bool RankedOnly { get; set; }
-        public int MaxPages { get; set; }
+
+        /// <summary>
+        /// Maximum songs to retrieve, will stop the reader before MaxPages is met. Use 0 for unlimited.
+        /// </summary>
         public int MaxSongs { get; set; }
+
+        /// <summary>
+        /// Maximum pages to check, will stop the reader before MaxSongs is met. Use 0 for unlimited.
+        /// </summary>
+        public int MaxPages { get; set; }
+
+        /// <summary>
+        /// Number of songs shown on a page. 100 is default.
+        /// </summary>
+        public int SongsPerPage { get; set; }
+
         public ScoreSaberFeedSettings(int feedIndex)
         {
             FeedIndex = feedIndex;

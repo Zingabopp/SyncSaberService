@@ -631,17 +631,32 @@ namespace FeedReader
 
     public class BeatSaverFeedSettings : IFeedSettings
     {
-        public int _feedIndex;
-        public int MaxPages = 0;
-        public string[] Authors;
-        public string FeedName { get { return BeatSaverReader.Feeds[Feed].Name; } }
-        public BeatSaverFeeds Feed { get { return (BeatSaverFeeds)FeedIndex; } set { _feedIndex = (int)value; } }
-        public int FeedIndex { get { return _feedIndex; } }
-        public int MaxSongs { get; set; }
+        /// <summary>
+        /// Name of the chosen feed.
+        /// </summary>
+        public string FeedName { get { return BeatSaverReader.Feeds[Feed].Name; } } // Name of the chosen feed
+        public BeatSaverFeeds Feed { get { return (BeatSaverFeeds)FeedIndex; } set { FeedIndex = (int)value; } } // Which feed to use
+        public int FeedIndex { get; private set; } // Which feed to use
+
+        /// <summary>
+        /// List of authors, only used for the AUTHOR feed
+        /// </summary>
+        public string[] Authors { get; set; }
+
+        /// <summary>
+        /// Maximum songs to retrieve, will stop the reader before MaxPages is met. Use 0 for unlimited.
+        /// </summary>
+        public int MaxSongs { get; set; } 
+
+        /// <summary>
+        /// Maximum pages to check, will stop the reader before MaxSongs is met. Use 0 for unlimited.
+        /// </summary>
+        public int MaxPages { get; set; }
 
         public BeatSaverFeedSettings(int feedIndex)
         {
-            _feedIndex = feedIndex;
+            FeedIndex = feedIndex;
+            MaxPages = 0;
         }
     }
 

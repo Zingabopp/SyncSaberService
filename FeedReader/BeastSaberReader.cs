@@ -305,11 +305,8 @@ namespace FeedReader
             int pageIndex = 0;
             List<ScrapedSong> newSongs = null;
             int maxPages = _settings.MaxPages;
-            bool maxPagesSet = false;
-            if (maxPages == 0 && _settings.MaxSongs == 0)
-            {
-                maxPagesSet = true;
-            }
+            bool maxSongsSet = _settings.MaxSongs != 0;
+            bool maxPagesSet = maxPages != 0;
             do
             {
                 pageIndex++; // Increment page index first because it starts with 1.
@@ -330,24 +327,7 @@ namespace FeedReader
                     pageText = await response.Content.ReadAsStringAsync();
 
                 }
-                if (!maxPagesSet)
-                {
-                    maxPagesSet = true;
-                    if (contentType == ContentType.JSON)
-                    {
-                        maxPages = _settings.MaxSongs / SONGS_PER_JSON_PAGE;
-                        if (_settings.MaxSongs % SONGS_PER_JSON_PAGE != 0)
-                            maxPages++;
-                    }
-                    else if (contentType == ContentType.XML)
-                    {
-                        maxPages = _settings.MaxSongs / SONGS_PER_XML_PAGE;
-                        if (_settings.MaxSongs % SONGS_PER_XML_PAGE != 0)
-                            maxPages++;
-                    }
-                    else
-                        maxPagesSet = false;
-                }
+                
                 newSongs = GetSongsFromPageText(pageText, contentType);
                 foreach (var song in newSongs)
                 {
@@ -373,7 +353,7 @@ namespace FeedReader
                 //Logger.Debug($"FeedURL is {feedUrl}");
                 //Logger.Debug($"Queued page {pageIndex} for reading. EarliestEmptyPage is now {earliestEmptyPage}");
             }
-            while ((retDict.Count < settings.MaxSongs || settings.MaxSongs == 0) && newSongs.Count > 0);
+            while ((retDict.Count < settings.MaxSongs || !maxSongsSet) && (pageIndex <= maxPages || !maxPagesSet) && newSongs.Count > 0);
             //while ((pageIndex < maxPages || maxPages == 0) && newSongs.Count > 0);
 
             return retDict;
@@ -421,19 +401,23 @@ namespace FeedReader
 
     public class BeastSaberFeedSettings : IFeedSettings
     {
+        /// <summary>
+        /// Name of the chosen feed.
+        /// </summary>
         public string FeedName { get { return BeastSaberReader.Feeds[Feed].Name; } }
         public int FeedIndex { get; set; }
         public BeastSaberFeeds Feed { get { return (BeastSaberFeeds)FeedIndex; } set { FeedIndex = (int)value; } }
+
+        /// <summary>
+        /// Maximum songs to retrieve, will stop the reader before MaxPages is met. Use 0 for unlimited.
+        /// </summary>
+        public int MaxSongs { get; set; }
+
+        /// <summary>
+        /// Maximum pages to check, will stop the reader before MaxSongs is met. Use 0 for unlimited.
+        /// </summary>
         public int MaxPages { get; set; }
-        private int _maxSongs;
-        public int MaxSongs
-        {
-            get { return _maxSongs; }
-            set
-            {
-                _maxSongs = value;
-            }
-        }
+        
         public BeastSaberFeedSettings(int feedIndex, int _maxPages = 0)
         {
             FeedIndex = feedIndex;
