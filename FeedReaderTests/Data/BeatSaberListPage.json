@@ -1,0 +1,602 @@
+
+{
+
+    "docs": [
+        {
+            "metadata": {
+                "difficulties": {
+                    "easy": false,
+                    "expert": true,
+                    "expertPlus": false,
+                    "hard": false,
+                    "normal": false
+                },
+                "characteristics": [
+                    {
+                        "name": "Standard",
+                        "difficulties": {
+                            "easy": null,
+                            "normal": null,
+                            "hard": null,
+                            "expert": {
+                                "duration": 133,
+                                "length": 55,
+                                "bombs": 0,
+                                "notes": 219,
+                                "obstacles": 0,
+                                "njs": 12
+                            },
+                            "expertPlus": null
+                        }
+                    }
+                ],
+                "levelAuthorName": "Latte",
+                "songAuthorName": "INAZMA DELIVERY",
+                "songName": "The Bytheway Dance",
+                "songSubName": "",
+                "bpm": 145
+            },
+            "stats": {
+                "downloads": 42,
+                "plays": 0,
+                "downVotes": 0,
+                "upVotes": 0,
+                "heat": 834.2581412,
+                "rating": 0
+            },
+            "description": "Preview video: https://youtu.be/_nd0klDx-2Y",
+            "deletedAt": null,
+            "_id": "5d2484f0bc217b0006c91ea4",
+            "key": "5625",
+            "name": "The Bytheway Dance",
+            "uploader": {
+                "_id": "5cff0b7898cc5a672c85703d",
+                "username": "latte"
+            },
+            "hash": "27639680f92a9588b7cce843fc7aaa0f5dc720f8",
+            "uploaded": "2019-07-09T12:13:36.356Z",
+            "converted": true,
+            "downloadURL": "/api/download/key/5625",
+            "coverURL": "/cdn/5625/27639680f92a9588b7cce843fc7aaa0f5dc720f8.png"
+        },
+        {
+            "metadata": {
+                "difficulties": {
+                    "easy": true,
+                    "expert": false,
+                    "expertPlus": false,
+                    "hard": false,
+                    "normal": false
+                },
+                "characteristics": [
+                    {
+                        "name": "Standard",
+                        "difficulties": {
+                            "easy": {
+                                "duration": 316,
+                                "length": 228,
+                                "bombs": 0,
+                                "notes": 285,
+                                "obstacles": 0,
+                                "njs": 12
+                            },
+                            "normal": null,
+                            "hard": null,
+                            "expert": null,
+                            "expertPlus": null
+                        }
+                    }
+                ],
+                "levelAuthorName": "Bazinga!",
+                "songAuthorName": "Sido",
+                "songName": "Ruf mich",
+                "songSubName": "Feat. Kitty Kat und Bintia",
+                "bpm": 83
+            },
+            "stats": {
+                "downloads": 38,
+                "plays": 0,
+                "downVotes": 0,
+                "upVotes": 1,
+                "heat": 834.2157961,
+                "rating": 0.5941636475090435
+            },
+            "description": "Sido - Ruf mich\r\nEasy Level by Bazinga!\r\nPlay and Upvote and I will create more levels.\r\nHave fun!",
+            "deletedAt": null,
+            "_id": "5d247d7eb49dd2000689ac85",
+            "key": "5624",
+            "name": "Sido - Ruf mich",
+            "uploader": {
+                "_id": "5d245e65b49dd2000689a136",
+                "username": "bazinga!"
+            },
+            "hash": "25dac41c95e46c3e0248da03b9c4ec8949b301aa",
+            "uploaded": "2019-07-09T11:41:50.823Z",
+            "converted": true,
+            "downloadURL": "/api/download/key/5624",
+            "coverURL": "/cdn/5624/25dac41c95e46c3e0248da03b9c4ec8949b301aa.jpg"
+        },
+        {
+            "metadata": {
+                "difficulties": {
+                    "easy": false,
+                    "expert": false,
+                    "expertPlus": false,
+                    "hard": false,
+                    "normal": true
+                },
+                "characteristics": [
+                    {
+                        "name": "Standard",
+                        "difficulties": {
+                            "easy": null,
+                            "normal": {
+                                "duration": 513,
+                                "length": 248,
+                                "bombs": 0,
+                                "notes": 314,
+                                "obstacles": 2,
+                                "njs": 12
+                            },
+                            "hard": null,
+                            "expert": null,
+                            "expertPlus": null
+                        }
+                    }
+                ],
+                "levelAuthorName": "Michael Jackson",
+                "songAuthorName": "Michael Jackson",
+                "songName": "Blue Gangsta ",
+                "songSubName": "",
+                "bpm": 124
+            },
+            "stats": {
+                "downloads": 50,
+                "plays": 0,
+                "downVotes": 0,
+                "upVotes": 0,
+                "heat": 834.1228704,
+                "rating": 0
+            },
+            "description": "Strange Beat , strange Sync but always to the beat\nMap by Jahoo - FireRM ",
+            "deletedAt": null,
+            "_id": "5d246d29e987980006b471b8",
+            "key": "5621",
+            "name": "Michael Jackson - Blue Gangsta",
+            "uploader": {
+                "_id": "5d15fd9d1aea5f0006434422",
+                "username": "jahoo"
+            },
+            "hash": "c943cb71f8f99116e6571cd8ebc12a06444108f8",
+            "uploaded": "2019-07-09T10:32:09.169Z",
+            "converted": true,
+            "downloadURL": "/api/download/key/5621",
+            "coverURL": "/cdn/5621/c943cb71f8f99116e6571cd8ebc12a06444108f8.jpg"
+        },
+        {
+            "metadata": {
+                "difficulties": {
+                    "easy": false,
+                    "expert": false,
+                    "expertPlus": true,
+                    "hard": false,
+                    "normal": false
+                },
+                "characteristics": [
+                    {
+                        "name": "Standard",
+                        "difficulties": {
+                            "easy": null,
+                            "normal": null,
+                            "hard": null,
+                            "expert": null,
+                            "expertPlus": {
+                                "duration": 422.03125,
+                                "length": 130,
+                                "bombs": 0,
+                                "notes": 1829,
+                                "obstacles": 0,
+                                "njs": 20
+                            }
+                        }
+                    }
+                ],
+                "levelAuthorName": "BananenTropfen",
+                "songAuthorName": "Breis",
+                "songName": "Gay Green Greens",
+                "songSubName": "",
+                "bpm": 194
+            },
+            "stats": {
+                "downloads": 26,
+                "plays": 0,
+                "downVotes": 0,
+                "upVotes": 0,
+                "heat": 834.109694,
+                "rating": 0
+            },
+            "description": "jack wanted jumps so i mapped jumps (:",
+            "deletedAt": null,
+            "_id": "5d246ad8b3322b0006041aa0",
+            "key": "5620",
+            "name": "Gay Green Greens",
+            "uploader": {
+                "_id": "5cff0b7398cc5a672c84f5f3",
+                "username": "bananentropfen"
+            },
+            "hash": "a563de6f27b3f5064a4eedef0eef5477577dc460",
+            "uploaded": "2019-07-09T10:22:16.229Z",
+            "converted": true,
+            "downloadURL": "/api/download/key/5620",
+            "coverURL": "/cdn/5620/a563de6f27b3f5064a4eedef0eef5477577dc460.jpg"
+        },
+        {
+            "metadata": {
+                "difficulties": {
+                    "easy": false,
+                    "expert": false,
+                    "expertPlus": false,
+                    "hard": false,
+                    "normal": true
+                },
+                "characteristics": [
+                    {
+                        "name": "Standard",
+                        "difficulties": {
+                            "easy": null,
+                            "normal": {
+                                "duration": 495,
+                                "length": 221,
+                                "bombs": 0,
+                                "notes": 237,
+                                "obstacles": 11,
+                                "njs": 12
+                            },
+                            "hard": null,
+                            "expert": null,
+                            "expertPlus": null
+                        }
+                    }
+                ],
+                "levelAuthorName": "Backstreet Boys",
+                "songAuthorName": "BSB",
+                "songName": "incomplete ",
+                "songSubName": "",
+                "bpm": 134
+            },
+            "stats": {
+                "downloads": 33,
+                "plays": 0,
+                "downVotes": 0,
+                "upVotes": 0,
+                "heat": 834.0541963,
+                "rating": 0
+            },
+            "description": "Very Easy LvL \nMap by Jahoo\nGreek Community Beat saber",
+            "deletedAt": null,
+            "_id": "5d246116bc217b0006c910d2",
+            "key": "561f",
+            "name": "Backstreet Boys - Incomplete",
+            "uploader": {
+                "_id": "5d15fd9d1aea5f0006434422",
+                "username": "jahoo"
+            },
+            "hash": "793560ce306bc4769f1433fe2836286bfb80c6aa",
+            "uploaded": "2019-07-09T09:40:38.833Z",
+            "converted": true,
+            "downloadURL": "/api/download/key/561f",
+            "coverURL": "/cdn/561f/793560ce306bc4769f1433fe2836286bfb80c6aa.jpg"
+        },
+        {
+            "metadata": {
+                "difficulties": {
+                    "easy": false,
+                    "expert": true,
+                    "expertPlus": false,
+                    "hard": false,
+                    "normal": true
+                },
+                "characteristics": [
+                    {
+                        "name": "Standard",
+                        "difficulties": {
+                            "easy": null,
+                            "normal": {
+                                "duration": 240,
+                                "length": 112,
+                                "bombs": 0,
+                                "notes": 218,
+                                "obstacles": 5,
+                                "njs": 12
+                            },
+                            "hard": null,
+                            "expert": {
+                                "duration": 240,
+                                "length": 112,
+                                "bombs": 32,
+                                "notes": 328,
+                                "obstacles": 27,
+                                "njs": 12
+                            },
+                            "expertPlus": null
+                        }
+                    }
+                ],
+                "levelAuthorName": "elempedra + VRVancouver",
+                "songAuthorName": "Adrian Talens",
+                "songName": "Smash Forward Theme (Smash Forward OST)",
+                "songSubName": "",
+                "bpm": 128
+            },
+            "stats": {
+                "downloads": 37,
+                "plays": 0,
+                "downVotes": 0,
+                "upVotes": 0,
+                "heat": 834.0491012,
+                "rating": 0
+            },
+            "description": "Previews:\nNormal - https://youtu.be/9YhMAGgGuO0\nExpert - https://youtu.be/9JK3p4tE27w\n\nCustom map for the lead single of the \"Smash Forward: Growing the Vancouver Esports Scene\" official soundtrack by Adrian Talens. Available in Normal and Expert difficulty.\n\nAdrian Talens:\nhttps://twitter.com/adriantalens\n\nSmash Forward:\nhttps://twitter.com/smashforwarddoc\n\nAuthor note: My first beatmap! Thank you to BennyDaBeast and the rest of the BSMG community for the tutorials and resources. I learned a lot and will do my best to improve.",
+            "deletedAt": null,
+            "_id": "5d246031a4cb1600064a7094",
+            "key": "561e",
+            "name": "Smash Forward Theme (Smash Forward OST) - Adrian Talens",
+            "uploader": {
+                "_id": "5d23e746b49dd20006895f27",
+                "username": "elempedra"
+            },
+            "hash": "a8b7c228ae186ca827d0732bcf8c9e04ea201ee1",
+            "uploaded": "2019-07-09T09:36:49.556Z",
+            "converted": true,
+            "downloadURL": "/api/download/key/561e",
+            "coverURL": "/cdn/561e/a8b7c228ae186ca827d0732bcf8c9e04ea201ee1.jpg"
+        },
+        {
+            "metadata": {
+                "difficulties": {
+                    "easy": false,
+                    "expert": true,
+                    "expertPlus": true,
+                    "hard": true,
+                    "normal": false
+                },
+                "characteristics": [
+                    {
+                        "name": "Standard",
+                        "difficulties": {
+                            "easy": null,
+                            "normal": null,
+                            "hard": {
+                                "duration": 314,
+                                "length": 179,
+                                "bombs": 0,
+                                "notes": 529,
+                                "obstacles": 62,
+                                "njs": 10
+                            },
+                            "expert": {
+                                "duration": 314,
+                                "length": 179,
+                                "bombs": 0,
+                                "notes": 531,
+                                "obstacles": 84,
+                                "njs": 14.5
+                            },
+                            "expertPlus": {
+                                "duration": 314,
+                                "length": 179,
+                                "bombs": 0,
+                                "notes": 531,
+                                "obstacles": 93,
+                                "njs": 18
+                            }
+                        }
+                    }
+                ],
+                "levelAuthorName": "Vel-Sky",
+                "songAuthorName": "Two Feet ",
+                "songName": "I Feel Like I'm Drowning",
+                "songSubName": "",
+                "bpm": 105
+            },
+            "stats": {
+                "downloads": 59,
+                "plays": 0,
+                "downVotes": 1,
+                "upVotes": 1,
+                "heat": 834.016138,
+                "rating": 0.5
+            },
+            "description": "it's mostly doubles sorry about that",
+            "deletedAt": null,
+            "_id": "5d245a66b3322b0006041485",
+            "key": "561d",
+            "name": "Two Feet - I Feel Like I'm Drowning",
+            "uploader": {
+                "_id": "5d09a10a70f3260006555e09",
+                "username": "vel-sky"
+            },
+            "hash": "191dc8f6b33d082425a9116922807629a461b8f7",
+            "uploaded": "2019-07-09T09:12:06.210Z",
+            "converted": true,
+            "downloadURL": "/api/download/key/561d",
+            "coverURL": "/cdn/561d/191dc8f6b33d082425a9116922807629a461b8f7.jpg"
+        },
+        {
+            "metadata": {
+                "difficulties": {
+                    "easy": false,
+                    "expert": true,
+                    "expertPlus": false,
+                    "hard": false,
+                    "normal": false
+                },
+                "characteristics": [
+                    {
+                        "name": "Standard",
+                        "difficulties": {
+                            "easy": null,
+                            "normal": null,
+                            "hard": null,
+                            "expert": {
+                                "duration": 423.5,
+                                "length": 231,
+                                "bombs": 36,
+                                "notes": 1088,
+                                "obstacles": 19,
+                                "njs": 16
+                            },
+                            "expertPlus": null
+                        }
+                    }
+                ],
+                "levelAuthorName": "Oddloop",
+                "songAuthorName": "TheFatRat",
+                "songName": "The Calling (feat. Laura Brehm)",
+                "songSubName": "",
+                "bpm": 110
+            },
+            "stats": {
+                "downloads": 99,
+                "plays": 0,
+                "downVotes": 1,
+                "upVotes": 1,
+                "heat": 833.8938818,
+                "rating": 0.5
+            },
+            "description": "oddloop#4211 on discord if any issues, made a mistake and fixed em. ",
+            "deletedAt": null,
+            "_id": "5d2444e8e987980006b46285",
+            "key": "561c",
+            "name": "TheFatRat - The Calling feat. Laura Brehm",
+            "uploader": {
+                "_id": "5cff0b7398cc5a672c84fd45",
+                "username": "oddloop"
+            },
+            "hash": "4e54da2ed0a9cda841ff2d6d6cf7021a017b8325",
+            "uploaded": "2019-07-09T07:40:24.679Z",
+            "converted": true,
+            "downloadURL": "/api/download/key/561c",
+            "coverURL": "/cdn/561c/4e54da2ed0a9cda841ff2d6d6cf7021a017b8325.jpg"
+        },
+        {
+            "metadata": {
+                "difficulties": {
+                    "easy": false,
+                    "expert": true,
+                    "expertPlus": false,
+                    "hard": false,
+                    "normal": false
+                },
+                "characteristics": [
+                    {
+                        "name": "Standard",
+                        "difficulties": {
+                            "easy": null,
+                            "normal": null,
+                            "hard": null,
+                            "expert": {
+                                "duration": 515,
+                                "length": 241,
+                                "bombs": 207,
+                                "notes": 1340,
+                                "obstacles": 216,
+                                "njs": 15
+                            },
+                            "expertPlus": null
+                        }
+                    }
+                ],
+                "levelAuthorName": "Lemon",
+                "songAuthorName": "GameChops",
+                "songName": "Battle With Gladion",
+                "songSubName": "(Pokemon Sun & Moon)",
+                "bpm": 128
+            },
+            "stats": {
+                "downloads": 81,
+                "plays": 0,
+                "downVotes": 2,
+                "upVotes": 0,
+                "heat": 833.2698547,
+                "rating": 0.35920485264517465
+            },
+            "description": "first time uploading a chart to BeatSaver, tried adding a few extras to keep the level unique.",
+            "deletedAt": null,
+            "_id": "5d240c21e987980006b445f6",
+            "key": "5618",
+            "name": "Battle With Gladion (Pokemon Sun and Moon)",
+            "uploader": {
+                "_id": "5d23fb73b49dd20006896e15",
+                "username": "lemoin"
+            },
+            "hash": "cc0680b1d81302510725a3a2e23955611662fc07",
+            "uploaded": "2019-07-09T03:38:09.811Z",
+            "converted": true,
+            "downloadURL": "/api/download/key/5618",
+            "coverURL": "/cdn/5618/cc0680b1d81302510725a3a2e23955611662fc07.png"
+        },
+        {
+            "metadata": {
+                "difficulties": {
+                    "easy": false,
+                    "expert": true,
+                    "expertPlus": false,
+                    "hard": false,
+                    "normal": false
+                },
+                "characteristics": [
+                    {
+                        "name": "Standard",
+                        "difficulties": {
+                            "easy": null,
+                            "normal": null,
+                            "hard": null,
+                            "expert": {
+                                "duration": 394,
+                                "length": 187,
+                                "bombs": 78,
+                                "notes": 810,
+                                "obstacles": 0,
+                                "njs": 12
+                            },
+                            "expertPlus": null
+                        }
+                    }
+                ],
+                "levelAuthorName": "POCTOB-HA-DOHY",
+                "songAuthorName": "Diskoteka Avariia Nikolai Baskov",
+                "songName": "Fantazer",
+                "songSubName": "",
+                "bpm": 126
+            },
+            "stats": {
+                "downloads": 38,
+                "plays": 0,
+                "downVotes": 2,
+                "upVotes": 2,
+                "heat": 833.5504656,
+                "rating": 0.5
+            },
+            "description": "",
+            "deletedAt": null,
+            "_id": "5d24088ae987980006b4441c",
+            "key": "5617",
+            "name": "Diskoteka_Avariia_Nikolai_Baskov_-_Fantazer",
+            "uploader": {
+                "_id": "5d23dc93b49dd2000689571d",
+                "username": "poctob-ha-dohy"
+            },
+            "hash": "e4ac421fd7b6c03d314056d38db61be5aa90a146",
+            "uploaded": "2019-07-09T03:22:50.950Z",
+            "converted": true,
+            "downloadURL": "/api/download/key/5617",
+            "coverURL": "/cdn/5617/e4ac421fd7b6c03d314056d38db61be5aa90a146.jpg"
+        }
+    ],
+    "totalDocs": 14567,
+    "lastPage": 1456,
+    "prevPage": null,
+    "nextPage": 1
+
+}

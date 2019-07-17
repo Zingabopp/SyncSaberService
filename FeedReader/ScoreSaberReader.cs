@@ -5,6 +5,7 @@ using Newtonsoft.Json.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using FeedReader.Logging;
 using static FeedReader.WebUtils;
 
 namespace FeedReader
@@ -35,6 +36,7 @@ namespace FeedReader
         private const string LATEST_RANKED_KEY = "Latest Ranked";
         #endregion
 
+        public static FeedReaderLoggerBase Logger = new FeedReaderLogger(LoggingController.DefaultLogController);
         public string Name { get { return NameKey; } }
         public string Source { get { return SourceKey; } }
         public bool Ready { get; private set; }
@@ -129,7 +131,7 @@ namespace FeedReader
                     pageText = await response.Content.ReadAsStringAsync();
                 else
                 {
-                    //Logger.Error($"Error getting text from {url.ToString()}, HTTP Status Code is: {response.StatusCode.ToString()}: {response.ReasonPhrase}");
+                    Logger.Error($"Error getting text from {url.ToString()}, HTTP Status Code is: {response.StatusCode.ToString()}: {response.ReasonPhrase}");
                 }
             }
 
@@ -140,7 +142,7 @@ namespace FeedReader
             }
             catch (Exception ex)
             {
-                //Logger.Exception("Unable to parse JSON from text", ex);
+                Logger.Exception("Unable to parse JSON from text", ex);
             }
             foreach (var song in GetSongsFromPageText(pageText))
             {
@@ -161,7 +163,6 @@ namespace FeedReader
                 else
                     urlReplacements[PAGENUMKEY] = pageNum.ToString();
                 GetPageUrl(ref url, urlReplacements);
-                //Logger.Trace($"Adding pageReadTask {url.ToString()}");
                 foreach (var song in await GetSongsFromPageAsync(url.ToString()))
                 {
                     diffCount++;
@@ -191,7 +192,7 @@ namespace FeedReader
             }
             else
             {
-                //Logger.Error($"Error getting page {url}, response was {response.StatusCode.ToString()}: {response.ReasonPhrase}");
+                Logger.Error($"Error getting page {url}, response was {response.StatusCode.ToString()}: {response.ReasonPhrase}");
                 songs = new List<ScrapedSong>();
             }
             return songs;
@@ -207,23 +208,30 @@ namespace FeedReader
             }
             catch (Exception ex)
             {
-                //Logger.Exception("Unable to parse JSON from text", ex);
+                Logger.Exception("Unable to parse JSON from text", ex);
             }
             List<ScrapedSong> songs = new List<ScrapedSong>();
-
+            
             var songJSONAry = result["songs"]?.ToArray();
             if (songJSONAry == null)
             {
-                //Logger.Error("Invalid page text: 'songs' field not found.");
+                Logger.Error("Invalid page text: 'songs' field not found.");
             }
             foreach (var song in songJSONAry)
             {
                 var hash = song["id"]?.Value<string>();
+                var songName = song["name"]?.Value<string>();
+                var mapperName = song["levelAuthorName"]?.Value<string>();
 
                 if (!string.IsNullOrEmpty(hash))
                     songs.Add(new ScrapedSong(hash)
-                    {DownloadUrl = BEATSAVER_DOWNLOAD_URL_BASE + hash,
-                     RawData = StoreRawData ? song.ToString(Newtonsoft.Json.Formatting.None) : string.Empty });
+                    {
+                        DownloadUrl = BEATSAVER_DOWNLOAD_URL_BASE + hash,
+                        SongName = songName,
+                        MapperName = mapperName,
+                        RawData = StoreRawData ? song.ToString(Newtonsoft.Json.Formatting.None) : string.Empty
+                    });
+                ;
             }
             return songs;
         }
@@ -233,7 +241,7 @@ namespace FeedReader
 
         }
 
-         }
+    }
 
     public class ScoreSaberFeedSettings : IFeedSettings
     {

@@ -13,6 +13,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Net.Http;
+using FeedReader.Logging;
 
 namespace FeedReader
 {
@@ -36,7 +37,7 @@ namespace FeedReader
         private const string XML_AUTHOR_KEY = "LevelAuthorName";
         private const string XML_SONGKEY_KEY = "SongKey";
         #endregion
-
+        public static FeedReaderLoggerBase Logger = new FeedReaderLogger(LoggingController.DefaultLogController);
         public string Name { get { return NameKey; } }
         public string Source { get { return SourceKey; } }
         public bool Ready { get; private set; }
@@ -125,7 +126,7 @@ namespace FeedReader
             {
                 songsOnPage = ParseJsonPage(pageText);
             }
-            //Logger.Debug($"{songsOnPage.Count} songs on the page");
+            Logger.Debug($"{songsOnPage.Count} songs on the page");
             return songsOnPage;
         }
 
@@ -145,12 +146,12 @@ namespace FeedReader
                 {
                     if (retry == true)
                     {
-                        //Logger.Exception("Exception parsing XML.", ex);
+                        Logger.Exception("Exception parsing XML.", ex);
                         retry = false;
                     }
                     else
                     {
-                        //Logger.Warning("Invalid XML formatting detected, attempting to fix...");
+                        Logger.Warning("Invalid XML formatting detected, attempting to fix...");
                         pageText = pageText.Replace(" & ", " &amp; ");
                         retry = true;
                     }
@@ -164,11 +165,10 @@ namespace FeedReader
                 XmlNode node = (XmlNode)obj;
                 if (node["DownloadURL"] == null || node["SongTitle"] == null)
                 {
-                    //Logger.Debug("Not a song! Skipping!");
+                    Logger.Debug("Not a song! Skipping!");
                 }
                 else
                 {
-                    // TODO: Not really using any of this except the hash.
                     string songName = node[XML_TITLE_KEY].InnerText;
                     string downloadUrl = node[XML_DOWNLOADURL_KEY]?.InnerText;
                     string hash = node[XML_HASH_KEY]?.InnerText?.ToUpper();
@@ -176,7 +176,7 @@ namespace FeedReader
                     string songKey = node[XML_SONGKEY_KEY]?.InnerText;
                     if (downloadUrl.Contains("dl.php"))
                     {
-                        //Logger.Warning("Skipping BeastSaber download with old url format!");
+                       Logger.Warning("Skipping BeastSaber download with old url format!");
                     }
                     else
                     {
@@ -199,6 +199,8 @@ namespace FeedReader
                             songsOnPage.Add(new ScrapedSong(hash)
                             {
                                 DownloadUrl = downloadUrl,
+                                SongName = songName,
+                                MapperName = authorName,
                                 RawData = jObject != null ? jObject.ToString(Newtonsoft.Json.Formatting.None) : string.Empty
                             });
                         }
@@ -219,7 +221,7 @@ namespace FeedReader
             }
             catch (Exception ex)
             {
-                //Logger.Exception("Unable to parse JSON from text", ex);
+                Logger.Exception("Unable to parse JSON from text", ex);
             }
 
             var songs = result["songs"];
@@ -228,6 +230,8 @@ namespace FeedReader
                 // Try to get the song hash from BeastSaber
                 string songHash = bSong["hash"]?.Value<string>();
                 string songKey = bSong["song_key"]?.Value<string>();
+                string songName = bSong["title"]?.Value<string>();
+                string mapperName = bSong["level_author_name"]?.Value<string>();
                 string downloadUrl = "";
                 if (!string.IsNullOrEmpty(songKey))
                 {
@@ -238,6 +242,8 @@ namespace FeedReader
                     songsOnPage.Add(new ScrapedSong(songHash)
                     {
                         DownloadUrl = downloadUrl,
+                        SongName = songName,
+                        MapperName = mapperName,
                         RawData = StoreRawData ? bSong.ToString(Newtonsoft.Json.Formatting.None) : string.Empty
                     });
                 }
@@ -270,7 +276,7 @@ namespace FeedReader
         public string GetPageUrl(string feedUrlBase, int page)
         {
             string feedUrl = feedUrlBase.Replace(USERNAMEKEY, _username).Replace(PAGENUMKEY, page.ToString());
-            //Logger.Debug($"Replacing {USERNAMEKEY} with {_username} in base URL:\n   {feedUrlBase}");
+            Logger.Debug($"Replacing {USERNAMEKEY} with {_username} in base URL:\n   {feedUrlBase}");
             return feedUrl;
         }
 
@@ -293,7 +299,7 @@ namespace FeedReader
                 throw new InvalidCastException(INVALIDFEEDSETTINGSMESSAGE);
             if (_settings.FeedIndex != 2 && string.IsNullOrEmpty(_username?.Trim()))
             {
-                //Logger.Error($"Can't access feed without a valid username in the config file");
+                Logger.Error($"Can't access feed without a valid username in the config file");
                 throw new ArgumentException("Cannot access this feed without a valid username.");
             }
             int pageIndex = 0;
@@ -387,7 +393,7 @@ namespace FeedReader
                 throw new InvalidCastException(INVALIDFEEDSETTINGSMESSAGE);
             if (_settings.FeedIndex != 2 && string.IsNullOrEmpty(_username?.Trim()))
             {
-                //Logger.Error($"Can't access feed without a valid username in the config file");
+                Logger.Error($"Can't access feed without a valid username in the config file");
                 throw new ArgumentException("Cannot access this feed without a valid username.");
             }
             var retDict = GetSongsFromFeedAsync(settings).Result;
