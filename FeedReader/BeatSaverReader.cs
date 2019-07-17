@@ -182,12 +182,10 @@ namespace FeedReader
                     string songSource = string.Empty;
                     foreach (var author in settings.Authors)
                     {
-                        if (newSongs == null || newSongs.Count == 0)
-                        {
-                            newSongs = await GetSongsByAuthorAsync(author).ConfigureAwait(false);
-                            songSource = "Beat Saver";
-                        }
+                        newSongs = await GetSongsByAuthorAsync(author).ConfigureAwait(false);
+                        songSource = "Beat Saver";
                         songs.AddRange(newSongs);
+
                         Logger.Info($"Found {newSongs.Count} songs uploaded by {author} from {songSource}");
                     }
                     break;
@@ -361,7 +359,7 @@ namespace FeedReader
                     return songs;
                 }
             }
-            
+
             foreach (var song in ParseSongsFromPage(pageText))
             {
                 songs.Add(song);
