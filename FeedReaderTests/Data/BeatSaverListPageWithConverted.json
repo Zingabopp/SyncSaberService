@@ -1,0 +1,609 @@
+﻿{
+
+  "docs": [
+    {
+      "metadata": {
+        "difficulties": {
+          "easy": false,
+          "expert": false,
+          "expertPlus": true,
+          "hard": false,
+          "normal": false
+        },
+        "characteristics": [
+          {
+            "difficulties": {
+              "easy": null,
+              "expert": null,
+              "expertPlus": {
+                "duration": 528.056640625,
+                "length": 186,
+                "njs": 17,
+                "njsOffset": 1,
+                "bombs": 35,
+                "notes": 807,
+                "obstacles": 209
+              },
+              "hard": null,
+              "normal": null
+            },
+            "name": "Standard"
+          }
+        ],
+        "levelAuthorName": "xScaramouche",
+        "songAuthorName": "Ed Sheeran",
+        "songName": "Way To Break My Heart (ft. Skrillex)",
+        "songSubName": "",
+        "bpm": 170
+      },
+      "stats": {
+        "downloads": 194,
+        "plays": 0,
+        "downVotes": 0,
+        "upVotes": 3,
+        "heat": 849.0780814,
+        "rating": 0.6705937099936721
+      },
+      "description": "Way To Break My Heart (ft. Skrillex) - Ed Sheeran\n\nNot really a fan of Ed Sheeran's work but this was a Skrillex release so I had to map it.\n\n4th re-upload of this map because I only have 3.5 brain cells.",
+      "deletedAt": null,
+      "_id": "5d2e5e23100c89000661b0b6",
+      "key": "576f",
+      "name": "Way To Break My Heart (ft. Skrillex) - Ed Sheeran",
+      "uploader": {
+        "_id": "5cff0b7798cc5a672c8558ed",
+        "username": "xscaramouche"
+      },
+      "hash": "f5a6ac517ab6a78d9c2ebda05e94ee15bc4f6d27",
+      "uploaded": "2019-07-16T23:30:43.207Z",
+      "downloadURL": "/api/download/key/576f",
+      "coverURL": "/cdn/576f/f5a6ac517ab6a78d9c2ebda05e94ee15bc4f6d27.jpg"
+    },
+    {
+      "metadata": {
+        "difficulties": {
+          "easy": false,
+          "expert": true,
+          "expertPlus": true,
+          "hard": true,
+          "normal": false
+        },
+        "characteristics": [
+          {
+            "difficulties": {
+              "easy": null,
+              "expert": {
+                "duration": 359.6892395019531,
+                "length": 120,
+                "njs": 12,
+                "njsOffset": 0,
+                "bombs": 0,
+                "notes": 456,
+                "obstacles": 6
+              },
+              "expertPlus": {
+                "duration": 359.6892395019531,
+                "length": 120,
+                "njs": 16,
+                "njsOffset": 0,
+                "bombs": 12,
+                "notes": 623,
+                "obstacles": 11
+              },
+              "hard": {
+                "duration": 359.6892395019531,
+                "length": 120,
+                "njs": 10,
+                "njsOffset": 0,
+                "bombs": 0,
+                "notes": 306,
+                "obstacles": 0
+              },
+              "normal": null
+            },
+            "name": "Standard"
+          }
+        ],
+        "levelAuthorName": "Yubashi",
+        "songAuthorName": "Uganda Theme Song",
+        "songName": "Do you know de way",
+        "songSubName": "",
+        "bpm": 179.8000030517578
+      },
+      "stats": {
+        "downloads": 459,
+        "plays": 0,
+        "downVotes": 2,
+        "upVotes": 6,
+        "heat": 849.1646588,
+        "rating": 0.6209718738361584
+      },
+      "description": "A Tribute to all Knuckles in the World\r\nWe'll find the Queen!",
+      "deletedAt": null,
+      "_id": "5d2e5764100c89000661ab0b",
+      "key": "576d",
+      "name": "Uganda Theme Song",
+      "uploader": {
+        "_id": "5d2e470b5dee270006fd5186",
+        "username": "yubashi"
+      },
+      "hash": "97f87f05c844750cc2360af287806f7c270b15fb",
+      "uploaded": "2019-07-16T23:01:56.946Z",
+      "downloadURL": "/api/download/key/576d",
+      "coverURL": "/cdn/576d/97f87f05c844750cc2360af287806f7c270b15fb.png"
+    },
+    {
+      "metadata": {
+        "difficulties": {
+          "easy": false,
+          "expert": false,
+          "expertPlus": true,
+          "hard": false,
+          "normal": false
+        },
+        "characteristics": [
+          {
+            "difficulties": {
+              "easy": null,
+              "expert": null,
+              "expertPlus": {
+                "duration": 819.5,
+                "length": 252,
+                "njs": 19,
+                "njsOffset": 0,
+                "bombs": 232,
+                "notes": 1173,
+                "obstacles": 144
+              },
+              "hard": null,
+              "normal": null
+            },
+            "name": "Standard"
+          }
+        ],
+        "levelAuthorName": "denpadokei",
+        "songAuthorName": "AKINO from bless4",
+        "songName": "Miiro",
+        "songSubName": "",
+        "bpm": 195
+      },
+      "stats": {
+        "downloads": 131,
+        "plays": 0,
+        "downVotes": 0,
+        "upVotes": 2,
+        "heat": 848.8471325,
+        "rating": 0.6407951473548253
+      },
+      "description": "Title:海色\nSong by AKINO from bless4\n\nEX+ onry",
+      "deletedAt": null,
+      "_id": "5d2e547e100c89000661a819",
+      "key": "576c",
+      "name": "Miiro",
+      "uploader": {
+        "_id": "5cff0b7698cc5a672c8540a7",
+        "username": "denpadokei"
+      },
+      "hash": "b12d32745818d22df48ebcb861450a2946528930",
+      "uploaded": "2019-07-16T22:49:34.613Z",
+      "downloadURL": "/api/download/key/576c",
+      "coverURL": "/cdn/576c/b12d32745818d22df48ebcb861450a2946528930.jpg"
+    },
+    {
+      "metadata": {
+        "difficulties": {
+          "easy": false,
+          "expert": false,
+          "expertPlus": true,
+          "hard": false,
+          "normal": false
+        },
+        "characteristics": [
+          {
+            "difficulties": {
+              "easy": null,
+              "expert": null,
+              "expertPlus": {
+                "duration": 645.3333740234375,
+                "length": 242,
+                "njs": 20,
+                "njsOffset": 0,
+                "bombs": 0,
+                "notes": 1059,
+                "obstacles": 53
+              },
+              "hard": null,
+              "normal": null
+            },
+            "name": "Standard"
+          }
+        ],
+        "levelAuthorName": "Raxan Zeric",
+        "songAuthorName": "Ronan Parke",
+        "songName": "Move",
+        "songSubName": "",
+        "bpm": 160
+      },
+      "stats": {
+        "downloads": 57,
+        "plays": 0,
+        "downVotes": 0,
+        "upVotes": 0,
+        "heat": 848.5045612,
+        "rating": 0
+      },
+      "description": "Made by Raxan",
+      "deletedAt": null,
+      "_id": "5d2e4d31100c89000661a2ee",
+      "key": "576b",
+      "name": "Move by Ronan Parke",
+      "uploader": {
+        "_id": "5d2e4c595dee270006fd566a",
+        "username": "umbra7991"
+      },
+      "hash": "db92c76736c22fb5c1672164c78605038b920d01",
+      "uploaded": "2019-07-16T22:18:25.255Z",
+      "downloadURL": "/api/download/key/576b",
+      "coverURL": "/cdn/576b/db92c76736c22fb5c1672164c78605038b920d01.jpg"
+    },
+    {
+      "metadata": {
+        "difficulties": {
+          "easy": false,
+          "expert": true,
+          "expertPlus": false,
+          "hard": false,
+          "normal": false
+        },
+        "characteristics": [
+          {
+            "difficulties": {
+              "easy": null,
+              "expert": {
+                "duration": 556.989990234375,
+                "length": 253,
+                "njs": 12,
+                "njsOffset": 1,
+                "bombs": 0,
+                "notes": 728,
+                "obstacles": 1163
+              },
+              "expertPlus": null,
+              "hard": null,
+              "normal": null
+            },
+            "name": "Standard"
+          }
+        ],
+        "levelAuthorName": "WeL",
+        "songAuthorName": "Auralnauts、Silver Letomi",
+        "songName": "You Spin Me Round",
+        "songSubName": "",
+        "bpm": 132
+      },
+      "stats": {
+        "downloads": 219,
+        "plays": 0,
+        "downVotes": 1,
+        "upVotes": 2,
+        "heat": 848.497962,
+        "rating": 0.5568645699978907
+      },
+      "description": "",
+      "deletedAt": null,
+      "_id": "5d2e4c08bc201300063b59c9",
+      "key": "576a",
+      "name": "Auralnauts、Silver Letomi - You Spin Me Round",
+      "uploader": {
+        "_id": "5cff0b7398cc5a672c84f556",
+        "username": "wei"
+      },
+      "hash": "f9789ec58cb7ff7756af0d314c022f6a642b99d3",
+      "uploaded": "2019-07-16T22:13:28.289Z",
+      "downloadURL": "/api/download/key/576a",
+      "coverURL": "/cdn/576a/f9789ec58cb7ff7756af0d314c022f6a642b99d3.png"
+    },
+    {
+      "metadata": {
+        "difficulties": {
+          "easy": false,
+          "expert": false,
+          "expertPlus": true,
+          "hard": false,
+          "normal": false
+        },
+        "characteristics": [
+          {
+            "name": "Standard",
+            "difficulties": {
+              "easy": null,
+              "normal": null,
+              "hard": null,
+              "expert": null,
+              "expertPlus": {
+                "duration": 546.1625366210938,
+                "length": 218,
+                "bombs": 4,
+                "notes": 1278,
+                "obstacles": 53,
+                "njs": 20,
+                "njsOffset": 0
+              }
+            }
+          }
+        ],
+        "levelAuthorName": "Nuketime",
+        "songAuthorName": "Jonathan Young & Jason Paige",
+        "songName": "The Pokemon Theme ",
+        "songSubName": "",
+        "bpm": 150
+      },
+      "stats": {
+        "downloads": 577,
+        "plays": 0,
+        "downVotes": 4,
+        "upVotes": 5,
+        "heat": 848.3636434,
+        "rating": 0.5277777777777778
+      },
+      "description": "I cant not sing to this.\nHope everyone has fun with this one!\n\nCommissioned from Austinator13",
+      "deletedAt": null,
+      "_id": "5d2e346bf9fa5c0006c48791",
+      "key": "5768",
+      "name": "Pokemon Theme Song (Metal Cover)",
+      "uploader": {
+        "_id": "5cff0b7498cc5a672c8507f7",
+        "username": "nuketime"
+      },
+      "hash": "f2c7de64e9539cf983b073944c268653467e0cdf",
+      "uploaded": "2019-07-16T20:32:43.955Z",
+      "converted": "new",
+      "downloadURL": "/api/download/key/5768",
+      "coverURL": "/cdn/5768/f2c7de64e9539cf983b073944c268653467e0cdf.jpg"
+    },
+    {
+      "metadata": {
+        "difficulties": {
+          "easy": false,
+          "expert": false,
+          "expertPlus": true,
+          "hard": false,
+          "normal": false
+        },
+        "characteristics": [
+          {
+            "name": "Standard",
+            "difficulties": {
+              "easy": null,
+              "normal": null,
+              "hard": null,
+              "expert": null,
+              "expertPlus": {
+                "duration": 448.5333251953125,
+                "length": 134,
+                "bombs": 12,
+                "notes": 783,
+                "obstacles": 2,
+                "njs": 18,
+                "njsOffset": 0
+              }
+            }
+          }
+        ],
+        "levelAuthorName": "Rigid",
+        "songAuthorName": "Shiggy Jr.",
+        "songName": "Oyasumi",
+        "songSubName": "",
+        "bpm": 200
+      },
+      "stats": {
+        "downloads": 338,
+        "plays": 0,
+        "downVotes": 1,
+        "upVotes": 13,
+        "heat": 849.4327092,
+        "rating": 0.7389076196210433
+      },
+      "description": "good night",
+      "deletedAt": null,
+      "_id": "5d2e32a4df3a8b00067c7b04",
+      "key": "5767",
+      "name": "Shiggy Jr. - Oyasumi",
+      "uploader": {
+        "_id": "5cff0b7598cc5a672c852224",
+        "username": "rigid"
+      },
+      "hash": "7fd301cb944dfda280834070f4ecce26a4a1bbf5",
+      "uploaded": "2019-07-16T20:25:08.760Z",
+      "converted": "new",
+      "downloadURL": "/api/download/key/5767",
+      "coverURL": "/cdn/5767/7fd301cb944dfda280834070f4ecce26a4a1bbf5.png"
+    },
+    {
+      "metadata": {
+        "difficulties": {
+          "easy": false,
+          "expert": true,
+          "expertPlus": false,
+          "hard": false,
+          "normal": true
+        },
+        "characteristics": [
+          {
+            "name": "Standard",
+            "difficulties": {
+              "easy": null,
+              "normal": {
+                "duration": 181,
+                "length": 83,
+                "bombs": 0,
+                "notes": 122,
+                "obstacles": 2,
+                "njs": 0,
+                "njsOffset": 0
+              },
+              "hard": null,
+              "expert": {
+                "duration": 181,
+                "length": 83,
+                "bombs": 0,
+                "notes": 278,
+                "obstacles": 4,
+                "njs": 12,
+                "njsOffset": 0
+              },
+              "expertPlus": null
+            }
+          }
+        ],
+        "levelAuthorName": "Pixelman546",
+        "songAuthorName": "Danny Baranowsky",
+        "songName": "Gleeokenspiel Battle",
+        "songSubName": "",
+        "bpm": 130
+      },
+      "stats": {
+        "downloads": 148,
+        "plays": 0,
+        "downVotes": 0,
+        "upVotes": 0,
+        "heat": 848.333809,
+        "rating": 0
+      },
+      "description": "One of my three favorite boss themes from Cadence of Hyrule! The song's artist is the legendary Danny Baranowsky; Beatmap was made by me. (obviously) \nI hope you enjoy! These maps are fun to make but they sure do take some time. Follow me on Youtube and Twitter!\nTwitter: @TheRealPixelman\nYoutube: https://www.youtube.com/channel/UCNg-SEKP36SktAuiBmnOHyg?view_as=subscriber",
+      "deletedAt": null,
+      "_id": "5d2e2f2ddf3a8b00067c7816",
+      "key": "5766",
+      "name": "Gleeokenspiel Boss Battle",
+      "uploader": {
+        "_id": "5d09b528f9117f00061ee31f",
+        "username": "pixelman546"
+      },
+      "hash": "6c8cf102b0466193bc883419e6cdd5f1e6204fb6",
+      "uploaded": "2019-07-16T20:10:21.407Z",
+      "converted": "new",
+      "downloadURL": "/api/download/key/5766",
+      "coverURL": "/cdn/5766/6c8cf102b0466193bc883419e6cdd5f1e6204fb6.png"
+    },
+    {
+      "metadata": {
+        "difficulties": {
+          "easy": false,
+          "expert": true,
+          "expertPlus": false,
+          "hard": false,
+          "normal": false
+        },
+        "characteristics": [
+          {
+            "name": "Standard",
+            "difficulties": {
+              "easy": null,
+              "normal": null,
+              "hard": null,
+              "expert": {
+                "duration": 177.08334350585938,
+                "length": 106,
+                "bombs": 0,
+                "notes": 613,
+                "obstacles": 0,
+                "njs": 15,
+                "njsOffset": 0
+              },
+              "expertPlus": null
+            }
+          }
+        ],
+        "levelAuthorName": "Raven_xDDDDD",
+        "songAuthorName": "M2U",
+        "songName": "Stellar",
+        "songSubName": "",
+        "bpm": 100
+      },
+      "stats": {
+        "downloads": 155,
+        "plays": 0,
+        "downVotes": 0,
+        "upVotes": 2,
+        "heat": 848.6237584,
+        "rating": 0.6407951473548253
+      },
+      "description": "100 BPM (´･_･`)\n613 Notes BTW\n(Reupload)",
+      "deletedAt": null,
+      "_id": "5d2e2d3acaaa3400069fa51d",
+      "key": "5765",
+      "name": "M2U - Stellar",
+      "uploader": {
+        "_id": "5d2e25a913100a0006212d76",
+        "username": "raven?"
+      },
+      "hash": "b6052d9a4073d13aedd0fbed60c2b7cdbcbaecfb",
+      "uploaded": "2019-07-16T20:02:02.776Z",
+      "converted": "new",
+      "downloadURL": "/api/download/key/5765",
+      "coverURL": "/cdn/5765/b6052d9a4073d13aedd0fbed60c2b7cdbcbaecfb.png"
+    },
+    {
+      "metadata": {
+        "difficulties": {
+          "easy": false,
+          "expert": false,
+          "expertPlus": false,
+          "hard": true,
+          "normal": false
+        },
+        "characteristics": [
+          {
+            "name": "OneSaber",
+            "difficulties": {
+              "easy": null,
+              "normal": null,
+              "hard": {
+                "duration": 206,
+                "length": 147,
+                "bombs": 0,
+                "notes": 240,
+                "obstacles": 0,
+                "njs": 12,
+                "njsOffset": 0
+              },
+              "expert": null,
+              "expertPlus": null
+            }
+          }
+        ],
+        "levelAuthorName": "Bebe Rehxa",
+        "songAuthorName": "Bebe Rehxa",
+        "songName": "Last Hurrah",
+        "songSubName": "",
+        "bpm": 84
+      },
+      "stats": {
+        "downloads": 93,
+        "plays": 0,
+        "downVotes": 2,
+        "upVotes": 1,
+        "heat": 848.3029663,
+        "rating": 0.4431354300021093
+      },
+      "description": "**RIGHT SABER ONLY SONG**\n\nI'm creating a series of one handed songs for the injured and/or disabled so they can enjoy beatsaber too.",
+      "deletedAt": null,
+      "_id": "5d2e29c197e4d4000653e7a8",
+      "key": "5764",
+      "name": "(One-Handed) Last Hurrah - Bebe Rehxa",
+      "uploader": {
+        "_id": "5d28f1cc93d60200060970b4",
+        "username": "winterkat"
+      },
+      "hash": "1335f43e9c005544c799bd7e98d56f8f7cfa7567",
+      "uploaded": "2019-07-16T19:47:13.484Z",
+      "converted": "new",
+      "downloadURL": "/api/download/key/5764",
+      "coverURL": "/cdn/5764/1335f43e9c005544c799bd7e98d56f8f7cfa7567.jpg"
+    }
+  ],
+  "totalDocs": 14760,
+  "lastPage": 1475,
+  "prevPage": 3,
+  "nextPage": 5
+
+}
