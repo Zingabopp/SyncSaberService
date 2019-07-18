@@ -395,7 +395,7 @@ namespace SyncSaberLib.Data
         public string hash { get { return _hash; } set { _hash = value.ToUpper(); } }
 
         [JsonProperty("converted")]
-        public bool converted { get; set; }
+        public string converted { get; set; }
 
         [JsonProperty("downloadURL")]
         public string downloadURL { get; set; }
@@ -463,6 +463,8 @@ namespace SyncSaberLib.Data
         public int obstacles { get; set; }
         [JsonProperty("njs")]
         public float njs { get; set; }
+        [JsonProperty("njsOffset")]
+        public float njsOffset { get; set; }
     }
 
     public class SongStats
