@@ -38,7 +38,7 @@ namespace SyncSaberConsole
             var song = ScrapedDataProvider.Songs.Values.Where(s => s.ScoreSaberInfo.Any(d => d.Value.uid == 155732)).FirstOrDefault();
 
             var found = ScrapedDataProvider.TryGetSongByKey("3f57", out SongInfo badSong, false);
-            var CustomSongsPath = Path.Combine(Config.BeatSaberPath, @"Beat Saber_Data\CustomLevels"); 
+            var CustomSongsPath = Path.Combine(OldConfig.BeatSaberPath, @"Beat Saber_Data\CustomLevels"); 
             var tempFolder = new DirectoryInfo(Path.Combine(Path.GetTempPath(), badSong.key + ".zip"));
             var outputFolder = new DirectoryInfo(Path.Combine(CustomSongsPath, $"{badSong.key} ({Utilities.MakeSafeFilename(badSong.songName)} - {Utilities.MakeSafeFilename(badSong.authorName)})"));
             var job = new DownloadJob(badSong, tempFolder.FullName, outputFolder.FullName);
@@ -86,8 +86,8 @@ namespace SyncSaberConsole
             {
                 try
                 {
-                    Config.Initialize();
-                    Logger.LogLevel = Config.StrToLogLevel(Config.LoggingLevel);
+                    OldConfig.Initialize();
+                    Logger.LogLevel = OldConfig.StrToLogLevel(OldConfig.LoggingLevel);
                     if (Logger.LogLevel < LogLevel.Info)
                         Logger.ShortenSourceName = false;
                 }
@@ -95,7 +95,7 @@ namespace SyncSaberConsole
                 {
                     Logger.Exception("Error initializing Config", ex);
                 }
-                Logger.Info($"Using Beat Saber directory: {Config.BeatSaberPath}");
+                Logger.Info($"Using Beat Saber directory: {OldConfig.BeatSaberPath}");
                 ScrapedDataProvider.Initialize();
                 Logger.Info($"Scrapes loaded, {ScrapedDataProvider.BeatSaverSongs.Data.Count} BeatSaverSongs and {ScrapedDataProvider.ScoreSaberSongs.Data.Count} ScoreSaber difficulties loaded");
                 //DoFullScrape();
@@ -111,8 +111,8 @@ namespace SyncSaberConsole
                             if (bsDir.GetFiles("Beat Saber.exe").Length > 0)
                             {
                                 Logger.Info("Found Beat Saber.exe");
-                                Config.BeatSaberPath = bsDir.FullName;
-                                Logger.Info($"Updated Beat Saber directory path to {Config.BeatSaberPath}");
+                                OldConfig.BeatSaberPath = bsDir.FullName;
+                                Logger.Info($"Updated Beat Saber directory path to {OldConfig.BeatSaberPath}");
                                 Console.WriteLine("Press any key to continue...");
                                 Console.ReadKey();
                             }
@@ -127,21 +127,21 @@ namespace SyncSaberConsole
                 }
 
 
-                if (!Config.CriticalError)
+                if (!OldConfig.CriticalError)
                 {
-                    WebUtils.Initialize(Config.MaxConcurrentPageChecks);
+                    WebUtils.Initialize(OldConfig.MaxConcurrentPageChecks);
                     Stopwatch sw = new Stopwatch();
                     sw.Start();
                     SyncSaber ss = new SyncSaber();
                     ss.ScrapeNewSongs();
                     Console.WriteLine();
-                    if (Config.SyncFavoriteMappersFeed && Config.FavoriteMappers.Count > 0)
+                    if (OldConfig.SyncFavoriteMappersFeed && OldConfig.FavoriteMappers.Count > 0)
                     {
                         Logger.Info($"Downloading songs from FavoriteMappers.ini...");
                         try
                         {
                             ss.DownloadSongsFromFeed(BeatSaverReader.NameKey, new BeatSaverFeedSettings(0) {
-                                Authors = Config.FavoriteMappers.ToArray()
+                                Authors = OldConfig.FavoriteMappers.ToArray()
                             });
                         }
                         catch(AggregateException ae)
@@ -155,11 +155,11 @@ namespace SyncSaberConsole
                     }
                     else
                     {
-                        if(Config.SyncFavoriteMappersFeed)
-                            Logger.Warning($"Skipping FavoriteMappers.ini feed, no authors found in {Config.BeatSaberPath + @"\UserData\FavoriteMappers.ini"}");
+                        if(OldConfig.SyncFavoriteMappersFeed)
+                            Logger.Warning($"Skipping FavoriteMappers.ini feed, no authors found in {OldConfig.BeatSaberPath + @"\UserData\FavoriteMappers.ini"}");
                     }
 
-                    if (Config.SyncFollowingsFeed)
+                    if (OldConfig.SyncFollowingsFeed)
                     {
                         // Followings
                         Console.WriteLine();
@@ -168,7 +168,7 @@ namespace SyncSaberConsole
                         {
                             //ss.DownloadBeastSaberFeed(0, Web.BeastSaberReader.GetMaxBeastSaberPages(0));
                             ss.DownloadSongsFromFeed(BeastSaberReader.NameKey, new BeastSaberFeedSettings(0) {
-                                MaxPages = Config.MaxFollowingsPages
+                                MaxPages = OldConfig.MaxFollowingsPages
                             });
                         }
                         catch (AggregateException ae)
@@ -181,7 +181,7 @@ namespace SyncSaberConsole
                         }
                     }
                     // Bookmarks
-                    if (Config.SyncBookmarksFeed)
+                    if (OldConfig.SyncBookmarksFeed)
                     {
                         Console.WriteLine();
                         Logger.Info($"Downloading songs from {BeastSaberReader.Feeds[BeastSaberFeeds.BOOKMARKS].Name} feed...");
@@ -189,7 +189,7 @@ namespace SyncSaberConsole
                         {
                             //ss.DownloadBeastSaberFeed(1, Web.BeastSaberReader.GetMaxBeastSaberPages(1));
                             ss.DownloadSongsFromFeed(BeastSaberReader.NameKey, new BeastSaberFeedSettings(1) {
-                                MaxPages = Config.MaxBookmarksPages
+                                MaxPages = OldConfig.MaxBookmarksPages
                             });
                         }
                         catch (AggregateException ae)
@@ -201,7 +201,7 @@ namespace SyncSaberConsole
                             Logger.Exception($"Exception downloading BeastSaberFeed: Bookmarks", ex);
                         }
                     }
-                    if (Config.SyncCuratorRecommendedFeed)
+                    if (OldConfig.SyncCuratorRecommendedFeed)
                     {
                         // Curator Recommended
                         Console.WriteLine();
@@ -210,7 +210,7 @@ namespace SyncSaberConsole
                         {
                             //ss.DownloadBeastSaberFeed(2, Web.BeastSaberReader.GetMaxBeastSaberPages(2));
                             ss.DownloadSongsFromFeed(BeastSaberReader.NameKey, new BeastSaberFeedSettings(2) {
-                                MaxPages = Config.MaxCuratorRecommendedPages
+                                MaxPages = OldConfig.MaxCuratorRecommendedPages
                             });
                         }
                         catch (AggregateException ae)
@@ -223,7 +223,7 @@ namespace SyncSaberConsole
                         }
                     }
 
-                    if (Config.SyncTopPPFeed)
+                    if (OldConfig.SyncTopPPFeed)
                     {
                         // ScoreSaber Top PP
                         Console.WriteLine();
@@ -269,8 +269,8 @@ namespace SyncSaberConsole
                 }
                 else
                 {
-                    foreach (string e in Config.Errors)
-                        Logger.Error($"Invalid setting: {e} = {Config.Setting[e]}");
+                    foreach (string e in OldConfig.Errors)
+                        Logger.Error($"Invalid setting: {e} = {OldConfig.Setting[e]}");
                 }
 
 

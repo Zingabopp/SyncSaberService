@@ -86,6 +86,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Config.cs" />
+    <Compile Include="Config\CustomSetting.cs" />
+    <Compile Include="Config\IFeedConfig.cs" />
+    <Compile Include="Config\ISyncSaberLibConfig.cs" />
     <Compile Include="Data\BeatSaverScrape.cs" />
     <Compile Include="Data\JsonConverters.cs" />
     <Compile Include="Data\ScoreSaberScrape.cs" />

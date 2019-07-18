@@ -10,7 +10,7 @@ using static SyncSaberLib.Utilities;
 
 namespace SyncSaberLib
 {
-    public static class Config
+    public static class OldConfig
     {
         public static class SettingKeys
         {
