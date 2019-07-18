@@ -16,7 +16,7 @@ namespace FeedReaderTests
             if (!WebUtils.IsInitialized)
                 WebUtils.Initialize();
         }
-
+        #region Web
         [TestMethod]
         public void GetSongsFromFeed_Authors_Test()
         {
@@ -115,6 +115,28 @@ namespace FeedReaderTests
             {
                 Console.WriteLine($"{song.SongName} by {song.MapperName}, {song.Hash}");
             }
+        }
+        #endregion
+
+        [TestMethod]
+        public void ParseSongsFromPage_Test()
+        {
+            string pageText = File.ReadAllText(@"Data\BeatSaverListPage.json");
+            var songs = BeatSaverReader.ParseSongsFromPage(pageText);
+            Assert.IsTrue(songs.Count == 10);
+            foreach (var song in songs)
+            {
+                Assert.IsFalse(string.IsNullOrEmpty(song.DownloadUrl));
+                Assert.IsFalse(string.IsNullOrEmpty(song.Hash));
+                Assert.IsFalse(string.IsNullOrEmpty(song.MapperName));
+                Assert.IsFalse(string.IsNullOrEmpty(song.RawData));
+                Assert.IsFalse(string.IsNullOrEmpty(song.SongName));
+            }
+            var firstSong = JObject.Parse(songs.First().RawData);
+            string firstHash = firstSong["hash"]?.Value<string>();
+            Assert.IsTrue( firstHash == "27639680f92a9588b7cce843fc7aaa0f5dc720f8");
+            string firstUploader = firstSong["uploader"]?["username"]?.Value<string>();
+            Assert.IsTrue(firstUploader == "latte");
         }
     }
 }

@@ -55,15 +55,18 @@ namespace FeedReader
         private const string RATE_LIMIT_RESET_KEY = "Rate-Limit-Reset";
         private const string RATE_LIMIT_TOTAL_KEY = "Rate-Limit-Total";
         private const string RATE_LIMIT_PREFIX = "Rate-Limit";
-
+        private static readonly string[] RateLimitKeys = new string[] { RATE_LIMIT_REMAINING_KEY, RATE_LIMIT_RESET_KEY, RATE_LIMIT_TOTAL_KEY };
         public static RateLimit ParseRateLimit(Dictionary<string, string> headers)
         {
-            return new RateLimit()
-            {
-                CallsRemaining = int.Parse(headers[RATE_LIMIT_REMAINING_KEY]),
-                TimeToReset = UnixTimeStampToDateTime(double.Parse(headers[RATE_LIMIT_RESET_KEY])) - DateTime.Now,
-                CallsPerReset = int.Parse(headers[RATE_LIMIT_TOTAL_KEY])
-            };
+            if (RateLimitKeys.All(k => headers.Keys.Contains(k)))
+                return new RateLimit()
+                {
+                    CallsRemaining = int.Parse(headers[RATE_LIMIT_REMAINING_KEY]),
+                    TimeToReset = UnixTimeStampToDateTime(double.Parse(headers[RATE_LIMIT_RESET_KEY])) - DateTime.Now,
+                    CallsPerReset = int.Parse(headers[RATE_LIMIT_TOTAL_KEY])
+                };
+            else
+                return null;
         }
 
         public static void Initialize(HttpClient client = null)
