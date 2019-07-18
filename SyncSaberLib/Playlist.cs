@@ -45,8 +45,8 @@ namespace SyncSaberLib
 
         public bool ReadPlaylist()
         {
-            string oldFormatPath = Config.BeatSaberPath + "\\Playlists\\" + this.fileName + ".json";
-            string newFormatPath = Config.BeatSaberPath + "\\Playlists\\" + this.fileName + ".bplist";
+            string oldFormatPath = OldConfig.BeatSaberPath + "\\Playlists\\" + this.fileName + ".json";
+            string newFormatPath = OldConfig.BeatSaberPath + "\\Playlists\\" + this.fileName + ".bplist";
             oldFormat = !File.Exists(newFormatPath);
             Logger.Info($"Playlist {Title} found in {(oldFormat ? "old" : "new")} playlist format.");
             if (File.Exists(this.oldFormat ? oldFormatPath : newFormatPath))

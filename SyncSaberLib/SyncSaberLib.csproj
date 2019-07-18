@@ -87,6 +87,7 @@
   <ItemGroup>
     <Compile Include="Config.cs" />
     <Compile Include="Config\CustomSetting.cs" />
+    <Compile Include="Config\IReaderConfig.cs" />
     <Compile Include="Config\IFeedConfig.cs" />
     <Compile Include="Config\ISyncSaberLibConfig.cs" />
     <Compile Include="Data\BeatSaverScrape.cs" />
@@ -126,6 +127,10 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\FeedReader\FeedReader.csproj">
+      <Project>{ada8c603-a103-4324-a308-6d4236270c13}</Project>
+      <Name>FeedReader</Name>
+    </ProjectReference>
     <ProjectReference Include="libs\BeatSaber-PlayerDataReader\BeatSaber-PlayerDataReader\BeatSaber-PlayerDataReader.csproj">
       <Project>{76dea3a1-3558-4dfe-834b-1fbd597a4dd6}</Project>
       <Name>BeatSaber-PlayerDataReader</Name>

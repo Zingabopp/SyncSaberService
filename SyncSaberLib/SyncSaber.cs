@@ -84,7 +84,7 @@ namespace SyncSaberLib
             existingSongs = new SongHashDataModel();
             existingSongs.Initialize();
             Logger.Info($"Found {existingSongs.Data.Count} songs cached by SongCore.");
-            _historyPath = Path.Combine(Config.BeatSaberPath, "UserData", "SyncSaberHistory.txt");
+            _historyPath = Path.Combine(OldConfig.BeatSaberPath, "UserData", "SyncSaberHistory.txt");
             if (File.Exists(_historyPath + ".bak"))
             {
                 if (File.Exists(_historyPath))
@@ -99,9 +99,9 @@ namespace SyncSaberLib
             }
             else
                 File.Create(_historyPath);
-            if (Directory.Exists(Config.BeatSaberPath))
+            if (Directory.Exists(OldConfig.BeatSaberPath))
             {
-                CustomSongsPath = Path.Combine(Config.BeatSaberPath, @"Beat Saber_Data\CustomLevels");
+                CustomSongsPath = Path.Combine(OldConfig.BeatSaberPath, @"Beat Saber_Data\CustomLevels");
                 if (!Directory.Exists(CustomSongsPath))
                 {
                     Directory.CreateDirectory(CustomSongsPath);
@@ -110,7 +110,7 @@ namespace SyncSaberLib
 
             FeedReaders = new Dictionary<string, IFeedReader> {
                 {BeatSaverReader.NameKey, new BeatSaverReader() },
-                {BeastSaberReader.NameKey, new BeastSaberReader(Config.BeastSaberUsername, Config.MaxConcurrentPageChecks) },
+                {BeastSaberReader.NameKey, new BeastSaberReader(OldConfig.BeastSaberUsername, OldConfig.MaxConcurrentPageChecks) },
                 {ScoreSaberReader.NameKey, new ScoreSaberReader() }
             };
         }
@@ -135,7 +135,7 @@ namespace SyncSaberLib
         private void RemoveOldVersions(string songIndex)
         {
             return;
-            if (!Config.DeleteOldVersions)
+            if (!OldConfig.DeleteOldVersions)
             {
                 return;
             }

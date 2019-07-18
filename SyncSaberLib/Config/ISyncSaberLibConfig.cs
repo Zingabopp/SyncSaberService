@@ -16,7 +16,7 @@ namespace SyncSaberLib.Config
     /// </summary>
     interface ISyncSaberLibConfig
     {
-        IEnumerable<IFeedConfig> FeedConfigs { get; set; }
+        IEnumerable<IReaderConfig> FeedConfigs { get; set; }
         Dictionary<string, object> CustomSettings { get; set; }
         string ConfigPath { get; set; }
         string ScrapedDataDirectory { get; set; }

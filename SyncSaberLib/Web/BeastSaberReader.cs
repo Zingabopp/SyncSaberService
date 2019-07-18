@@ -455,11 +455,11 @@ namespace SyncSaberLib.Web
             switch (feedToDownload)
             {
                 case 0:
-                    return Config.MaxFollowingsPages;
+                    return OldConfig.MaxFollowingsPages;
                 case 1:
-                    return Config.MaxBookmarksPages;
+                    return OldConfig.MaxBookmarksPages;
                 case 2:
-                    return Config.MaxCuratorRecommendedPages;
+                    return OldConfig.MaxCuratorRecommendedPages;
                 default:
                     return 0;
             }

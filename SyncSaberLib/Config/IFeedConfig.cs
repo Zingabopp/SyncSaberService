@@ -6,11 +6,15 @@ using System.Threading.Tasks;
 
 namespace SyncSaberLib.Config
 {
-    /// <summary>
-    /// Interface for individual feed configuration.
-    /// </summary>
     interface IFeedConfig
     {
-
+        string Name { get; set; }
+        int FeedIndex { get; set; }
+        string Description { get; set; }
+        bool Enabled { get; set; }
+        int MaxPages { get; set; }
+        int MaxSongs { get; set; }
+        int StartingPage { get; set; }
+        List<CustomSetting> CustomSettings { get; set; }
     }
 }

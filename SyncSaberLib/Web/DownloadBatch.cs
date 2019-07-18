@@ -15,7 +15,7 @@ namespace SyncSaberLib.Web
         public async Task WorkDownloadQueueAsync()
         {
             BatchComplete = false;
-            int maxConcurrentDownloads = Config.MaxConcurrentDownloads; // Set it here so it doesn't error
+            int maxConcurrentDownloads = OldConfig.MaxConcurrentDownloads; // Set it here so it doesn't error
             var actionBlock = new ActionBlock<DownloadJob>(job => {
                 Logger.Debug($"Running job {job.Song.key} in ActionBlock");
                 Task newTask = job.RunJobAsync();
