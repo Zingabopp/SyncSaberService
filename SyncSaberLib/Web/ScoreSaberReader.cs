@@ -221,7 +221,7 @@ namespace SyncSaberLib.Web
             //Parallel.ForEach(sssongs, new ParallelOptions { MaxDegreeOfParallelism = Config.MaxConcurrentPageChecks }, s => s.PopulateFields());
             foreach (var song in sssongs)
             {
-                tempSong = ScrapedDataProvider.GetSong(song, false);
+                tempSong = ScrapedDataProvider.GetSong(song, false); // Don't search online because creating the ScoreSaberSong already tried
                 if (tempSong != null && !string.IsNullOrEmpty(tempSong.key))
                 {
                     //tempSong.ScoreSaberInfo.AddOrUpdate(song.uid, song);
