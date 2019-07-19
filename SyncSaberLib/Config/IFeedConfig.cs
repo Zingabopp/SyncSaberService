@@ -15,6 +15,6 @@ namespace SyncSaberLib.Config
         int MaxPages { get; set; }
         int MaxSongs { get; set; }
         int StartingPage { get; set; }
-        List<CustomSetting> CustomSettings { get; set; }
+        Dictionary<string, CustomSetting> CustomSettings { get; set; }
     }
 }

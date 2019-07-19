@@ -223,12 +223,13 @@ namespace SyncSaberLib
                 int newScoreSaberSongs = ScrapedDataProvider.ScoreSaberSongs.Data.Count - lastScoreSaberCount;
                 ScoreSaberReader.ScrapeScoreSaber(1000, 500, true, 2);
                 Logger.Info($"Scraped {(newScoreSaberSongs).ToString()} new difficult{(newScoreSaberSongs == 1 ? "y" : "ies")} from ScoreSaber.");
+                ScrapedDataProvider.ScoreSaberSongs.WriteFile();
             }
             else
             {
                 Logger.Info($"Last ScoreSaber scrape was at {lastSSScrape.ToString()}, skipping.");
             }
-            ScrapedDataProvider.ScoreSaberSongs.WriteFile();
+            
         }
 
         public void DownloadSongsFromFeed(string feedType, IFeedSettings _settings)

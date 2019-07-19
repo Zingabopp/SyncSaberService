@@ -34,7 +34,7 @@ namespace SyncSaberLib.Web
         private const string INVALIDFEEDSETTINGSMESSAGE = "The IFeedSettings passed is not a BeatSaverFeedSettings.";
         private const string BEATSAVER_DETAILS_BASE_URL = "https://beatsaver.com/api/maps/detail/";
         private const string BEATSAVER_GETBYHASH_BASE_URL = "https://beatsaver.com/api/maps/by-hash/";
-        private const string BEATSAVER_NIGHTLYDUMP_URL = "https://beatsaver.com/api/download/dumps/maps";
+        private const string BEATSAVER_NIGHTLYDUMP_URL = "https://beatsaver.com/api/download/dump/maps";
 
         private static ConcurrentDictionary<string, string> _authors = new ConcurrentDictionary<string, string>();
         // { (BeatSaverFeeds)99, new FeedInfo("search-by-author", "https://beatsaver.com/api/songs/search/user/" + AUTHORKEY) }
@@ -93,6 +93,10 @@ namespace SyncSaberLib.Web
 
         public static List<BeatSaverSong> ScrapeBeatSaver(int requestDelay, bool onlyGetNew, int maxPages = 0)
         {
+            if (!onlyGetNew)
+            {
+
+            }
             int feedIndex = (int)BeatSaverFeeds.LATEST;
             bool useMaxPages = maxPages != 0;
             int latestVersion = 0;
@@ -104,15 +108,38 @@ namespace SyncSaberLib.Web
             }
 
             List<BeatSaverSong> songs = new List<BeatSaverSong>();
-            //if (lastScraped < DateTime.Now - new TimeSpan(7,0,0,0))
+            //var dumpTestPath = new FileInfo(@"ScrapedData\NightlyDumpTest.json");
+            //bool testing = true;
+            //if(testing)
+            //{
+            //    var fileSerializer = new JsonSerializer();
+            //    using (var sr = new StreamReader(File.OpenRead(dumpTestPath.FullName)))
+            //    {
+            //        using (var jsonTextReader = new JsonTextReader(sr))
+            //        {
+            //            var songDump = fileSerializer.Deserialize<List<BeatSaverSong>>(jsonTextReader);
+            //            var latest = songDump.Max(s => s.uploaded);
+            //            songDump.ForEach(s => s.ScrapedAt = DateTime.Now);
+            //            if(songDump.Count > 0)
+            //            {
+            //                ScrapedDataProvider.BeatSaverSongs.Data.Clear();
+            //                ScrapedDataProvider.BeatSaverSongs.Data.AddRange(songDump);
+            //            }
+            //            return songDump;
+            //        }
+            //    }
+            //}
+            
+
+            //if (lastScraped < DateTime.Now - new TimeSpan(7, 0, 0, 0))
             //{
             //    Logger.Info("Local BeatSaver scrape is outdated or doesn't exist, replacing with full scrape.");
-            //    using(var response = WebUtils.GetPage(BEATSAVER_NIGHTLYDUMP_URL))
+            //    using (var response = WebUtils.GetPage(dumpTestPath.FullName))
             //    {
-            //        if(response.IsSuccessStatusCode)
+            //        if (response.IsSuccessStatusCode)
             //        {
             //            var serializer = new JsonSerializer();
-            //            using(var sr = new StreamReader(response.Content.ReadAsStreamAsync().Result))
+            //            using (var sr = new StreamReader(response.Content.ReadAsStreamAsync().Result))
             //            {
             //                using (var jsonTextReader = new JsonTextReader(sr))
             //                {
@@ -122,7 +149,7 @@ namespace SyncSaberLib.Web
             //        }
             //    }
             //}
-            
+
             string pageText = GetPageText(GetPageUrl(feedIndex));
             JObject result = new JObject();
             try { result = JObject.Parse(pageText); }

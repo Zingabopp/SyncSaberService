@@ -19,8 +19,8 @@ namespace SyncSaberConsole
     {
         private static void DoFullScrape()
         {
-            //BeatSaverReader.ScrapeBeatSaver(400, false);
-            //ScrapedDataProvider.BeatSaverSongs.WriteFile();
+            BeatSaverReader.ScrapeBeatSaver(400, false);
+            ScrapedDataProvider.BeatSaverSongs.WriteFile();
             ScoreSaberReader.ScrapeScoreSaber(5000, 13000, false);
             ScrapedDataProvider.ScoreSaberSongs.WriteFile();
         }
@@ -31,6 +31,7 @@ namespace SyncSaberConsole
 
             WebUtils.Initialize(5);
 
+            ScrapedDataProvider.BeatSaverSongs.WriteFile();
             var bsReader = new BeatSaverReader();
             //var bsSongs = bsReader.GetSongsFromFeed(new BeatSaverFeedSettings((int)BeatSaverFeeds.LATEST) { MaxPages = 10, searchOnline = true });
             var authorSongs = BeatSaverReader.GetSongsByAuthor("ruckasdfus");
@@ -100,7 +101,7 @@ namespace SyncSaberConsole
                 Logger.Info($"Scrapes loaded, {ScrapedDataProvider.BeatSaverSongs.Data.Count} BeatSaverSongs and {ScrapedDataProvider.ScoreSaberSongs.Data.Count} ScoreSaber difficulties loaded");
                 //DoFullScrape();
                
-                //Tests();
+                Tests();
                 try
                 {
                     if (args.Length > 0)
