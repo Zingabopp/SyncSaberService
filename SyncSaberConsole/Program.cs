@@ -101,7 +101,7 @@ namespace SyncSaberConsole
                 Logger.Info($"Scrapes loaded, {ScrapedDataProvider.BeatSaverSongs.Data.Count} BeatSaverSongs and {ScrapedDataProvider.ScoreSaberSongs.Data.Count} ScoreSaber difficulties loaded");
                 //DoFullScrape();
                
-                Tests();
+                //Tests();
                 try
                 {
                     if (args.Length > 0)
