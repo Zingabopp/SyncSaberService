@@ -317,6 +317,7 @@ namespace FeedReader
             bool useMaxPages = maxPages != 0;
             if (useMaxPages && pageIndex > 1)
                 maxPages = maxPages + pageIndex - 1;
+            bool continueLooping = true;
             do
             {
                 if (newSongs != null)
@@ -343,6 +344,7 @@ namespace FeedReader
                 {
                     if (retDict.ContainsKey(song.Hash))
                     {
+                        Console.WriteLine($"Song {song.Hash} already exists.");
                         /*
                         if (retDict[song.keyAsInt].SongVersion < song.SongVersion)
                         {
@@ -363,8 +365,14 @@ namespace FeedReader
                 //Logger.Debug($"FeedURL is {feedUrl}");
                 //Logger.Debug($"Queued page {pageIndex} for reading. EarliestEmptyPage is now {earliestEmptyPage}");
                 pageIndex++;
+                if (retDict.Count >= settings.MaxSongs && useMaxSongs)
+                    continueLooping = false;
+                if (pageIndex > maxPages && useMaxPages)
+                    continueLooping = false;
+                if (newSongs.Count == 0)
+                    continueLooping = false;
             }
-            while ((retDict.Count < settings.MaxSongs || !useMaxSongs) && (pageIndex < maxPages || !useMaxPages) && newSongs.Count > 0);
+            while (continueLooping);
             //while ((pageIndex < maxPages || maxPages == 0) && newSongs.Count > 0);
 
             return retDict;
