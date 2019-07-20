@@ -71,7 +71,7 @@ namespace FeedReaderTests
         }
 
         [TestMethod]
-        public void GetSongsFromFeed_Bookmarks_Test()
+        public void GetSongsFromFeed_Bookmarks()
         {
             var reader = new BeastSaberReader("Zingabopp", 3);
             int maxSongs = 60;
@@ -87,7 +87,7 @@ namespace FeedReaderTests
         {
             var reader = new BeastSaberReader("Zingabopp", 3);
             int maxSongs = 150;
-            int maxPages = 2;
+            int maxPages = 1;
             var settings = new BeastSaberFeedSettings((int)BeastSaberFeeds.FOLLOWING)
             {
                 MaxSongs = maxSongs,
@@ -101,7 +101,27 @@ namespace FeedReaderTests
         }
 
         [TestMethod]
-        public void GetSongsFromFeed_Followings_Test()
+        public void GetSongsFromFeed_Followings_SinglePage_LimitedSongs()
+        {
+            var reader = new BeastSaberReader("Zingabopp", 3) { StoreRawData = true } ;
+            int maxSongs = 20;
+            int maxPages = 1;
+            var settings = new BeastSaberFeedSettings((int)BeastSaberFeeds.FOLLOWING)
+            {
+                MaxSongs = maxSongs,
+                MaxPages = maxPages
+            };
+            var songList = reader.GetSongsFromFeed(settings);
+            var pagesChecked = songList.Values.GroupBy(s => s.SourceUrl);
+            Assert.IsTrue(pagesChecked.Count() == 1);
+            Assert.IsTrue(songList.Count > 0);
+            Assert.IsTrue(songList.Count <= 20);
+            //Assert.IsFalse(songList.Count > maxSongs);
+            Assert.IsFalse(songList.Any(s => string.IsNullOrEmpty(s.Key)));
+        }
+
+        [TestMethod]
+        public void GetSongsFromFeed_Followings()
         {
             var reader = new BeastSaberReader("Zingabopp", 3);
             int maxSongs = 60;
@@ -112,22 +132,10 @@ namespace FeedReaderTests
             Assert.IsFalse(songList.Any(s => string.IsNullOrEmpty(s.Key)));
         }
 
-        [TestMethod]
-        public void GetSongsFromFeed_CuratorRecommended_Test()
-        {
-            var reader = new BeastSaberReader("Zingabopp", 3);
-            int maxSongs = 30;
-            int maxPages = 2;
-            var settings = new BeastSaberFeedSettings((int)BeastSaberFeeds.CURATOR_RECOMMENDED) { MaxPages = maxPages, MaxSongs = maxSongs };
-            var songList = reader.GetSongsFromFeed(settings);
-            Assert.IsTrue(songList.Count == maxSongs);
-            Assert.IsFalse(songList.Any(s => string.IsNullOrEmpty(s.Key)));
-            Assert.IsFalse(songList.Any(s => string.IsNullOrEmpty(s.Value.DownloadUrl)));
-        }
 
 
         [TestMethod]
-        public void GetSongsFromFeedAsync_Bookmarks_UnlimitedSongs_Test()
+        public void GetSongsFromFeedAsync_Bookmarks_UnlimitedSongs()
         {
             var reader = new BeastSaberReader("Zingabopp", 3);
             int maxSongs = 0;
@@ -138,7 +146,7 @@ namespace FeedReaderTests
         }
 
         [TestMethod]
-        public void GetSongsFromFeedAsync_Bookmarks_LimitedSongs_Test()
+        public void GetSongsFromFeedAsync_Bookmarks_LimitedSongs()
         {
             var reader = new BeastSaberReader("Zingabopp", 3);
             int maxSongs = 60;
@@ -150,7 +158,7 @@ namespace FeedReaderTests
         }
 
         [TestMethod]
-        public void GetSongsFromFeedAsync_Followings_UnlimitedSongs_Test()
+        public void GetSongsFromFeedAsync_Followings_UnlimitedSongs()
         {
             var reader = new BeastSaberReader("Zingabopp", 3) { StoreRawData = true };
             int maxSongs = 0;
@@ -162,7 +170,7 @@ namespace FeedReaderTests
         }
 
         [TestMethod]
-        public void GetSongsFromFeedAsync_Followings_LimitedSongs_Test()
+        public void GetSongsFromFeedAsync_Followings_LimitedSongs()
         {
             var reader = new BeastSaberReader("Zingabopp", 3) { StoreRawData = true };
             int maxSongs = 60;
@@ -174,7 +182,7 @@ namespace FeedReaderTests
         }
 
         [TestMethod]
-        public void GetSongsFromFeedAsync_CuratorRecommended_UnlimitedSongs_Test()
+        public void GetSongsFromFeedAsync_CuratorRecommended_UnlimitedSongs()
         {
             var reader = new BeastSaberReader("Zingabopp", 3) { StoreRawData = true };
             int maxSongs = 0;
@@ -189,7 +197,7 @@ namespace FeedReaderTests
         }
 
         [TestMethod]
-        public void GetSongsFromFeedAsync_CuratorRecommended_LimitedSongs_Test()
+        public void GetSongsFromFeedAsync_CuratorRecommended_LimitedSongs()
         {
             var reader = new BeastSaberReader("Zingabopp", 3) { StoreRawData = true };
             int maxSongs = 60;
@@ -203,5 +211,17 @@ namespace FeedReaderTests
             Assert.IsTrue(firstRawData["hash"]?.Value<string>().ToUpper() == firstSong.Hash);
         }
 
+        [TestMethod]
+        public void GetSongsFromFeed_CuratorRecommended_LimitedPages()
+        {
+            var reader = new BeastSaberReader("Zingabopp", 3);
+            int maxSongs = 30;
+            int maxPages = 2;
+            var settings = new BeastSaberFeedSettings((int)BeastSaberFeeds.CURATOR_RECOMMENDED) { MaxPages = maxPages, MaxSongs = maxSongs };
+            var songList = reader.GetSongsFromFeed(settings);
+            Assert.IsTrue(songList.Count == maxSongs);
+            Assert.IsFalse(songList.Any(s => string.IsNullOrEmpty(s.Key)));
+            Assert.IsFalse(songList.Any(s => string.IsNullOrEmpty(s.Value.DownloadUrl)));
+        }
     }
 }
