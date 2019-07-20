@@ -86,8 +86,8 @@ namespace FeedReaderTests
         public void GetSongsFromFeed_Followings_SinglePage()
         {
             var reader = new BeastSaberReader("Zingabopp", 3);
-            int maxSongs = 60;
-            int maxPages = 1;
+            int maxSongs = 150;
+            int maxPages = 2;
             var settings = new BeastSaberFeedSettings((int)BeastSaberFeeds.FOLLOWING)
             {
                 MaxSongs = maxSongs,
@@ -95,7 +95,7 @@ namespace FeedReaderTests
             };
             var songList = reader.GetSongsFromFeed(settings);
             Assert.IsTrue(songList.Count > 0);
-            Assert.IsTrue(songList.Count <= 50);
+            Assert.IsTrue(songList.Count <= 100);
             //Assert.IsFalse(songList.Count > maxSongs);
             Assert.IsFalse(songList.Any(s => string.IsNullOrEmpty(s.Key)));
         }
