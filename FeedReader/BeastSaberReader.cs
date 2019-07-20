@@ -114,17 +114,17 @@ namespace FeedReader
         /// <param name="pageText"></param>
         /// <exception cref="XmlException">Invalid XML in pageText</exception>
         /// <returns></returns>
-        public List<ScrapedSong> GetSongsFromPageText(string pageText, ContentType contentType)
+        public List<ScrapedSong> GetSongsFromPageText(string pageText, string sourceUrl, ContentType contentType)
         {
             List<ScrapedSong> songsOnPage = new List<ScrapedSong>();
             //if (pageText.ToLower().StartsWith(@"<?xml"))
             if (contentType == ContentType.XML)
             {
-                songsOnPage = ParseXMLPage(pageText);
+                songsOnPage = ParseXMLPage(pageText, sourceUrl);
             }
             else if (contentType == ContentType.JSON) // Page is JSON
             {
-                songsOnPage = ParseJsonPage(pageText);
+                songsOnPage = ParseJsonPage(pageText, sourceUrl);
             }
             Logger.Debug($"{songsOnPage.Count} songs on the page");
             return songsOnPage;
@@ -136,7 +136,7 @@ namespace FeedReader
         /// </summary>
         /// <param name="pageText"></param>
         /// <returns></returns>
-        public List<ScrapedSong> ParseXMLPage(string pageText)
+        public List<ScrapedSong> ParseXMLPage(string pageText, string sourceUrl)
         {
             bool retry = false;
             var songsOnPage = new List<ScrapedSong>();
@@ -205,6 +205,7 @@ namespace FeedReader
                             songsOnPage.Add(new ScrapedSong(hash)
                             {
                                 DownloadUrl = downloadUrl,
+                                SourceUrl = sourceUrl,
                                 SongName = songName,
                                 MapperName = authorName,
                                 RawData = jObject != null ? jObject.ToString(Newtonsoft.Json.Formatting.None) : string.Empty
@@ -216,7 +217,7 @@ namespace FeedReader
             return songsOnPage;
         }
 
-        public List<ScrapedSong> ParseJsonPage(string pageText)
+        public List<ScrapedSong> ParseJsonPage(string pageText, string sourceUrl)
         {
             JObject result = new JObject();
             var songsOnPage = new List<ScrapedSong>();
@@ -248,6 +249,7 @@ namespace FeedReader
                     songsOnPage.Add(new ScrapedSong(songHash)
                     {
                         DownloadUrl = downloadUrl,
+                        SourceUrl = sourceUrl,
                         SongName = songName,
                         MapperName = mapperName,
                         RawData = StoreRawData ? bSong.ToString(Newtonsoft.Json.Formatting.None) : string.Empty
@@ -336,7 +338,7 @@ namespace FeedReader
 
                 }
                 
-                newSongs = GetSongsFromPageText(pageText, contentType);
+                newSongs = GetSongsFromPageText(pageText, feedUrl, contentType);
                 foreach (var song in newSongs)
                 {
                     if (retDict.ContainsKey(song.Hash))

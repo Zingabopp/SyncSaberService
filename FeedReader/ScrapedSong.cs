@@ -12,9 +12,19 @@ namespace FeedReader
             get { return _hash; }
             set { _hash = value?.ToUpper(); }
         }
+        /// <summary>
+        /// Full URL to download song.
+        /// </summary>
         public string DownloadUrl { get; set; }
+        /// <summary>
+        /// What web page this song was scraped from.
+        /// </summary>
+        public string SourceUrl { get; set; }
         public string SongName { get; set; }
         public string MapperName { get; set; }
+        /// <summary>
+        /// Data this song was scraped from in JSON form.
+        /// </summary>
         public string RawData { get; set; }
 
         public ScrapedSong() { }

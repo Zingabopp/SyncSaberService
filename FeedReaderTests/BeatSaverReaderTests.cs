@@ -122,7 +122,7 @@ namespace FeedReaderTests
         public void ParseSongsFromPage_Test()
         {
             string pageText = File.ReadAllText(@"Data\BeatSaverListPage.json");
-            var songs = BeatSaverReader.ParseSongsFromPage(pageText);
+            var songs = BeatSaverReader.ParseSongsFromPage(pageText, "");
             Assert.IsTrue(songs.Count == 10);
             foreach (var song in songs)
             {

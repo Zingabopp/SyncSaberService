@@ -88,7 +88,7 @@ namespace FeedReader
         /// </summary>
         /// <param name="pageText"></param>
         /// <returns></returns>
-        public static List<ScrapedSong> ParseSongsFromPage(string pageText)
+        public static List<ScrapedSong> ParseSongsFromPage(string pageText, string sourceUrl)
         {
             JObject result = new JObject();
             try
@@ -110,7 +110,7 @@ namespace FeedReader
             {
                 if (result["key"] != null)
                 {
-                    newSong = ParseSongFromJson(result);
+                    newSong = ParseSongFromJson(result, sourceUrl);
                     if (newSong != null)
                     {
                         songs.Add(newSong);
@@ -131,7 +131,7 @@ namespace FeedReader
 
             foreach (JObject song in songJSONAry)
             {
-                newSong = ParseSongFromJson(song);
+                newSong = ParseSongFromJson(song, sourceUrl);
                 if (newSong != null)
                     songs.Add(newSong);
             }
@@ -144,7 +144,7 @@ namespace FeedReader
         /// <param name="song"></param>
         /// <exception cref="ArgumentException">Thrown when a hash can't be found for the given song JObject.</exception>
         /// <returns></returns>
-        public static ScrapedSong ParseSongFromJson(JObject song)
+        public static ScrapedSong ParseSongFromJson(JObject song, string sourceUrl)
         {
             //JSONObject song = (JSONObject) aKeyValue;
             string songKey = song["key"]?.Value<string>();
@@ -157,6 +157,7 @@ namespace FeedReader
             var newSong = new ScrapedSong(songHash)
             {
                 DownloadUrl = songUrl,
+                SourceUrl = sourceUrl,
                 SongName = songName,
                 MapperName = mapperName,
                 RawData = song.ToString()
@@ -368,7 +369,7 @@ namespace FeedReader
                 }
             }
 
-            foreach (var song in ParseSongsFromPage(pageText))
+            foreach (var song in ParseSongsFromPage(pageText, url))
             {
                 songs.Add(song);
             }
@@ -483,7 +484,7 @@ namespace FeedReader
             {
                 Logger.Exception("Exception getting page", ex);
             }
-            song = ParseSongsFromPage(pageText).FirstOrDefault();
+            song = ParseSongsFromPage(pageText, url).FirstOrDefault();
             return song;
         }
         public static async Task<ScrapedSong> GetSongByKeyAsync(string key)
@@ -522,7 +523,7 @@ namespace FeedReader
             {
                 Logger.Exception("Exception getting page", ex);
             }
-            song = ParseSongsFromPage(pageText).FirstOrDefault();
+            song = ParseSongsFromPage(pageText, url).FirstOrDefault();
             return song;
         }
         public static async Task<List<ScrapedSong>> SearchAsync(string criteria, SearchType type, BeatSaverFeedSettings settings = null)
@@ -579,7 +580,7 @@ namespace FeedReader
                         return songs;
                     }
                 }
-                newSongs = ParseSongsFromPage(pageText);
+                newSongs = ParseSongsFromPage(pageText, url.ToString());
                 foreach(var song in newSongs)
                 {
                     if (!useMaxSongs || songs.Count < maxSongs)

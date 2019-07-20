@@ -22,7 +22,7 @@ namespace FeedReaderTests
 
             var reader = new BeastSaberReader("Zingabopp", 3) { StoreRawData = true };
             var text = File.ReadAllText("Data\\BeastSaberXMLPage.xml");
-            var songList = reader.GetSongsFromPageText(text, BeastSaberReader.ContentType.XML);
+            var songList = reader.GetSongsFromPageText(text, "", BeastSaberReader.ContentType.XML);
             Assert.IsTrue(songList.Count == 50);
             var firstHash = "74575254ae759f3f836eb521b4b80093ca52cd3d".ToUpper();
             var firstKey = "56ff";
@@ -56,7 +56,7 @@ namespace FeedReaderTests
         {
             var reader = new BeastSaberReader("Zingabopp", 3);
             var text = File.ReadAllText("Data\\BeastSaberJsonPage.json");
-            var songList = reader.GetSongsFromPageText(text, BeastSaberReader.ContentType.JSON);
+            var songList = reader.GetSongsFromPageText(text, "", BeastSaberReader.ContentType.JSON);
             Assert.IsTrue(songList.Count == 20);
             var firstHash = "a3bbbe2d6f64dfe8324c7098d5c35281d21fd20f".ToUpper();
             var firstUrl = "https://beatsaver.com/api/download/key/5679";
@@ -118,7 +118,7 @@ namespace FeedReaderTests
             var reader = new BeastSaberReader("Zingabopp", 3);
             int maxSongs = 30;
             int maxPages = 2;
-            var settings = new BeastSaberFeedSettings((int)BeastSaberFeeds.CURATOR_RECOMMENDED) { MaxPages = maxPages };
+            var settings = new BeastSaberFeedSettings((int)BeastSaberFeeds.CURATOR_RECOMMENDED) { MaxPages = maxPages, MaxSongs = maxSongs };
             var songList = reader.GetSongsFromFeed(settings);
             Assert.IsTrue(songList.Count == maxSongs);
             Assert.IsFalse(songList.Any(s => string.IsNullOrEmpty(s.Key)));

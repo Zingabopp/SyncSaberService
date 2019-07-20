@@ -32,7 +32,7 @@ namespace FeedReaderTests
         {
             var reader = new ScoreSaberReader() { StoreRawData = true };
             var pageText = File.ReadAllText("Data\\ScoreSaberPage.json");
-            var songList = reader.GetSongsFromPageText(pageText);
+            var songList = reader.GetSongsFromPageText(pageText, "");
             Assert.IsTrue(songList.Count == 50);
             var firstHash = "0597F8F7D8E396EBFEF511DC9EC98B69635CE532";
             Assert.IsTrue(songList.First().Hash == firstHash);

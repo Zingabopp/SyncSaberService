@@ -146,7 +146,7 @@ namespace FeedReader
             {
                 Logger.Exception("Unable to parse JSON from text", ex);
             }
-            foreach (var song in GetSongsFromPageText(pageText))
+            foreach (var song in GetSongsFromPageText(pageText, url.ToString()))
             {
                 if (!songs.ContainsKey(song.Hash) && songs.Count < settings.MaxSongs)
                     songs.Add(song.Hash, song);
@@ -190,7 +190,7 @@ namespace FeedReader
             if (response.IsSuccessStatusCode)
             {
                 var pageText = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-                songs = GetSongsFromPageText(pageText);
+                songs = GetSongsFromPageText(pageText, url);
             }
             else
             {
@@ -200,7 +200,7 @@ namespace FeedReader
             return songs;
         }
 
-        public List<ScrapedSong> GetSongsFromPageText(string pageText)
+        public List<ScrapedSong> GetSongsFromPageText(string pageText, string sourceUrl)
         {
             JObject result = new JObject();
             try
@@ -229,6 +229,7 @@ namespace FeedReader
                     songs.Add(new ScrapedSong(hash)
                     {
                         DownloadUrl = BEATSAVER_DOWNLOAD_URL_BASE + hash,
+                        SourceUrl = sourceUrl,
                         SongName = songName,
                         MapperName = mapperName,
                         RawData = StoreRawData ? song.ToString(Newtonsoft.Json.Formatting.None) : string.Empty
