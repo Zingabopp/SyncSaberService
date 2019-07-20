@@ -14,9 +14,9 @@ namespace SyncSaberLib.Config
     {
         string ReaderName { get; set; }
         string ReaderDescription { get; set; }
-        Dictionary<int, string> AvailableFeeds { get; set; }
         bool Enabled { get; set; }
-
+        Dictionary<int, string> AvailableFeeds { get; set; }
+        Dictionary<string, CustomSetting> CustomSettings { get; set; }
 
     }
 }

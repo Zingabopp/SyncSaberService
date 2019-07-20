@@ -87,7 +87,7 @@ namespace SyncSaberLib.Data
         {
             hash = hash.ToUpper();
             song = Songs.ContainsKey(hash) ? Songs[hash] : null;
-            if (song == null && searchOnline)
+            if (song?.BeatSaverInfo == null && searchOnline)
             {
                 Logger.Info($"Song with hash: {hash}, not in scraped data, searching Beat Saver...");
                 song = BeatSaverReader.Search(hash, BeatSaverReader.SearchType.hash).FirstOrDefault();
@@ -116,7 +116,7 @@ namespace SyncSaberLib.Data
         {
             key = key.ToLower();
             song = Songs.Values.Where(s => s.key == key).FirstOrDefault();
-            if (song == null && searchOnline)
+            if (song?.BeatSaverInfo == null && searchOnline)
             {
                 Logger.Info($"Song with key: {key}, not in scraped data, searching Beat Saver...");
                 song = BeatSaverReader.GetSongByKey(key);

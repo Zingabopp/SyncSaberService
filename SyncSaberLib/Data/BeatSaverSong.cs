@@ -197,38 +197,17 @@ namespace SyncSaberLib.Data
         [OnDeserialized]
         protected void OnDeserialized(StreamingContext context)
         {
-            //if (!(this is ScoreSaberSong))
-            //if(!this.GetType().IsSubclassOf(typeof(SongInfo)))
-            //{
-            //    //Logger.Warning("SongInfo OnDeserialized");
             Populated = true;
-            /*
-            if (_songInfo == null)
+            foreach (var characteristic in metadata.characteristics)
             {
-                if (_beatSaverRegex.IsMatch(key))
-                    _songInfo = ScrapedDataProvider.GetSongByKey(key, false);
-                if (_songInfo == null)
-                    _songInfo = ScrapedDataProvider.GetSongByHash(hashMd5, false);
-
-                if (_songInfo == null)
+                var toRemove = new List<string>();
+                foreach(var diff in characteristic.difficulties)
                 {
-                    //Logger.Info($"Couldn't find song {key} - {name} by {authorName}, generating new song info...");
-                    _songInfo = new SongInfo() {
-                        key = key,
-                        songName = songName,
-                        songSubName = songSubName,
-                        authorName = authorName,
-                        bpm = bpm,
-                        playedCount = playedCount,
-                        upVotes = upVotes,
-                        downVotes = downVotes,
-                        hash = hashMd5,
-                    };
-                    _songInfo.EnhancedInfo = this;
-                    ScrapedDataProvider.TryAddToScrapedData(_songInfo);
+                    if (diff.Value == null)
+                        toRemove.Add(diff.Key);
                 }
+                toRemove.ForEach(k => characteristic.difficulties.Remove(k));
             }
-            */
         }
 
 
@@ -370,7 +349,7 @@ namespace SyncSaberLib.Data
         public string description { get; set; }
 
         [JsonProperty("deletedAt")]
-        public DateTime deletedAt { get; set; }
+        public DateTime? deletedAt { get; set; }
         [JsonProperty("_id")]
         public string _id { get; set; }
         [JsonIgnore]
