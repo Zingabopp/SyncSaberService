@@ -22,7 +22,7 @@ namespace FeedReaderTests
         {
             var reader = new BeatSaverReader() { StoreRawData = true };
             var authorList = new string[] { "BlackBlazon", "greatyazer" };
-            var settings = new BeatSaverFeedSettings((int)BeatSaverFeeds.AUTHOR) { Authors = authorList, MaxSongs = 20 };
+            var settings = new BeatSaverFeedSettings((int)BeatSaverFeeds.AUTHOR) { Authors = authorList, MaxSongs = 59 };
             var songsByAuthor = reader.GetSongsFromFeed(settings);
             var detectedAuthors = songsByAuthor.Values.Select(s => s.MapperName.ToLower()).Distinct();
             foreach (var song in songsByAuthor)

@@ -165,6 +165,37 @@ namespace FeedReader
             return newSong;
         }
 
+        private static int CalcMaxSongs(int maxPages, int maxSongs)
+        {
+            int retVal = 0;
+            if (maxPages > 0)
+                retVal = maxPages * SONGS_PER_PAGE;
+            if (maxSongs > 0)
+            {
+                if (retVal == 0)
+                    retVal = maxSongs;
+                else
+                    retVal = Math.Min(retVal, maxSongs);
+            }
+            return retVal;
+        }
+
+        private static int CalcMaxPages(int maxPages, int maxSongs)
+        {
+            int retVal = 0;
+            if (maxPages > 0)
+                retVal = maxPages;
+            if (maxSongs > 0)
+            {
+                int pagesForSongs = (int)Math.Ceiling(maxSongs / (float)SONGS_PER_PAGE);
+                if (retVal == 0)
+                    retVal = pagesForSongs;
+                else
+                    retVal = Math.Min(retVal, pagesForSongs);
+            }
+            return retVal;
+        }
+
         #region Web Requests
 
         #region Async
@@ -184,7 +215,7 @@ namespace FeedReader
                     songs = new List<ScrapedSong>();
                     foreach (var author in settings.Authors)
                     {
-                        newSongs = await GetSongsByAuthorAsync(author).ConfigureAwait(false);
+                        newSongs = await GetSongsByAuthorAsync(author, CalcMaxPages(settings.MaxPages, settings.MaxSongs)).ConfigureAwait(false);
                         songSource = "Beat Saver";
                         songs.AddRange(newSongs.Take(settings.MaxSongs));
 
@@ -280,8 +311,8 @@ namespace FeedReader
                 songs.AddRange(await job.ConfigureAwait(false));
                 foreach (var song in await job.ConfigureAwait(false))
                 {
-                    if(!useMaxSongs || songs.Count <= settings.MaxSongs )
-                    songs.Add(song);
+                    if (!useMaxSongs || songs.Count <= settings.MaxSongs)
+                        songs.Add(song);
                 }
             }
             return songs;
@@ -380,7 +411,7 @@ namespace FeedReader
         /// </summary>
         /// <param name="authorId"></param>
         /// <returns></returns>
-        public static async Task<List<ScrapedSong>> GetSongsByUploaderIdAsync(string authorId)
+        public static async Task<List<ScrapedSong>> GetSongsByUploaderIdAsync(string authorId, int maxPages = 0)
         {
             int feedIndex = 0;
             List<ScrapedSong> songs = new List<ScrapedSong>();
@@ -423,6 +454,8 @@ namespace FeedReader
 
             int numSongs = result["totalDocs"]?.Value<int>() ?? 0; // Check this
             int lastPage = result["lastPage"]?.Value<int>() ?? 0;
+            if (maxPages > 0)
+                lastPage = Math.Min(lastPage, maxPages);
             Logger.Debug($"{numSongs} songs by {authorId} available on Beat Saver");
             int pageNum = 0;
             List<Task<List<ScrapedSong>>> pageReadTasks = new List<Task<List<ScrapedSong>>>();
@@ -441,12 +474,12 @@ namespace FeedReader
             }
             return songs;
         }
-        public static async Task<List<ScrapedSong>> GetSongsByAuthorAsync(string uploader)
+        public static async Task<List<ScrapedSong>> GetSongsByAuthorAsync(string uploader, int maxPages = 0)
         {
             string mapperId = await GetAuthorIDAsync(uploader).ConfigureAwait(false);
             if (string.IsNullOrEmpty(mapperId))
                 return new List<ScrapedSong>();
-            return await GetSongsByUploaderIdAsync(mapperId).ConfigureAwait(false);
+            return await GetSongsByUploaderIdAsync(mapperId, maxPages).ConfigureAwait(false);
         }
         public static async Task<ScrapedSong> GetSongByHashAsync(string hash)
         {
@@ -549,7 +582,7 @@ namespace FeedReader
             //int lastPage;
             //int nextPage;
             int pageIndex = 0;
-            if(settings != null)
+            if (settings != null)
             {
                 maxSongs = settings.MaxSongs;
                 maxPages = settings.MaxPages;
@@ -581,7 +614,7 @@ namespace FeedReader
                     }
                 }
                 newSongs = ParseSongsFromPage(pageText, url.ToString());
-                foreach(var song in newSongs)
+                foreach (var song in newSongs)
                 {
                     if (!useMaxSongs || songs.Count < maxSongs)
                         songs.Add(song);
@@ -700,7 +733,7 @@ namespace FeedReader
         /// <summary>
         /// Maximum songs to retrieve, will stop the reader before MaxPages is met. Use 0 for unlimited.
         /// </summary>
-        public int MaxSongs { get; set; } 
+        public int MaxSongs { get; set; }
 
         /// <summary>
         /// Maximum pages to check, will stop the reader before MaxSongs is met. Use 0 for unlimited.
