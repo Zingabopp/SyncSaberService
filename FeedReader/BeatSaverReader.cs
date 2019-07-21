@@ -186,7 +186,7 @@ namespace FeedReader
                     {
                         newSongs = await GetSongsByAuthorAsync(author).ConfigureAwait(false);
                         songSource = "Beat Saver";
-                        songs.AddRange(newSongs);
+                        songs.AddRange(newSongs.Take(settings.MaxSongs));
 
                         Logger.Info($"Found {newSongs.Count} songs uploaded by {author} from {songSource}");
                     }

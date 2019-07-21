@@ -21,17 +21,14 @@ namespace FeedReaderTests
         public void GetSongsFromFeed_Authors_Test()
         {
             var reader = new BeatSaverReader() { StoreRawData = true };
-            var settings = new BeatSaverFeedSettings((int)BeatSaverFeeds.LATEST) { MaxSongs = 50 };
-            var songList = reader.GetSongsFromFeed(settings);
             var authorList = new string[] { "BlackBlazon", "greatyazer" };
-            settings = new BeatSaverFeedSettings((int)BeatSaverFeeds.AUTHOR) { Authors = authorList, MaxSongs = 50 };
+            var settings = new BeatSaverFeedSettings((int)BeatSaverFeeds.AUTHOR) { Authors = authorList, MaxSongs = 20 };
             var songsByAuthor = reader.GetSongsFromFeed(settings);
             var detectedAuthors = songsByAuthor.Values.Select(s => s.MapperName.ToLower()).Distinct();
             foreach (var song in songsByAuthor)
             {
                 Assert.IsTrue(!string.IsNullOrEmpty(song.Value.DownloadUrl));
                 Assert.IsTrue(authorList.Any(a => a.ToLower() == song.Value.MapperName.ToLower()));
-
             }
             foreach (var author in authorList)
             {
@@ -48,10 +45,6 @@ namespace FeedReaderTests
             var yazerSong = songsByAuthor[songHash];
             Assert.IsTrue(yazerSong != null);
             Assert.IsTrue(!string.IsNullOrEmpty(yazerSong.DownloadUrl));
-            foreach (var song in songList.Values)
-            {
-                Console.WriteLine($"{song.SongName} by {song.MapperName}, {song.Hash}");
-            }
         }
 
         [TestMethod]
