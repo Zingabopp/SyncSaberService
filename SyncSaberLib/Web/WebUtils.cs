@@ -21,9 +21,9 @@ namespace SyncSaberLib.Web
                 if (_httpClientHandler == null)
                 {
                     _httpClientHandler = new HttpClientHandler();
-                    HttpClientHandler.MaxConnectionsPerServer = 10;
-                    HttpClientHandler.UseCookies = true;
-                    HttpClientHandler.AllowAutoRedirect = true; // Needs to be false to detect Beat Saver song download rate limit
+                    _httpClientHandler.MaxConnectionsPerServer = 10;
+                    _httpClientHandler.UseCookies = true;
+                    _httpClientHandler.AllowAutoRedirect = true; // Needs to be false to detect Beat Saver song download rate limit
                 }
                 return _httpClientHandler;
             }

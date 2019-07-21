@@ -16,11 +16,13 @@ namespace FeedReaderTests
                 WebUtils.Initialize();
         }
 
+        private int DefaultMaxConcurrency = 5;
+
         [TestMethod]
         public void GetSongsFromPage_XML_Test()
         {
 
-            var reader = new BeastSaberReader("Zingabopp", 3) { StoreRawData = true };
+            var reader = new BeastSaberReader("Zingabopp", DefaultMaxConcurrency) { StoreRawData = true };
             var text = File.ReadAllText("Data\\BeastSaberXMLPage.xml");
             var songList = reader.GetSongsFromPageText(text, "", BeastSaberReader.ContentType.XML);
             Assert.IsTrue(songList.Count == 50);
@@ -54,7 +56,7 @@ namespace FeedReaderTests
         [TestMethod]
         public void GetSongsFromPage_JSON_Test()
         {
-            var reader = new BeastSaberReader("Zingabopp", 3);
+            var reader = new BeastSaberReader("Zingabopp", DefaultMaxConcurrency);
             var text = File.ReadAllText("Data\\BeastSaberJsonPage.json");
             var songList = reader.GetSongsFromPageText(text, "", BeastSaberReader.ContentType.JSON);
             Assert.IsTrue(songList.Count == 20);
@@ -73,7 +75,7 @@ namespace FeedReaderTests
         [TestMethod]
         public void GetSongsFromFeed_Bookmarks()
         {
-            var reader = new BeastSaberReader("Zingabopp", 3);
+            var reader = new BeastSaberReader("Zingabopp", DefaultMaxConcurrency);
             int maxSongs = 60;
             var settings = new BeastSaberFeedSettings((int)BeastSaberFeeds.BOOKMARKS) { MaxSongs = maxSongs };
             var songList = reader.GetSongsFromFeed(settings);
@@ -85,7 +87,7 @@ namespace FeedReaderTests
         [TestMethod]
         public void GetSongsFromFeed_Followings_SinglePage()
         {
-            var reader = new BeastSaberReader("Zingabopp", 3);
+            var reader = new BeastSaberReader("Zingabopp", DefaultMaxConcurrency);
             int maxSongs = 150;
             int maxPages = 1;
             var settings = new BeastSaberFeedSettings((int)BeastSaberFeeds.FOLLOWING)
@@ -103,7 +105,7 @@ namespace FeedReaderTests
         [TestMethod]
         public void GetSongsFromFeed_Followings_SinglePage_LimitedSongs()
         {
-            var reader = new BeastSaberReader("Zingabopp", 3) { StoreRawData = true } ;
+            var reader = new BeastSaberReader("Zingabopp", DefaultMaxConcurrency) { StoreRawData = true } ;
             int maxSongs = 20;
             int maxPages = 1;
             var settings = new BeastSaberFeedSettings((int)BeastSaberFeeds.FOLLOWING)
@@ -123,7 +125,7 @@ namespace FeedReaderTests
         [TestMethod]
         public void GetSongsFromFeed_Followings()
         {
-            var reader = new BeastSaberReader("Zingabopp", 3);
+            var reader = new BeastSaberReader("Zingabopp", DefaultMaxConcurrency);
             int maxSongs = 60;
             var settings = new BeastSaberFeedSettings((int)BeastSaberFeeds.FOLLOWING) { MaxSongs = maxSongs };
             var songList = reader.GetSongsFromFeed(settings);
@@ -137,7 +139,7 @@ namespace FeedReaderTests
         [TestMethod]
         public void GetSongsFromFeedAsync_Bookmarks_UnlimitedSongs()
         {
-            var reader = new BeastSaberReader("Zingabopp", 3);
+            var reader = new BeastSaberReader("Zingabopp", DefaultMaxConcurrency);
             int maxSongs = 0;
             var settings = new BeastSaberFeedSettings((int)BeastSaberFeeds.BOOKMARKS) { MaxSongs = maxSongs };
             var songList = reader.GetSongsFromFeedAsync(settings).Result;
@@ -148,7 +150,7 @@ namespace FeedReaderTests
         [TestMethod]
         public void GetSongsFromFeedAsync_Bookmarks_LimitedSongs()
         {
-            var reader = new BeastSaberReader("Zingabopp", 3);
+            var reader = new BeastSaberReader("Zingabopp", DefaultMaxConcurrency);
             int maxSongs = 60;
             var settings = new BeastSaberFeedSettings((int)BeastSaberFeeds.BOOKMARKS) { MaxSongs = maxSongs };
             var songList = reader.GetSongsFromFeedAsync(settings).Result;
@@ -160,7 +162,7 @@ namespace FeedReaderTests
         [TestMethod]
         public void GetSongsFromFeedAsync_Followings_UnlimitedSongs()
         {
-            var reader = new BeastSaberReader("Zingabopp", 3) { StoreRawData = true };
+            var reader = new BeastSaberReader("Zingabopp", DefaultMaxConcurrency) { StoreRawData = true };
             int maxSongs = 0;
             var settings = new BeastSaberFeedSettings((int)BeastSaberFeeds.FOLLOWING) { MaxSongs = maxSongs };
             var songList = reader.GetSongsFromFeedAsync(settings).Result;
@@ -172,7 +174,7 @@ namespace FeedReaderTests
         [TestMethod]
         public void GetSongsFromFeedAsync_Followings_LimitedSongs()
         {
-            var reader = new BeastSaberReader("Zingabopp", 3) { StoreRawData = true };
+            var reader = new BeastSaberReader("Zingabopp", DefaultMaxConcurrency) { StoreRawData = true };
             int maxSongs = 60;
             var settings = new BeastSaberFeedSettings((int)BeastSaberFeeds.FOLLOWING) { MaxSongs = maxSongs };
             var songList = reader.GetSongsFromFeedAsync(settings).Result;
@@ -184,7 +186,7 @@ namespace FeedReaderTests
         [TestMethod]
         public void GetSongsFromFeedAsync_CuratorRecommended_UnlimitedSongs()
         {
-            var reader = new BeastSaberReader("Zingabopp", 3) { StoreRawData = true };
+            var reader = new BeastSaberReader("Zingabopp", DefaultMaxConcurrency) { StoreRawData = true };
             int maxSongs = 0;
             var settings = new BeastSaberFeedSettings((int)BeastSaberFeeds.CURATOR_RECOMMENDED) { MaxSongs = maxSongs };
             var songList = reader.GetSongsFromFeedAsync(settings).Result;
@@ -199,7 +201,7 @@ namespace FeedReaderTests
         [TestMethod]
         public void GetSongsFromFeedAsync_CuratorRecommended_LimitedSongs()
         {
-            var reader = new BeastSaberReader("Zingabopp", 3) { StoreRawData = true };
+            var reader = new BeastSaberReader("Zingabopp", DefaultMaxConcurrency) { StoreRawData = true };
             int maxSongs = 60;
             var settings = new BeastSaberFeedSettings((int)BeastSaberFeeds.CURATOR_RECOMMENDED) { MaxSongs = maxSongs };
             var songList = reader.GetSongsFromFeedAsync(settings).Result;
@@ -214,7 +216,7 @@ namespace FeedReaderTests
         [TestMethod]
         public void GetSongsFromFeed_CuratorRecommended_LimitedPages()
         {
-            var reader = new BeastSaberReader("Zingabopp", 3);
+            var reader = new BeastSaberReader("Zingabopp", DefaultMaxConcurrency);
             int maxSongs = 30;
             int maxPages = 2;
             var settings = new BeastSaberFeedSettings((int)BeastSaberFeeds.CURATOR_RECOMMENDED) { MaxPages = maxPages, MaxSongs = maxSongs };

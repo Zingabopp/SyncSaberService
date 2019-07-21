@@ -12,8 +12,10 @@ using System.Net;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Threading.Tasks.Dataflow;
 using System.Net.Http;
 using FeedReader.Logging;
+using System.Diagnostics;
 
 namespace FeedReader
 {
@@ -46,6 +48,21 @@ namespace FeedReader
         private string _username, _password, _loginUri;
         private int _maxConcurrency;
 
+        /// <summary>
+        /// Sets the maximum number of simultaneous page checks.
+        /// </summary>
+        ///<exception cref="ArgumentOutOfRangeException">Thrown when setting MaxConcurrency less than 1.</exception>
+        public int MaxConcurrency
+        {
+            get { return _maxConcurrency; }
+            set
+            {
+                if (value < 1)
+                    throw new ArgumentOutOfRangeException("MaxConcurrency must be >= 1.");
+                _maxConcurrency = value;
+            }
+        }
+
         private static Dictionary<BeastSaberFeeds, FeedInfo> _feeds;
         public static Dictionary<BeastSaberFeeds, FeedInfo> Feeds
         {
@@ -72,25 +89,13 @@ namespace FeedReader
             }
         }
 
-        public BeastSaberReader(string username, int maxConcurrency)
+        public BeastSaberReader(string username, int maxConcurrency = 0)
         {
             Ready = false;
             _username = username;
-            if (maxConcurrency > 0)
-                _maxConcurrency = maxConcurrency;
-            else
-                _maxConcurrency = 5;
+            MaxConcurrency = maxConcurrency;
         }
 
-        [Obsolete("Login info is no longer required for Bookmarks and Followings.")]
-        public BeastSaberReader(string username, string password, int maxConcurrency, string loginUri = DefaultLoginUri)
-            : this(username, maxConcurrency)
-        {
-
-            _password = password;
-            _loginUri = loginUri;
-
-        }
         public enum ContentType
         {
             Unknown = 0,
@@ -116,7 +121,7 @@ namespace FeedReader
             {
                 songsOnPage = ParseJsonPage(pageText, sourceUrl);
             }
-            Logger.Debug($"{songsOnPage.Count} songs on the page");
+            //Logger.Debug($"{songsOnPage.Count} songs on page at {sourceUrl}");
             return songsOnPage;
         }
 
@@ -172,7 +177,7 @@ namespace FeedReader
                     string songKey = node[XML_SONGKEY_KEY]?.InnerText;
                     if (downloadUrl.Contains("dl.php"))
                     {
-                       Logger.Warning("Skipping BeastSaber download with old url format!");
+                        Logger.Warning("Skipping BeastSaber download with old url format!");
                     }
                     else
                     {
@@ -281,56 +286,100 @@ namespace FeedReader
                 throw new ArgumentException("Cannot access this feed without a valid username.");
             }
             int pageIndex = settings.StartingPage;
-            List<ScrapedSong> newSongs = null;
             int maxPages = _settings.MaxPages;
             bool useMaxSongs = _settings.MaxSongs != 0;
             bool useMaxPages = maxPages != 0;
             if (useMaxPages && pageIndex > 1)
                 maxPages = maxPages + pageIndex - 1;
+            var ProcessPageBlock = new TransformBlock<string, List<ScrapedSong>>(async feedUrl =>
+               {
+                   Stopwatch sw = new Stopwatch();
+                   sw.Start();
+                   //Logger.Debug($"Checking URL: {feedUrl}");
+                   string pageText = "";
+
+                   ContentType contentType;
+                   string contentTypeStr = string.Empty;
+                   try
+                   {
+                       using (var response = await WebUtils.GetPageAsync(feedUrl).ConfigureAwait(false))
+                       {
+                           contentTypeStr = response.Content.Headers.ContentType.MediaType.ToLower();
+                           if (ContentDictionary.ContainsKey(contentTypeStr))
+                               contentType = ContentDictionary[contentTypeStr];
+                           else
+                               contentType = ContentType.Unknown;
+                           pageText = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+                       }
+                   }
+                   catch (HttpRequestException ex)
+                   {
+                       Logger.Exception($"Error downloading {feedUrl} in TransformBlock.", ex);
+                       return new List<ScrapedSong>();
+                   }
+
+                   var newSongs = GetSongsFromPageText(pageText, feedUrl, contentType);
+                   sw.Stop();
+                   //Logger.Debug($"Task for {feedUrl} completed in {sw.ElapsedMilliseconds}ms");
+                   return newSongs.Count > 0 ? newSongs : null;
+               }, new ExecutionDataflowBlockOptions
+               {
+                   MaxDegreeOfParallelism = MaxConcurrency,
+                   BoundedCapacity = MaxConcurrency,
+                   EnsureOrdered = true
+               });
             bool continueLooping = true;
+            int itemsInBlock = 0;
             do
             {
-                if (newSongs != null)
-                    newSongs.Clear();
-
-                string feedUrl = GetPageUrl(Feeds[_settings.Feed].BaseUrl, pageIndex);
-                Logger.Debug($"Checking URL: {feedUrl}");
-                string pageText = "";
-
-                ContentType contentType;
-                using (var response = await WebUtils.GetPageAsync(feedUrl))
+                while (continueLooping)
                 {
-                    string contentTypeStr = response.Content.Headers.ContentType.MediaType.ToLower();
-                    if (ContentDictionary.ContainsKey(contentTypeStr))
-                        contentType = ContentDictionary[contentTypeStr];
-                    else
-                        contentType = ContentType.Unknown;
-                    pageText = await response.Content.ReadAsStringAsync();
 
-                }
-                
-                newSongs = GetSongsFromPageText(pageText, feedUrl, contentType);
-                foreach (var song in newSongs)
-                {
-                    if (retDict.ContainsKey(song.Hash))
+                    string feedUrl = GetPageUrl(Feeds[_settings.Feed].BaseUrl, pageIndex);
+                    await ProcessPageBlock.SendAsync(feedUrl).ConfigureAwait(false); // TODO: Need check with SongsPerPage
+                    itemsInBlock++;
+                    pageIndex++;
+
+                    if (pageIndex > maxPages && useMaxPages)
+                        continueLooping = false;
+
+                    while (ProcessPageBlock.OutputCount > 0 || itemsInBlock == MaxConcurrency || !continueLooping)
                     {
-                        Console.WriteLine($"Song {song.Hash} already exists.");
-                    }
-                    else
-                    {
-                        if (retDict.Count < settings.MaxSongs || settings.MaxSongs == 0)
-                            retDict.Add(song.Hash, song);
+                        if (itemsInBlock <= 0)
+                            break;
+                        await ProcessPageBlock.OutputAvailableAsync().ConfigureAwait(false);
+                        while (ProcessPageBlock.TryReceive(out List<ScrapedSong> newSongs))
+                        {
+                            itemsInBlock--;
+                            if (newSongs == null)
+                            {
+                                Logger.Debug("Received no new songs, last page reached.");
+                                ProcessPageBlock.Complete();
+                                itemsInBlock = 0;
+                                continueLooping = false;
+                                break;
+                            }
+                            Logger.Debug($"Receiving {newSongs.Count} potential songs from {newSongs.First().SourceUrl}");
+                            foreach (var song in newSongs)
+                            {
+                                if (retDict.ContainsKey(song.Hash))
+                                {
+                                    Logger.Debug($"Song {song.Hash} already exists.");
+                                }
+                                else
+                                {
+                                    if (retDict.Count < settings.MaxSongs || settings.MaxSongs == 0)
+                                        retDict.Add(song.Hash, song);
+                                    if (retDict.Count >= settings.MaxSongs && useMaxSongs)
+                                        continueLooping = false;
+                                }
+                            }
+                            if (!useMaxPages || pageIndex <= maxPages)
+                                if (retDict.Count < settings.MaxSongs)
+                                    continueLooping = true;
+                        }
                     }
                 }
-                //Logger.Debug($"FeedURL is {feedUrl}");
-                //Logger.Debug($"Queued page {pageIndex} for reading. EarliestEmptyPage is now {earliestEmptyPage}");
-                pageIndex++;
-                if (retDict.Count >= settings.MaxSongs && useMaxSongs)
-                    continueLooping = false;
-                if (pageIndex > maxPages && useMaxPages)
-                    continueLooping = false;
-                if (newSongs.Count == 0)
-                    continueLooping = false;
             }
             while (continueLooping);
 
