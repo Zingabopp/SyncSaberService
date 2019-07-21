@@ -74,9 +74,9 @@ namespace FeedReader
         {
             if (!Ready)
             {
-                for (int i = 0; i < Feeds.Keys.Count; i++)
-                    if (!_earliestEmptyPage.ContainsKey((int)Feeds.Keys.ElementAt(i)))
-                        _earliestEmptyPage.Add((int)Feeds.Keys.ElementAt(i), 9999); // Do I even need this?
+                //for (int i = 0; i < Feeds.Keys.Count; i++)
+                //    if (!_earliestEmptyPage.ContainsKey((int)Feeds.Keys.ElementAt(i)))
+                //        _earliestEmptyPage.Add((int)Feeds.Keys.ElementAt(i), 9999); // Do I even need this?
                 Ready = true;
             }
         }
