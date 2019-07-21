@@ -15,6 +15,7 @@ using System.Threading.Tasks;
 using System.Threading.Tasks.Dataflow;
 using System.Net.Http;
 using FeedReader.Logging;
+using System.Diagnostics;
 
 namespace FeedReader
 {
@@ -47,10 +48,19 @@ namespace FeedReader
         private string _username, _password, _loginUri;
         private int _maxConcurrency;
 
-        private static Dictionary<int, int> _earliestEmptyPage;
-        public static int EarliestEmptyPageForFeed(int feedIndex)
+        /// <summary>
+        /// Sets the maximum number of simultaneous page checks.
+        /// </summary>
+        ///<exception cref="ArgumentOutOfRangeException">Thrown when setting MaxConcurrency less than 1.</exception>
+        public int MaxConcurrency
         {
-            return _earliestEmptyPage[feedIndex];
+            get { return _maxConcurrency; }
+            set
+            {
+                if (value < 1)
+                    throw new ArgumentOutOfRangeException("MaxConcurrency must be >= 1.");
+                _maxConcurrency = value;
+            }
         }
 
         private static Dictionary<BeastSaberFeeds, FeedInfo> _feeds;
@@ -75,33 +85,17 @@ namespace FeedReader
         {
             if (!Ready)
             {
-                for (int i = 0; i < Feeds.Keys.Count; i++)
-                    if (!_earliestEmptyPage.ContainsKey((int)Feeds.Keys.ElementAt(i)))
-                        _earliestEmptyPage.Add((int)Feeds.Keys.ElementAt(i), 9999); // Do I even need this?
                 Ready = true;
             }
         }
 
-        public BeastSaberReader(string username, int maxConcurrency)
+        public BeastSaberReader(string username, int maxConcurrency = 0)
         {
             Ready = false;
             _username = username;
-            if (maxConcurrency > 0)
-                _maxConcurrency = maxConcurrency;
-            else
-                _maxConcurrency = 5;
-            _earliestEmptyPage = new Dictionary<int, int>();
+            MaxConcurrency = maxConcurrency;
         }
 
-        [Obsolete("Login info is no longer required for Bookmarks and Followings.")]
-        public BeastSaberReader(string username, string password, int maxConcurrency, string loginUri = DefaultLoginUri)
-            : this(username, maxConcurrency)
-        {
-
-            _password = password;
-            _loginUri = loginUri;
-
-        }
         public enum ContentType
         {
             Unknown = 0,
@@ -127,7 +121,7 @@ namespace FeedReader
             {
                 songsOnPage = ParseJsonPage(pageText, sourceUrl);
             }
-            Logger.Debug($"{songsOnPage.Count} songs on page at {sourceUrl}");
+            //Logger.Debug($"{songsOnPage.Count} songs on page at {sourceUrl}");
             return songsOnPage;
         }
 
@@ -319,59 +313,85 @@ namespace FeedReader
                 maxPages = maxPages + pageIndex - 1;
             var ProcessPageBlock = new TransformBlock<string, List<ScrapedSong>>(async feedUrl =>
                {
-                   Logger.Debug($"Checking URL: {feedUrl}");
+                   Stopwatch sw = new Stopwatch();
+                   sw.Start();
+                   //Logger.Debug($"Checking URL: {feedUrl}");
                    string pageText = "";
 
                    ContentType contentType;
-                   using (var response = await WebUtils.GetPageAsync(feedUrl).ConfigureAwait(false))
+                   string contentTypeStr = string.Empty;
+                   try
                    {
-                       string contentTypeStr = response.Content.Headers.ContentType.MediaType.ToLower();
-                       if (ContentDictionary.ContainsKey(contentTypeStr))
-                           contentType = ContentDictionary[contentTypeStr];
-                       else
-                           contentType = ContentType.Unknown;
-                       pageText = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-
+                       using (var response = await WebUtils.GetPageAsync(feedUrl).ConfigureAwait(false))
+                       {
+                           contentTypeStr = response.Content.Headers.ContentType.MediaType.ToLower();
+                           if (ContentDictionary.ContainsKey(contentTypeStr))
+                               contentType = ContentDictionary[contentTypeStr];
+                           else
+                               contentType = ContentType.Unknown;
+                           pageText = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+                       }
                    }
+                   catch (HttpRequestException ex)
+                   {
+                       Logger.Exception($"Error downloading {feedUrl} in TransformBlock.", ex);
+                       return new List<ScrapedSong>();
+                   }
+
                    var newSongs = GetSongsFromPageText(pageText, feedUrl, contentType);
+                   sw.Stop();
+                   //Logger.Debug($"Task for {feedUrl} completed in {sw.ElapsedMilliseconds}ms");
                    return newSongs.Count > 0 ? newSongs : null;
                }, new ExecutionDataflowBlockOptions
                {
-                   MaxDegreeOfParallelism = _maxConcurrency,
-                   BoundedCapacity = _maxConcurrency,
+                   MaxDegreeOfParallelism = MaxConcurrency,
+                   BoundedCapacity = MaxConcurrency,
                    EnsureOrdered = true
                });
             bool continueLooping = true;
             int itemsInBlock = 0;
             do
             {
-                do
+                while (continueLooping)
                 {
+
                     string feedUrl = GetPageUrl(Feeds[_settings.Feed].BaseUrl, pageIndex);
                     await ProcessPageBlock.SendAsync(feedUrl).ConfigureAwait(false); // TODO: Need check with SongsPerPage
                     itemsInBlock++;
-                    while (ProcessPageBlock.OutputCount > 0 || itemsInBlock == _maxConcurrency)
+                    pageIndex++;
+
+                    if (pageIndex > maxPages && useMaxPages)
+                        continueLooping = false;
+
+                    while (ProcessPageBlock.OutputCount > 0 || itemsInBlock == MaxConcurrency || !continueLooping)
                     {
+                        if (itemsInBlock <= 0)
+                            break;
                         await ProcessPageBlock.OutputAvailableAsync().ConfigureAwait(false);
                         while (ProcessPageBlock.TryReceive(out List<ScrapedSong> newSongs))
                         {
                             itemsInBlock--;
                             if (newSongs == null)
                             {
+                                Logger.Debug("Received no new songs, last page reached.");
+                                ProcessPageBlock.Complete();
+                                itemsInBlock = 0;
                                 continueLooping = false;
                                 break;
                             }
-                            Logger.Debug($"Receiving songs from {newSongs.First().SourceUrl}");
+                            Logger.Debug($"Receiving {newSongs.Count} potential songs from {newSongs.First().SourceUrl}");
                             foreach (var song in newSongs)
                             {
                                 if (retDict.ContainsKey(song.Hash))
                                 {
-                                    Console.WriteLine($"Song {song.Hash} already exists.");
+                                    Logger.Debug($"Song {song.Hash} already exists.");
                                 }
                                 else
                                 {
                                     if (retDict.Count < settings.MaxSongs || settings.MaxSongs == 0)
                                         retDict.Add(song.Hash, song);
+                                    if (retDict.Count >= settings.MaxSongs && useMaxSongs)
+                                        continueLooping = false;
                                 }
                             }
                             if (!useMaxPages || pageIndex <= maxPages)
@@ -379,47 +399,7 @@ namespace FeedReader
                                     continueLooping = true;
                         }
                     }
-                    //Logger.Debug($"FeedURL is {feedUrl}");
-                    //Logger.Debug($"Queued page {pageIndex} for reading. EarliestEmptyPage is now {earliestEmptyPage}");
-                    pageIndex++;
-                    if (retDict.Count >= settings.MaxSongs && useMaxSongs)
-                        continueLooping = false;
-                    if (pageIndex > maxPages && useMaxPages)
-                        continueLooping = false;
-                    //if (newSongs.Count == 0)
-                    //    continueLooping = false;
-                } while (continueLooping);
-
-                while (itemsInBlock > 0)
-                {
-                    await ProcessPageBlock.OutputAvailableAsync().ConfigureAwait(false);
-                    while (ProcessPageBlock.TryReceive(out List<ScrapedSong> newSongs))
-                    {
-                        itemsInBlock--;
-                        if (newSongs == null)
-                        {
-                            continueLooping = false;
-                            break;
-                        }
-                        Logger.Debug($"Receiving songs from {newSongs.First().SourceUrl}");
-                        foreach (var song in newSongs)
-                        {
-                            if (retDict.ContainsKey(song.Hash))
-                            {
-                                Console.WriteLine($"Song {song.Hash} already exists.");
-                            }
-                            else
-                            {
-                                if (retDict.Count < settings.MaxSongs || settings.MaxSongs == 0)
-                                    retDict.Add(song.Hash, song);
-                            }
-                        }
-                        if (!useMaxPages || pageIndex <= maxPages)
-                            if (retDict.Count < settings.MaxSongs)
-                                continueLooping = true;
-                    }
                 }
-
             }
             while (continueLooping);
             //while ((pageIndex < maxPages || maxPages == 0) && newSongs.Count > 0);
