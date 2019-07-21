@@ -250,26 +250,6 @@ namespace FeedReader
                         RawData = StoreRawData ? bSong.ToString(Newtonsoft.Json.Formatting.None) : string.Empty
                     });
                 }
-                //else
-                //{
-                //    // Unable to get song hash, try getting song_key from BeastSaber
-                //    string songKey = bSong["song_key"]?.Value<string>();
-                //    if (!string.IsNullOrEmpty(songKey))
-                //    {
-                //        if (ScrapedDataProvider.TryGetSongByKey(songKey, out SongInfo currentSong))
-                //        {
-                //            songsOnPage.Add(currentSong);
-                //        }
-                //        else
-                //        {
-                //            Logger.Debug($"ScrapedDataProvider could not find song: {bSong.Value<string>()}");
-                //        }
-                //    }
-                //    else
-                //    {
-                //        Logger.Debug($"Not a song, skipping: {bSong.ToString()}");
-                //    }
-                //}
             }
             return songsOnPage;
         }
@@ -402,7 +382,6 @@ namespace FeedReader
                 }
             }
             while (continueLooping);
-            //while ((pageIndex < maxPages || maxPages == 0) && newSongs.Count > 0);
 
             return retDict;
         }
