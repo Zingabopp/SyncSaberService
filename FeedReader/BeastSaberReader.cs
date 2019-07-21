@@ -46,12 +46,6 @@ namespace FeedReader
         private string _username, _password, _loginUri;
         private int _maxConcurrency;
 
-        private static Dictionary<int, int> _earliestEmptyPage;
-        public static int EarliestEmptyPageForFeed(int feedIndex)
-        {
-            return _earliestEmptyPage[feedIndex];
-        }
-
         private static Dictionary<BeastSaberFeeds, FeedInfo> _feeds;
         public static Dictionary<BeastSaberFeeds, FeedInfo> Feeds
         {
@@ -74,9 +68,6 @@ namespace FeedReader
         {
             if (!Ready)
             {
-                for (int i = 0; i < Feeds.Keys.Count; i++)
-                    if (!_earliestEmptyPage.ContainsKey((int)Feeds.Keys.ElementAt(i)))
-                        _earliestEmptyPage.Add((int)Feeds.Keys.ElementAt(i), 9999); // Do I even need this?
                 Ready = true;
             }
         }
@@ -89,7 +80,6 @@ namespace FeedReader
                 _maxConcurrency = maxConcurrency;
             else
                 _maxConcurrency = 5;
-            _earliestEmptyPage = new Dictionary<int, int>();
         }
 
         [Obsolete("Login info is no longer required for Bookmarks and Followings.")]
@@ -255,26 +245,6 @@ namespace FeedReader
                         RawData = StoreRawData ? bSong.ToString(Newtonsoft.Json.Formatting.None) : string.Empty
                     });
                 }
-                //else
-                //{
-                //    // Unable to get song hash, try getting song_key from BeastSaber
-                //    string songKey = bSong["song_key"]?.Value<string>();
-                //    if (!string.IsNullOrEmpty(songKey))
-                //    {
-                //        if (ScrapedDataProvider.TryGetSongByKey(songKey, out SongInfo currentSong))
-                //        {
-                //            songsOnPage.Add(currentSong);
-                //        }
-                //        else
-                //        {
-                //            Logger.Debug($"ScrapedDataProvider could not find song: {bSong.Value<string>()}");
-                //        }
-                //    }
-                //    else
-                //    {
-                //        Logger.Debug($"Not a song, skipping: {bSong.ToString()}");
-                //    }
-                //}
             }
             return songsOnPage;
         }
@@ -345,16 +315,6 @@ namespace FeedReader
                     if (retDict.ContainsKey(song.Hash))
                     {
                         Console.WriteLine($"Song {song.Hash} already exists.");
-                        /*
-                        if (retDict[song.keyAsInt].SongVersion < song.SongVersion)
-                        {
-                            Logger.Debug($"Song with ID {song.keyAsInt} already exists, updating");
-                            retDict[song.keyAsInt] = song;
-                        }
-                        else
-                        {
-                            Logger.Debug($"Song with ID {song.keyAsInt} is already the newest version");
-                        }*/
                     }
                     else
                     {
@@ -373,7 +333,6 @@ namespace FeedReader
                     continueLooping = false;
             }
             while (continueLooping);
-            //while ((pageIndex < maxPages || maxPages == 0) && newSongs.Count > 0);
 
             return retDict;
         }
