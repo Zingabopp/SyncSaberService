@@ -35,7 +35,7 @@ namespace FeedReaderTests.MockClasses.MockTests
                 mockContent.ReadAsFileAsync(destPath, true).Wait();
                 var actualString = mockContent.ReadAsStringAsync().Result;
                 Assert.AreEqual(expectedString, actualString);
-                AssertAsync.ThrowsExceptionAsync<InvalidOperationException>(async () => await mockContent.ReadAsFileAsync(destPath, false)).Wait();
+                AssertAsync.ThrowsExceptionAsync<InvalidOperationException>(async () => await mockContent.ReadAsFileAsync(destPath, false).ConfigureAwait(false)).Wait();
             }
         }
 

@@ -235,20 +235,22 @@ namespace FeedReader
 
         public async static Task<string> TryGetStringAsync(string url)
         {
-            HttpResponseMessage response = await HttpClient.GetAsync(url).ConfigureAwait(false);
-            if (response.IsSuccessStatusCode)
+            using (HttpResponseMessage response = await HttpClient.GetAsync(url).ConfigureAwait(false))
             {
-                return await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+                if (response.IsSuccessStatusCode)
+                {
+                    return await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+                }
+                return string.Empty;
             }
-            return string.Empty;
         }
     }
 
     public class RateLimit
     {
-        public int CallsRemaining;
-        public TimeSpan TimeToReset;
-        public int CallsPerReset;
+        public int CallsRemaining { get; set; }
+        public TimeSpan TimeToReset { get; set; }
+        public int CallsPerReset { get; set; }
     }
 
     public class HttpGetException : Exception
@@ -300,32 +302,33 @@ namespace FeedReader
     // From https://stackoverflow.com/questions/45711428/download-file-with-webclient-or-httpclient
     public static class HttpContentExtensions
     {
-        public static Task ReadAsFileAsync(this HttpContent content, string filename, bool overwrite)
+        /// <summary>
+        /// Downloads the provided HttpContent to the specified file.
+        /// </summary>
+        /// <param name="content"></param>
+        /// <param name="filename"></param>
+        /// <param name="overwrite"></param>
+        /// <exception cref="ArgumentNullException">Thrown when content or the filename are null or empty.</exception>
+        /// <exception cref="InvalidOperationException">Thrown when overwrite is false and a file at the provided path already exists.</exception>
+        /// <returns></returns>
+        public static async Task ReadAsFileAsync(this HttpContent content, string filename, bool overwrite)
         {
+            if (content == null)
+                throw new ArgumentNullException(nameof(content), "content cannot be null for HttpContent.ReadAsFileAsync");
+            if (string.IsNullOrEmpty(filename?.Trim()))
+                throw new ArgumentNullException(nameof(filename), "filename cannot be null or empty for HttpContent.ReadAsFileAsync");
             string pathname = Path.GetFullPath(filename);
             if (!overwrite && File.Exists(filename))
             {
                 throw new InvalidOperationException(string.Format("File {0} already exists.", pathname));
             }
 
-            FileStream fileStream = null;
-            try
+            using (Stream contentStream = await content.ReadAsStreamAsync().ConfigureAwait(false))
             {
-                fileStream = new FileStream(pathname, FileMode.Create, FileAccess.Write, FileShare.None);
-                return content.CopyToAsync(fileStream).ContinueWith(
-                    (copyTask) =>
-                    {
-                        fileStream.Close();
-                    });
-            }
-            catch
-            {
-                if (fileStream != null)
+                using (Stream streamToWriteTo = File.Open(filename, FileMode.Create, FileAccess.Write, FileShare.None))
                 {
-                    fileStream.Close();
+                    await contentStream.CopyToAsync(streamToWriteTo).ConfigureAwait(false);
                 }
-
-                throw;
             }
         }
     }

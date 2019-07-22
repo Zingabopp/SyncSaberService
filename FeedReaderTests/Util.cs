@@ -17,9 +17,11 @@ namespace FeedReaderTests
     {
         public static async Task ThrowsExceptionAsync<TException, TResult>(Func<Task<TResult>> action)
         {
+            if (action == null)
+                return;
             try
             {
-                await action();
+                await action().ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -33,9 +35,11 @@ namespace FeedReaderTests
 
         public static async Task ThrowsExceptionAsync<TException>(Func<Task> action)
         {
+            if (action == null)
+                return;
             try
             {
-                await action();
+                await action().ConfigureAwait(false);
             }
             catch (Exception ex)
             {

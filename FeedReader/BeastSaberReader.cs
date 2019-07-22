@@ -59,7 +59,7 @@ namespace FeedReader
             set
             {
                 if (value < 1)
-                    throw new ArgumentOutOfRangeException("MaxConcurrency must be >= 1.");
+                    throw new ArgumentOutOfRangeException("MaxConcurrency", value, "MaxConcurrency must be >= 1.");
                 _maxConcurrency = value;
             }
         }
@@ -273,7 +273,7 @@ namespace FeedReader
 
         public async Task<Dictionary<string, ScrapedSong>> GetSongsFromFeedAsync(IFeedSettings settings)
         {
-            return await GetSongsFromFeedAsync(settings, CancellationToken.None);
+            return await GetSongsFromFeedAsync(settings, CancellationToken.None).ConfigureAwait(false);
         }
 
         public async Task<Dictionary<string, ScrapedSong>> GetSongsFromFeedAsync(IFeedSettings settings, CancellationToken cancellationToken)

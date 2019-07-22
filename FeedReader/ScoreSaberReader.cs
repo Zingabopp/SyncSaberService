@@ -65,7 +65,7 @@ namespace FeedReader
         }
         public async Task<Dictionary<string, ScrapedSong>> GetSongsFromFeedAsync(IFeedSettings settings)
         {
-            return await GetSongsFromFeedAsync(settings, CancellationToken.None);
+            return await GetSongsFromFeedAsync(settings, CancellationToken.None).ConfigureAwait(false);
         }
         public async Task<Dictionary<string, ScrapedSong>> GetSongsFromFeedAsync(IFeedSettings _settings, CancellationToken cancellationToken)
         {
@@ -77,18 +77,18 @@ namespace FeedReader
             switch (settings.Feed)
             {
                 case ScoreSaberFeeds.TRENDING:
-                    retDict = await GetSongsFromScoreSaberAsync(settings);
+                    retDict = await GetSongsFromScoreSaberAsync(settings).ConfigureAwait(false);
                     break;
                 case ScoreSaberFeeds.LATEST_RANKED:
                     settings.RankedOnly = true;
-                    retDict = await GetSongsFromScoreSaberAsync(settings);
+                    retDict = await GetSongsFromScoreSaberAsync(settings).ConfigureAwait(false);
                     break;
                 case ScoreSaberFeeds.TOP_PLAYED:
-                    retDict = await GetSongsFromScoreSaberAsync(settings);
+                    retDict = await GetSongsFromScoreSaberAsync(settings).ConfigureAwait(false);
                     break;
                 case ScoreSaberFeeds.TOP_RANKED:
                     settings.RankedOnly = true;
-                    retDict = await GetSongsFromScoreSaberAsync(settings);
+                    retDict = await GetSongsFromScoreSaberAsync(settings).ConfigureAwait(false);
                     break;
                 default:
                     break;
@@ -130,10 +130,10 @@ namespace FeedReader
             GetPageUrl(ref url, urlReplacements);
 
             string pageText = "";
-            using (var response = await WebUtils.WebClient.GetAsync(url.ToString()))
+            using (var response = await WebUtils.WebClient.GetAsync(url.ToString()).ConfigureAwait(false))
             {
                 if (response.IsSuccessStatusCode)
-                    pageText = await response.Content.ReadAsStringAsync();
+                    pageText = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
                 else
                 {
                     Logger.Error($"Error getting text from {url.ToString()}, HTTP Status Code is: {response.StatusCode.ToString()}: {response.ReasonPhrase}");
@@ -168,7 +168,7 @@ namespace FeedReader
                 else
                     urlReplacements[PAGENUMKEY] = pageNum.ToString();
                 GetPageUrl(ref url, urlReplacements);
-                foreach (var song in await GetSongsFromPageAsync(url.ToString()))
+                foreach (var song in await GetSongsFromPageAsync(url.ToString()).ConfigureAwait(false))
                 {
                     diffCount++;
                     if (!songs.ContainsKey(song.Hash) && songs.Count < settings.MaxSongs)

@@ -223,7 +223,7 @@ namespace FeedReader
                     }
                     break;
                 case BeatSaverFeeds.SEARCH:
-                    songs = await SearchAsync(settings.SearchCriteria, settings.SearchType);
+                    songs = await SearchAsync(settings.SearchCriteria, settings.SearchType).ConfigureAwait(false);
                     break;
                 // Latest/Hot/Plays/Downloads
                 default:
@@ -470,7 +470,7 @@ namespace FeedReader
             await Task.WhenAll(pageReadTasks.ToArray()).ConfigureAwait(false);
             foreach (var job in pageReadTasks)
             {
-                songs.AddRange(await job);
+                songs.AddRange(await job.ConfigureAwait(false));
             }
             return songs;
         }

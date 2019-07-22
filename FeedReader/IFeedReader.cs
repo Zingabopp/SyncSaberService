@@ -48,14 +48,40 @@ namespace FeedReader
     /// <summary>
     /// Data for a feed.
     /// </summary>
-    public struct FeedInfo
+    public struct FeedInfo : IEquatable<FeedInfo>
     {
-        public FeedInfo(string _name, string _baseUrl)
+        public FeedInfo(string name, string baseUrl)
         {
-            Name = _name;
-            BaseUrl = _baseUrl;
+            Name = name;
+            BaseUrl = baseUrl;
         }
-        public string BaseUrl; // Base URL for the feed, has string keys to replace with things like page number/bsaber username
-        public string Name; // Name of the feed
+        public string BaseUrl { get; set; } // Base URL for the feed, has string keys to replace with things like page number/bsaber username
+        public string Name { get; set; } // Name of the feed
+
+        #region EqualsOperators
+        public override bool Equals(object obj)
+        {
+            if (!(obj is FeedInfo))
+                return false;
+            return Equals((FeedInfo)obj);
+        }
+        public bool Equals(FeedInfo other)
+        {
+            if (Name != other.Name)
+                return false;
+            return BaseUrl == other.BaseUrl;
+        }
+
+        public static bool operator ==(FeedInfo feedInfo1, FeedInfo feedInfo2)
+        {
+            return feedInfo1.Equals(feedInfo2);
+        }
+        public static bool operator !=(FeedInfo feedInfo1, FeedInfo feedInfo2)
+        {
+            return !feedInfo1.Equals(feedInfo2);
+        }
+
+        public override int GetHashCode() => (Name, BaseUrl).GetHashCode();
+        #endregion
     }
 }
