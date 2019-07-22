@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using System;
 using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace WebUtilities
@@ -22,11 +23,14 @@ namespace WebUtilities
         public int Timeout { get; set; }
         public ErrorHandling ErrorHandling { get; set; }
 
-        public async Task<IWebResponseMessage> GetAsync(string url)
+        public async Task<IWebResponseMessage> GetAsync(string url, bool completeOnHeaders, CancellationToken cancellationToken)
         {
+            HttpCompletionOption completionOption = 
+                completeOnHeaders ? HttpCompletionOption.ResponseHeadersRead : HttpCompletionOption.ResponseContentRead;
             try
             {
-                return new HttpResponseWrapper(await httpClient.GetAsync(url).ConfigureAwait(false));
+                //TODO: Need testing for cancellation token
+                return new HttpResponseWrapper(await httpClient.GetAsync(url, completionOption, cancellationToken).ConfigureAwait(false));
             }
             catch(ArgumentException ex)
             {
@@ -50,6 +54,21 @@ namespace WebUtilities
             }
 
         }
+
+        #region GetAsyncOverloads
+        public Task<IWebResponseMessage> GetAsync(string url)
+        {
+            return GetAsync(url, false, CancellationToken.None);
+        }
+        public Task<IWebResponseMessage> GetAsync(string url, bool completeOnHeaders)
+        {
+            return GetAsync(url, completeOnHeaders, CancellationToken.None);
+        }
+        public Task<IWebResponseMessage> GetAsync(string url, CancellationToken cancellationToken)
+        {
+            return GetAsync(url, false, cancellationToken);
+        }
+        #endregion
 
         #region IDisposable Support
         private bool disposedValue = false; // To detect redundant calls

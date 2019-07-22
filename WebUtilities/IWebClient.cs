@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace WebUtilities
@@ -10,6 +11,9 @@ namespace WebUtilities
         int Timeout { get; set; }
         ErrorHandling ErrorHandling { get; set; }
         Task<IWebResponseMessage> GetAsync(string url);
+        Task<IWebResponseMessage> GetAsync(string url, bool completeOnHeaders);
+        Task<IWebResponseMessage> GetAsync(string url, CancellationToken cancellationToken);
+        Task<IWebResponseMessage> GetAsync(string url, bool completeOnHeaders, CancellationToken cancellationToken);
 
     }
 
