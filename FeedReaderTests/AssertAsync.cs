@@ -8,11 +8,6 @@ using System.Threading.Tasks;
 
 namespace FeedReaderTests
 {
-    public static class Util
-    {
-        
-    }
-
     public static class AssertAsync
     {
         public static async Task ThrowsExceptionAsync<TException, TResult>(Func<Task<TResult>> action)
