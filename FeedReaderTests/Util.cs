@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 
+[assembly: Parallelize(Workers = 0, Scope = ExecutionScope.MethodLevel)]
+
 namespace FeedReaderTests
 {
     public static class Util
