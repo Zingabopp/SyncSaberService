@@ -82,7 +82,17 @@ namespace FeedReader
                 return null;
         }
 
-        public static void Initialize(HttpClient client = null)
+        public static void Initialize()
+        {
+            if (!IsInitialized)
+            {
+                HttpClient = new HttpClient();
+                _webClient = new HttpClientWrapper();
+                IsInitialized = true;
+            }
+        }
+
+        public static void Initialize(HttpClient client)
         {
             if (!IsInitialized)
             {
@@ -95,6 +105,23 @@ namespace FeedReader
                 {
                     HttpClient = client;
                     _webClient = new HttpClientWrapper(client);
+                }
+                IsInitialized = true;
+            }
+        }
+        public static void Initialize(IWebClient client)
+        {
+            if (!IsInitialized)
+            {
+                if (client == null)
+                {
+                    HttpClient = new HttpClient();
+                    _webClient = new HttpClientWrapper();
+                }
+                else
+                {
+                    HttpClient = new HttpClient();
+                    _webClient = client;
                 }
                 IsInitialized = true;
             }
