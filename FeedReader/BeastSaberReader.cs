@@ -46,7 +46,7 @@ namespace FeedReader
         public bool Ready { get; private set; }
         public bool StoreRawData { get; set; }
 
-        private string _username, _password, _loginUri;
+        private string _username;
         private int _maxConcurrency;
 
         /// <summary>
