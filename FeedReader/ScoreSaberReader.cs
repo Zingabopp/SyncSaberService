@@ -29,11 +29,13 @@ namespace FeedReader
         //private static readonly string CATKEY = "{CAT}";
         private static readonly string RANKEDKEY = "{RANKKEY}";
         private static readonly string LIMITKEY = "{LIMIT}";
+        private static readonly string QUERYKEY = "{QUERY}";
         private const string INVALID_FEED_SETTINGS_MESSAGE = "The IFeedSettings passed is not a ScoreSaberFeedSettings.";
         private const string TOP_RANKED_KEY = "Top Ranked";
         private const string TRENDING_KEY = "Trending";
         private const string TOP_PLAYED_KEY = "Top Played";
         private const string LATEST_RANKED_KEY = "Latest Ranked";
+        private const string SEARCH_KEY = "Search";
         #endregion
 
         public static FeedReaderLoggerBase Logger = new FeedReaderLogger(LoggingController.DefaultLogController);
@@ -54,7 +56,8 @@ namespace FeedReader
                         { (ScoreSaberFeeds)0, new FeedInfo(TRENDING_KEY, $"https://scoresaber.com/api.php?function=get-leaderboards&cat=0&limit={LIMITKEY}&page={PAGENUMKEY}&ranked={RANKEDKEY}") },
                         { (ScoreSaberFeeds)1, new FeedInfo(LATEST_RANKED_KEY, $"https://scoresaber.com/api.php?function=get-leaderboards&cat=1&limit={LIMITKEY}&page={PAGENUMKEY}&ranked={RANKEDKEY}") },
                         { (ScoreSaberFeeds)2, new FeedInfo(TOP_PLAYED_KEY, $"https://scoresaber.com/api.php?function=get-leaderboards&cat=2&limit={LIMITKEY}&page={PAGENUMKEY}&ranked={RANKEDKEY}") },
-                        { (ScoreSaberFeeds)3, new FeedInfo(TOP_RANKED_KEY, $"https://scoresaber.com/api.php?function=get-leaderboards&cat=3&limit={LIMITKEY}&page={PAGENUMKEY}&ranked={RANKEDKEY}") }
+                        { (ScoreSaberFeeds)3, new FeedInfo(TOP_RANKED_KEY, $"https://scoresaber.com/api.php?function=get-leaderboards&cat=3&limit={LIMITKEY}&page={PAGENUMKEY}&ranked={RANKEDKEY}") },
+                        { (ScoreSaberFeeds)99, new FeedInfo(SEARCH_KEY, $"https://scoresaber.com/api.php?function=get-leaderboards&cat=3&limit={LIMITKEY}&page={PAGENUMKEY}&ranked={RANKEDKEY}&search={QUERYKEY}") }
                     };
                 }
                 return _feeds;
@@ -293,5 +296,6 @@ namespace FeedReader
         LATEST_RANKED = 1,
         TOP_PLAYED = 2,
         TOP_RANKED = 3,
+        SEARCH = 99
     }
 }

@@ -1,0 +1,77 @@
+{
+  "songs": [
+    {
+      "title": "Muse - Uprising",
+      "song_key": "4c6",
+      "hash": "00e5671e594a6fe621c3605fcc5a0e4466ba6478",
+      "level_author_name": "rustic"
+    },
+    {
+      "title": "Prototyperaptor - Awe",
+      "song_key": "65",
+      "hash": "f16443de4216fc5f9435f103d77a6919423edb8a",
+      "level_author_name": "rustic"
+    },
+    {
+      "title": "Royals (Yinyues Remix) - Lorde",
+      "song_key": "459",
+      "hash": "aee01374c29983b6e7488ed7f649c9f5d7bad019",
+      "level_author_name": "awfulnaut"
+    },
+    {
+      "title": "CAN'T STOP THE FEELING -Justin Timberlake",
+      "song_key": "45e",
+      "hash": "91ba25c089d50e93154e2c7920c46d4730f22569",
+      "level_author_name": "bennydabeast"
+    },
+    {
+      "title": "Tetris Effect Trailer \"I'm yours forever\"",
+      "song_key": "4d5",
+      "hash": "851daab7074f65fcb2ed2ac686f6a0cfb460ba61",
+      "level_author_name": "rustic"
+    },
+    {
+      "title": "Tetris (Trap Remix)",
+      "song_key": "4af",
+      "hash": "207a911d2ab94b833310e94ea0dd036a3b9fb74d",
+      "level_author_name": "crankor"
+    },
+    {
+      "title": "Believer - Imagine Dragons",
+      "song_key": "b",
+      "hash": "19f2879d11a91b51a5c090d63471c3e8d9b7aee3",
+      "level_author_name": "rustic"
+    },
+    {
+      "title": "Every Time We Touch - Cascada",
+      "song_key": "e4",
+      "hash": "bc6c7ef1385db4c11c59736d2b32eacf48c95bd9",
+      "level_author_name": "purphoros"
+    },
+    {
+      "title": "Ride - Twenty One Pilots",
+      "song_key": "475",
+      "hash": "05c4b1fc955756d2672ce322417ad2fadb416af6",
+      "level_author_name": "downycat"
+    },
+    {
+      "title": "Taylor Swift - Shake It Off",
+      "song_key": "348",
+      "hash": "483c7bc03133c6e215f3018e5033b0913821126f",
+      "level_author_name": "jovian"
+    },
+    {
+      "title": "Shia LaBeouf (Rob Cantor)",
+      "song_key": "1c1",
+      "hash": "1279a3fcaff31e767e5dd7d7c016ec08733cf566",
+      "level_author_name": "kleid"
+    },
+    {
+      "title": "The Island Part 2 Dusk - Pendulum",
+      "song_key": "13b",
+      "hash": "b564c43a1d52e8b51b91f882732e39c65ac9f8c2",
+      "level_author_name": "purphoros"
+    }
+  ],
+  "next_page": null
+}
