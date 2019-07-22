@@ -43,7 +43,10 @@ namespace WebUtilities
                 if (ErrorHandling == ErrorHandling.ThrowOnException)
                     throw;
                 else
+                {
+                    Logger?.Log(LogLevel.Error, $"Exception getting {url}\n{ex.Message}\n{ex.StackTrace}");
                     return new HttpResponseWrapper(null);
+                }
             }
 
         }

@@ -7,6 +7,7 @@ using System.IO;
 using System.Net.Http;
 using System.Net;
 using FeedReader.Logging;
+using WebUtilities;
 
 namespace FeedReader
 {
@@ -31,7 +32,8 @@ namespace FeedReader
         //    }
         //}
         private static HttpClient _httpClient;
-        private static HttpClient HttpClient {
+        private static HttpClient HttpClient
+        {
             get
             {
                 if (!IsInitialized)
@@ -42,6 +44,17 @@ namespace FeedReader
             {
                 _httpClient = value;
             }
+        }
+        private static IWebClient _webClient;
+        public static IWebClient WebClient
+        {
+            get
+            {
+                if (_webClient == null)
+                    _webClient = new HttpClientWrapper();
+                return _webClient;
+            }
+
         }
 
         public static DateTime UnixTimeStampToDateTime(double unixTimeStamp)
@@ -74,9 +87,15 @@ namespace FeedReader
             if (!IsInitialized)
             {
                 if (client == null)
+                {
                     HttpClient = new HttpClient();
+                    _webClient = new HttpClientWrapper();
+                }
                 else
+                {
                     HttpClient = client;
+                    _webClient = new HttpClientWrapper(client);
+                }
                 IsInitialized = true;
             }
         }
@@ -101,7 +120,7 @@ namespace FeedReader
             }
             catch (InvalidOperationException ex)
             {
-               Logger.Exception($"Error getting page {url}", ex);
+                Logger.Exception($"Error getting page {url}", ex);
             }
             HttpResponseMessage response = pageGetTask.Result;
             //Logger.Debug(pageText.Result);
@@ -143,6 +162,7 @@ namespace FeedReader
         /// <param name="url"></param>
         /// <exception cref="HttpRequestException"></exception>
         /// <returns></returns>
+        [Obsolete("Use WebClient.GetAsync() instead")]
         public static async Task<HttpResponseMessage> GetPageAsync(string url)
         {
             //lock (lockObject)
@@ -185,18 +205,6 @@ namespace FeedReader
         //{
         //    AddCookies(newCookies, new Uri(url));
         //}
-
-        public async static Task<bool> DownloadFileAsync(string downloadUrl, string path, bool overwrite = true)
-        {
-            var success = true;
-            var response = await WebUtils.HttpClient.GetAsync(downloadUrl).ConfigureAwait(false);
-
-            response.EnsureSuccessStatusCode();
-
-
-            await response.Content.ReadAsFileAsync(path, overwrite).ConfigureAwait(false);
-            return success;
-        }
 
         public async static Task<string> TryGetStringAsync(string url)
         {

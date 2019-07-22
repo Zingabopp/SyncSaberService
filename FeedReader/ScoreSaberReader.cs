@@ -127,7 +127,7 @@ namespace FeedReader
             GetPageUrl(ref url, urlReplacements);
 
             string pageText = "";
-            using (var response = await GetPageAsync(url.ToString()))
+            using (var response = await WebUtils.WebClient.GetAsync(url.ToString()))
             {
                 if (response.IsSuccessStatusCode)
                     pageText = await response.Content.ReadAsStringAsync();
@@ -185,19 +185,20 @@ namespace FeedReader
 
         public async Task<List<ScrapedSong>> GetSongsFromPageAsync(string url)
         {
-            var response = await GetPageAsync(url).ConfigureAwait(false);
-            List<ScrapedSong> songs;
-            if (response.IsSuccessStatusCode)
+            List<ScrapedSong> songs = null;
+            using (var response = await WebUtils.WebClient.GetAsync(url).ConfigureAwait(false))
             {
-                var pageText = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-                songs = GetSongsFromPageText(pageText, url);
+                if (response.IsSuccessStatusCode)
+                {
+                    var pageText = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+                    songs = GetSongsFromPageText(pageText, url);
+                }
+                else
+                {
+                    Logger.Error($"Error getting page {url}, response was {response.StatusCode.ToString()}: {response.ReasonPhrase}");
+                }
             }
-            else
-            {
-                Logger.Error($"Error getting page {url}, response was {response.StatusCode.ToString()}: {response.ReasonPhrase}");
-                songs = new List<ScrapedSong>();
-            }
-            return songs;
+            return songs ?? new List<ScrapedSong>();
         }
 
         public List<ScrapedSong> GetSongsFromPageText(string pageText, string sourceUrl)

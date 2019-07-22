@@ -16,16 +16,26 @@ namespace WebUtilities
 
         public IWebResponseContent Content { get; protected set; }
 
-        private ReadOnlyDictionary<string, IEnumerable<string>> _headers;
+        private Dictionary<string, IEnumerable<string>> _headers;
         public ReadOnlyDictionary<string, IEnumerable<string>> Headers
         {
             get { return new ReadOnlyDictionary<string, IEnumerable<string>>(_headers); }
         }
 
+        public string ReasonPhrase { get { return _response.ReasonPhrase; } }
+
         public HttpResponseWrapper(HttpResponseMessage response)
         {
             _response = response;
-            Content = new HttpContentWrapper(response.Content);
+            Content = new HttpContentWrapper(response?.Content);
+            _headers = new Dictionary<string, IEnumerable<string>>();
+            if (_response?.Headers != null)
+            {
+                foreach (var header in _response.Headers)
+                {
+                    _headers.Add(header.Key, header.Value);
+                }
+            }
         }
 
 

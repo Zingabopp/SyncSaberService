@@ -16,9 +16,12 @@ namespace WebUtilities
         {
             _content = content;
             _headers = new Dictionary<string, IEnumerable<string>>();
-            foreach (var header in _content.Headers)
+            if (_content?.Headers != null)
             {
-                _headers.Add(header.Key, header.Value);
+                foreach (var header in _content.Headers)
+                {
+                    _headers.Add(header.Key, header.Value);
+                }
             }
         }
 
@@ -28,23 +31,27 @@ namespace WebUtilities
             get { return new ReadOnlyDictionary<string, IEnumerable<string>>(_headers); }
         }
 
+        public string ContentType { get { return _content?.Headers?.ContentType?.MediaType; } }
+
         public Task<byte[]> ReadAsByteArrayAsync()
         {
-            return _content.ReadAsByteArrayAsync();
+            return _content?.ReadAsByteArrayAsync();
         }
 
         public Task<Stream> ReadAsStreamAsync()
         {
-            return _content.ReadAsStreamAsync();
+            return _content?.ReadAsStreamAsync();
         }
 
         public Task<string> ReadAsStringAsync()
         {
-            return _content.ReadAsStringAsync();
+            return _content?.ReadAsStringAsync();
         }
 
         public Task ReadAsFileAsync(string filePath, bool overwrite)
         {
+            if (_content == null)
+                return null;
             string pathname = Path.GetFullPath(filePath);
             if (!overwrite && File.Exists(filePath))
             {

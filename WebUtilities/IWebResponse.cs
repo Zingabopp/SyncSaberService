@@ -13,6 +13,7 @@ namespace WebUtilities
     public interface IWebResponseMessage : IDisposable
     {
         HttpStatusCode StatusCode { get; }
+        string ReasonPhrase { get; }
         bool IsSuccessStatusCode { get; }
         IWebResponseContent Content { get; }
 
@@ -27,6 +28,7 @@ namespace WebUtilities
         Task<byte[]> ReadAsByteArrayAsync();
         Task ReadAsFileAsync(string filePath, bool overwrite);
 
+        string ContentType { get; }
         ReadOnlyDictionary<string, IEnumerable<string>> Headers { get; }
 
     }

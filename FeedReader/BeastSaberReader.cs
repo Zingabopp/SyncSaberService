@@ -16,6 +16,7 @@ using System.Threading.Tasks.Dataflow;
 using System.Net.Http;
 using FeedReader.Logging;
 using System.Diagnostics;
+using WebUtilities;
 
 namespace FeedReader
 {
@@ -302,9 +303,9 @@ namespace FeedReader
                    string contentTypeStr = string.Empty;
                    try
                    {
-                       using (var response = await WebUtils.GetPageAsync(feedUrl).ConfigureAwait(false))
+                       using (var response = await WebUtils.WebClient.GetAsync(feedUrl).ConfigureAwait(false))
                        {
-                           contentTypeStr = response.Content.Headers.ContentType.MediaType.ToLower();
+                           contentTypeStr = response.Content.ContentType.ToLower();
                            if (ContentDictionary.ContainsKey(contentTypeStr))
                                contentType = ContentDictionary[contentTypeStr];
                            else

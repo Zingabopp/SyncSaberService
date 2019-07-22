@@ -253,7 +253,7 @@ namespace FeedReader
             bool useMaxSongs = settings.MaxSongs != 0;
             List<ScrapedSong> songs = new List<ScrapedSong>();
             string pageText = string.Empty;
-            using (var response = await GetPageAsync(GetPageUrl(feedIndex)).ConfigureAwait(false))
+            using (var response = await WebUtils.WebClient.GetAsync(GetPageUrl(feedIndex)).ConfigureAwait(false))
             {
                 if (response.IsSuccessStatusCode)
                     pageText = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
@@ -344,7 +344,7 @@ namespace FeedReader
                 Logger.Debug($"Checking page {page + 1} for the author ID.");
                 searchURL = Feeds[BeatSaverFeeds.SEARCH].BaseUrl.Replace(SEARCHKEY, authorName).Replace(PAGEKEY, (page * SONGS_PER_PAGE).ToString());
 
-                using (var response = await WebUtils.GetPageAsync(searchURL).ConfigureAwait(false))
+                using (var response = await WebUtils.WebClient.GetAsync(searchURL).ConfigureAwait(false))
                 {
                     if (response.IsSuccessStatusCode)
                         pageText = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
@@ -389,7 +389,7 @@ namespace FeedReader
         {
             string pageText = string.Empty;
             var songs = new List<ScrapedSong>();
-            using (var response = await WebUtils.GetPageAsync(url).ConfigureAwait(false))
+            using (var response = await WebUtils.WebClient.GetAsync(url).ConfigureAwait(false))
             {
                 if (response.IsSuccessStatusCode)
                     pageText = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
@@ -419,7 +419,7 @@ namespace FeedReader
             string url = GetPageUrl(feedIndex, 0, new Dictionary<string, string>() { { AUTHORIDKEY, authorId } });
             try
             {
-                using (var response = await GetPageAsync(url).ConfigureAwait(false))
+                using (var response = await WebUtils.WebClient.GetAsync(url).ConfigureAwait(false))
                 {
                     if (response.IsSuccessStatusCode)
                         pageText = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
@@ -488,7 +488,7 @@ namespace FeedReader
             ScrapedSong song = null;
             try
             {
-                using (var response = await WebUtils.GetPageAsync(url).ConfigureAwait(false))
+                using (var response = await WebUtils.WebClient.GetAsync(url).ConfigureAwait(false))
                 {
                     if (response.IsSuccessStatusCode)
                         pageText = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
@@ -527,7 +527,7 @@ namespace FeedReader
             ScrapedSong song = null;
             try
             {
-                using (var response = await WebUtils.GetPageAsync(url).ConfigureAwait(false))
+                using (var response = await WebUtils.WebClient.GetAsync(url).ConfigureAwait(false))
                 {
                     if (response.IsSuccessStatusCode)
                         pageText = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
@@ -602,7 +602,7 @@ namespace FeedReader
                 url.Replace(SEARCHKEY, criteria);
                 url.Replace(PAGEKEY, pageIndex.ToString());
                 string pageText = string.Empty;
-                using (var response = await WebUtils.GetPageAsync(url.ToString()).ConfigureAwait(false))
+                using (var response = await WebUtils.WebClient.GetAsync(url.ToString()).ConfigureAwait(false))
                 {
                     Logger.Debug($"Checking {url.ToString()} for songs.");
                     if (response.IsSuccessStatusCode)
