@@ -134,6 +134,8 @@ namespace FeedReader
         /// <returns></returns>
         public List<ScrapedSong> ParseXMLPage(string pageText, string sourceUrl)
         {
+            if (string.IsNullOrEmpty(pageText))
+                return new List<ScrapedSong>();
             bool retry = false;
             var songsOnPage = new List<ScrapedSong>();
             XmlDocument xmlDocument = new XmlDocument();
@@ -256,9 +258,17 @@ namespace FeedReader
         }
 
 
-
+        /// <summary>
+        /// Gets the page URL for a given UrlBase and page number.
+        /// </summary>
+        /// <param name="feedUrlBase"></param>
+        /// <param name="page"></param>
+        /// <exception cref="ArgumentNullException">Thrown when feedUrlBase is null or empty.</exception>
+        /// <returns></returns>
         public string GetPageUrl(string feedUrlBase, int page)
         {
+            if (string.IsNullOrEmpty(feedUrlBase))
+                throw new ArgumentNullException(nameof(feedUrlBase), "feedUrlBase cannot be null or empty for GetPageUrl");
             string feedUrl = feedUrlBase.Replace(USERNAMEKEY, _username).Replace(PAGENUMKEY, page.ToString());
             //Logger.Debug($"Replacing {USERNAMEKEY} with {_username} in base URL:\n   {feedUrlBase}");
             return feedUrl;
@@ -278,6 +288,8 @@ namespace FeedReader
 
         public async Task<Dictionary<string, ScrapedSong>> GetSongsFromFeedAsync(IFeedSettings settings, CancellationToken cancellationToken)
         {
+            if (settings == null)
+                throw new ArgumentNullException(nameof(settings), "settings cannot be null for BeastSaberReader.GetSongsFromFeedAsync.");
             Dictionary<string, ScrapedSong> retDict = new Dictionary<string, ScrapedSong>();
             if (!(settings is BeastSaberFeedSettings _settings))
                 throw new InvalidCastException(INVALIDFEEDSETTINGSMESSAGE);
@@ -434,10 +446,10 @@ namespace FeedReader
         /// </summary>
         public int StartingPage { get; set; }
 
-        public BeastSaberFeedSettings(int feedIndex, int _maxPages = 0)
+        public BeastSaberFeedSettings(int feedIndex, int maxPages = 0)
         {
             FeedIndex = feedIndex;
-            MaxPages = _maxPages;
+            MaxPages = maxPages;
             StartingPage = 1;
         }
     }

@@ -45,6 +45,8 @@ namespace FeedReaderTests.MockClasses
 
         public static string GetFileForUrl(string url)
         {
+            if (url == null)
+                throw new ArgumentNullException(nameof(url), "url cannot be null for MockHttpContent.GetFileForUrl");
             url = url.ToLower();
             string directory = "Data";
             string path = string.Empty;
@@ -106,7 +108,7 @@ namespace FeedReaderTests.MockClasses
         public string FileSourcePath { get; private set; }
         private readonly string _contentType;
 
-        public Dictionary<string, IEnumerable<string>> _headers;
+        private Dictionary<string, IEnumerable<string>> _headers;
         public MockHttpContent(string url, Dictionary<string, IEnumerable<string>> headers = null)
         {
             if (headers == null)
@@ -188,6 +190,7 @@ namespace FeedReaderTests.MockClasses
         public void Dispose()
         {
             Dispose(true);
+            GC.SuppressFinalize(this);
         }
         #endregion
 

@@ -146,6 +146,8 @@ namespace FeedReader
         /// <returns></returns>
         public static ScrapedSong ParseSongFromJson(JObject song, string sourceUrl)
         {
+            if (song == null)
+                throw new ArgumentNullException(nameof(song), "song cannot be null for BeatSaverReader.ParseSongFromJson.");
             //JSONObject song = (JSONObject) aKeyValue;
             string songKey = song["key"]?.Value<string>();
             string songHash = song["hash"]?.Value<string>().ToUpper();
@@ -247,6 +249,8 @@ namespace FeedReader
         }
         public async Task<List<ScrapedSong>> GetBeatSaverSongsAsync(BeatSaverFeedSettings settings)
         {
+            if (settings == null)
+                throw new ArgumentNullException(nameof(settings), "settings cannot be null for BeatSaverReader.GetBeatSaverSongsAsync");
             // TODO: double checks the first page
             int feedIndex = settings.FeedIndex;
             bool useMaxPages = settings.MaxPages != 0;

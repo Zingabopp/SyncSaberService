@@ -101,8 +101,12 @@ namespace FeedReader
             return GetSongsFromFeedAsync(_settings).Result;
         }
 
-        public void GetPageUrl(ref StringBuilder baseUrl, Dictionary<string, string> replacements)
+        public static void GetPageUrl(ref StringBuilder baseUrl, Dictionary<string, string> replacements)
         {
+            if(baseUrl == null)
+                throw new ArgumentNullException(nameof(replacements), "baseUrl cannot be null for ScoreSaberReader.GetPageUrl");
+            if (replacements == null)
+                throw new ArgumentNullException(nameof(replacements), "replacements cannot be null for ScoreSaberReader.GetPageUrl");
             foreach (var key in replacements.Keys)
             {
                 baseUrl.Replace(key, replacements[key]);
@@ -111,6 +115,8 @@ namespace FeedReader
 
         public async Task<Dictionary<string, ScrapedSong>> GetSongsFromScoreSaberAsync(ScoreSaberFeedSettings settings)
         {
+            if (settings == null)
+                throw new ArgumentNullException(nameof(settings), "settings cannot be null for ScoreSaberReader.GetSongsFromScoreSaberAsync");
             // "https://scoresaber.com/api.php?function=get-leaderboards&cat={CATKEY}&limit={LIMITKEY}&page={PAGENUMKEY}&ranked={RANKEDKEY}"
             int songsPerPage = settings.SongsPerPage;
             int pageNum = settings.StartingPage;

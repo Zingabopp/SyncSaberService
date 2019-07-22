@@ -175,7 +175,6 @@ namespace FeedReaderTests
         public void GetSongsFromFeedAsync_Followings_LimitedSongs()
         {
             var reader = new BeastSaberReader("Zingabopp", DefaultMaxConcurrency) { StoreRawData = true };
-            reader.MaxConcurrency = -1;
             int maxSongs = 60;
             var settings = new BeastSaberFeedSettings((int)BeastSaberFeeds.FOLLOWING) { MaxSongs = maxSongs };
             var songList = reader.GetSongsFromFeedAsync(settings).Result;

@@ -71,6 +71,8 @@ namespace FeedReader
         private static readonly string[] RateLimitKeys = new string[] { RATE_LIMIT_REMAINING_KEY, RATE_LIMIT_RESET_KEY, RATE_LIMIT_TOTAL_KEY };
         public static RateLimit ParseRateLimit(Dictionary<string, string> headers)
         {
+            if(headers == null)
+                throw new ArgumentNullException(nameof(headers), "headers cannot be null for WebUtils.ParseRateLimit");
             if (RateLimitKeys.All(k => headers.Keys.Contains(k)))
                 return new RateLimit()
                 {
