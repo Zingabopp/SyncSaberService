@@ -94,9 +94,4 @@
     </None>
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Data\BeatSaver\" />
-    <Folder Include="Data\ScoreSaber\" />
-  </ItemGroup>
-
 </Project>
