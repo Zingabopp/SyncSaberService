@@ -14,7 +14,9 @@ namespace FeedReaderTests.MockClasses
 
         public Task<IWebResponseMessage> GetAsync(string url, bool completeOnHeaders, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            //var content = new MockHttpContent(url);
+            var response = new MockHttpResponse(url);
+            return Task.Run(() => { return (IWebResponseMessage)response; });
         }
 
         #region GetAsyncOverloads

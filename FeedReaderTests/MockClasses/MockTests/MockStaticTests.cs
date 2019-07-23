@@ -15,12 +15,12 @@ namespace FeedReaderTests.MockClasses.MockTests
         {
             string testUrl = @"https://bsaber.com/wp-json/bsaber-api/songs/?bookmarked_by=Zingabopp&page=2&count=15";
             string fileMatch = "bookmarked_by_zingabopp2.json";
-            var file = new FileInfo(MockHttpContent.GetFileForUrl(testUrl));
+            var file = new FileInfo(MockHttpResponse.GetFileForUrl(testUrl));
             Assert.AreEqual(file.Name, fileMatch);
 
             testUrl = @"https://bsaber.com/wp-json/bsaber-api/songs/?bookmarked_by=Zingabopp&page=3&count=15";
             fileMatch = "bookmarked_by_zingabopp3_empty.json";
-            file = new FileInfo(MockHttpContent.GetFileForUrl(testUrl));
+            file = new FileInfo(MockHttpResponse.GetFileForUrl(testUrl));
             Assert.AreEqual(file.Name, fileMatch);
         }
 
@@ -29,12 +29,12 @@ namespace FeedReaderTests.MockClasses.MockTests
         {
             string testUrl = @"https://bsaber.com/members/zingabopp/wall/followings/feed/?acpage=1&count=20";
             string fileMatch = "followings1.xml";
-            var file = new FileInfo(MockHttpContent.GetFileForUrl(testUrl));
+            var file = new FileInfo(MockHttpResponse.GetFileForUrl(testUrl));
             Assert.AreEqual(file.Name, fileMatch);
 
             testUrl = @"https://bsaber.com/members/zingabopp/wall/followings/feed/?acpage=8";
             fileMatch = "followings8_partial.xml";
-            file = new FileInfo(MockHttpContent.GetFileForUrl(testUrl));
+            file = new FileInfo(MockHttpResponse.GetFileForUrl(testUrl));
             Assert.AreEqual(file.Name, fileMatch);
         }
 
@@ -43,12 +43,12 @@ namespace FeedReaderTests.MockClasses.MockTests
         {
             string testUrl = @"https://bsaber.com/wp-json/bsaber-api/songs/?bookmarked_by=curatorrecommended&page=1&count=50";
             string fileMatch = "bookmarked_by_curator1.json";
-            var file = new FileInfo(MockHttpContent.GetFileForUrl(testUrl));
+            var file = new FileInfo(MockHttpResponse.GetFileForUrl(testUrl));
             Assert.AreEqual(file.Name, fileMatch);
 
             testUrl = @"https://bsaber.com/wp-json/bsaber-api/songs/?bookmarked_by=curatorrecommended&page=4";
             fileMatch = "bookmarked_by_curator4_partial.json";
-            file = new FileInfo(MockHttpContent.GetFileForUrl(testUrl));
+            file = new FileInfo(MockHttpResponse.GetFileForUrl(testUrl));
             Assert.AreEqual(file.Name, fileMatch);
         }
     }
