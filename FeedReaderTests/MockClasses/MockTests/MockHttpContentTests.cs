@@ -13,10 +13,13 @@ namespace FeedReaderTests.MockClasses.MockTests
     public class MockHttpContentTests
     {
         public static readonly string DownloadPath = "MockDownloads";
+
         [TestMethod]
         public void ReadAsStringAsync_Test()
         {
-            using (var mockContent = new MockHttpContent(@"https://bsaber.com/wp-json/bsaber-api/songs/?bookmarked_by=Zingabopp&page=2&count=15"))
+            var dataDirectory = @"Data\BeastSaber";
+            var jsonFile = Path.Combine(dataDirectory, "bookmarked_by_zingabopp1.json");
+            using (var mockContent = new MockHttpContent(jsonFile))
             {
                 var expectedString = File.ReadAllText(mockContent.FileSourcePath);
                 var actualString = mockContent.ReadAsStringAsync().Result;
@@ -25,9 +28,45 @@ namespace FeedReaderTests.MockClasses.MockTests
         }
 
         [TestMethod]
+        public void ReadAsStreamAsync_Test()
+        {
+            var dataDirectory = @"Data\BeastSaber";
+            var jsonFile = Path.Combine(dataDirectory, "bookmarked_by_zingabopp1.json");
+            using (var mockContent = new MockHttpContent(jsonFile))
+            using (var actualStream = mockContent.ReadAsStreamAsync().Result)
+            using (var expectedStream = File.OpenRead(jsonFile))
+            {
+                Assert.AreEqual(expectedStream.Length, actualStream.Length);
+            }
+        }
+
+        [TestMethod]
+        public void ReadAsByteArrayAsync_Test()
+        {
+            var dataDirectory = @"Data\BeastSaber";
+            var jsonFile = Path.Combine(dataDirectory, "bookmarked_by_zingabopp1.json");
+            using (var mockContent = new MockHttpContent(jsonFile))
+            {
+                var expectedArray = File.ReadAllBytes(mockContent.FileSourcePath);
+                var actualArray = mockContent.ReadAsByteArrayAsync().Result;
+                bool notEqual = false;
+                Assert.AreEqual(expectedArray.LongLength, actualArray.LongLength);
+                Assert.IsTrue(actualArray.LongLength > 0);
+                for (long i = 0; i < expectedArray.LongLength; i++)
+                {
+                    if (expectedArray[i] != actualArray[i])
+                        notEqual = true;
+                }
+                Assert.IsFalse(notEqual);
+            }
+        }
+
+        [TestMethod]
         public void ReadAsFile_Test()
         {
-            using (var mockContent = new MockHttpContent(@"https://bsaber.com/wp-json/bsaber-api/songs/?bookmarked_by=Zingabopp&page=2&count=15"))
+            var dataDirectory = @"Data\BeastSaber";
+            var jsonFile = Path.Combine(dataDirectory, "bookmarked_by_zingabopp1.json");
+            using (var mockContent = new MockHttpContent(jsonFile))
             {
                 var expectedString = File.ReadAllText(mockContent.FileSourcePath);
                 var dirPath = new DirectoryInfo(DownloadPath);
@@ -42,17 +81,19 @@ namespace FeedReaderTests.MockClasses.MockTests
         [TestMethod]
         public void ContentType_Test()
         {
-            using (var mockContent = new MockHttpContent(@"https://bsaber.com/wp-json/bsaber-api/songs/?bookmarked_by=Zingabopp&page=2&count=15"))
+            var dataDirectory = @"Data\BeastSaber";
+            var jsonFile = Path.Combine(dataDirectory, "bookmarked_by_zingabopp1.json");
+            var xmlFile = Path.Combine(dataDirectory, "followings1.xml");
+            using (var mockContent = new MockHttpContent(jsonFile))
             {
                 var expectedContentType = @"application/json";
-                Assert.AreEqual(mockContent.ContentType, expectedContentType);
+                Assert.AreEqual(expectedContentType, mockContent.ContentType);
             }
-            using (var mockContent = new MockHttpContent(@"https://bsaber.com/members/zingabopp/wall/followings/feed/?acpage=1&count=20"))
+            using (var mockContent = new MockHttpContent(xmlFile))
             {
                 var expectedContentType = @"text/xml";
-                Assert.AreEqual(mockContent.ContentType, expectedContentType);
+                Assert.AreEqual(expectedContentType, mockContent.ContentType);
             }
-
         }
     }
 }

@@ -32,20 +32,7 @@ namespace FeedReader
         //        return _httpClientHandler;
         //    }
         //}
-        private static HttpClient _httpClient;
-        private static HttpClient HttpClient
-        {
-            get
-            {
-                if (!IsInitialized)
-                    throw new InvalidOperationException("WebUtils was not Initialized with an HttpClient.");
-                return _httpClient;
-            }
-            set
-            {
-                _httpClient = value;
-            }
-        }
+
         private static IWebClient _webClient;
         public static IWebClient WebClient
         {
@@ -89,7 +76,6 @@ namespace FeedReader
         {
             if (!IsInitialized)
             {
-                HttpClient = new HttpClient();
                 _webClient = new HttpClientWrapper();
                 IsInitialized = true;
             }
@@ -101,12 +87,10 @@ namespace FeedReader
             {
                 if (client == null)
                 {
-                    HttpClient = new HttpClient();
                     _webClient = new HttpClientWrapper();
                 }
                 else
                 {
-                    HttpClient = client;
                     _webClient = new HttpClientWrapper(client);
                 }
                 IsInitialized = true;
@@ -118,133 +102,13 @@ namespace FeedReader
             {
                 if (client == null)
                 {
-                    HttpClient = new HttpClient();
                     _webClient = new HttpClientWrapper();
                 }
                 else
                 {
-                    HttpClient = new HttpClient();
                     _webClient = client;
                 }
                 IsInitialized = true;
-            }
-        }
-
-        /// <summary>
-        /// Retrieves a web page as an HttpResponseMessage.
-        /// </summary>
-        /// <param name="url"></param>
-        /// <exception cref="HttpRequestException"></exception>
-        /// <returns></returns>
-        public static HttpResponseMessage GetPage(string url)
-        {
-            Task<HttpResponseMessage> pageGetTask;
-            //lock (lockObject)
-            bool goodUrl = Uri.TryCreate(url, UriKind.Absolute, out Uri result);
-            if (!goodUrl)
-                throw new ArgumentException($"Error in GetPage, invalid URL: {url}");
-            pageGetTask = HttpClient.GetAsync(result);
-            try
-            {
-                pageGetTask.Wait();
-            }
-            catch (InvalidOperationException ex)
-            {
-                Logger.Exception($"Error getting page {url}", ex);
-            }
-            HttpResponseMessage response = pageGetTask.Result;
-            //Logger.Debug(pageText.Result);
-            return response;
-        }
-
-        /// <summary>
-        /// Downloads the page and returns it as a string.
-        /// </summary>
-        /// <param name="url"></param>
-        /// <exception cref="HttpGetException">Thrown when Http response code is not a success.</exception>
-        /// <exception cref="HttpRequestException"></exception>
-        /// <returns></returns>
-        [Obsolete("Use GetPage instead.")]
-        public static string GetPageText(string url, bool exceptionOnHttpNotSuccessful = true)
-        {
-            // TODO: Change to use httpClient.GetAsync(url) so status codes can be handled and passed back
-            //Task<string> pageReadTask;
-            //lock (lockObject)
-            string pageText = string.Empty;
-            using (HttpResponseMessage pageReadTask = GetPage(url))
-            {//HttpClient.GetStringAsync(url);
-                //pageReadTask.Wait();
-                if (!pageReadTask.IsSuccessStatusCode)
-                {
-                    if (exceptionOnHttpNotSuccessful)
-                        throw new HttpGetException(pageReadTask.StatusCode, url, $"Exception getting page ({url}): {pageReadTask.ReasonPhrase}");
-                }
-                else
-                    pageText = pageReadTask.Content.ReadAsStringAsync().Result;
-            }
-            //Logger.Debug(pageText.Result);
-            return pageText;
-        }
-
-        /// <summary>
-        /// Retrieves a web page as an HttpResponseMessage as an asynchronous operation.
-        /// </summary>
-        /// <param name="url"></param>
-        /// <exception cref="HttpRequestException"></exception>
-        /// <returns></returns>
-        [Obsolete("Use WebClient.GetAsync() instead")]
-        public static async Task<HttpResponseMessage> GetPageAsync(string url)
-        {
-            //lock (lockObject)
-
-            HttpResponseMessage response = await HttpClient.GetAsync(url).ConfigureAwait(false);
-            //Logger.Debug(pageText.Result);
-            //Logger.Debug($"Got page text for {url}");
-            return response;
-        }
-
-        /// <summary>
-        /// Downloads the page and returns it as a string in an asynchronous operation.
-        /// </summary>
-        /// <param name="url"></param>
-        /// <exception cref="HttpRequestException"></exception>
-        /// <returns></returns>
-        [Obsolete("Use GetPageAsync instead")]
-        public static async Task<string> GetPageTextAsync(string url)
-        {
-            //lock (lockObject)
-
-            string pageText = await HttpClient.GetStringAsync(url).ConfigureAwait(false);
-            //Logger.Debug(pageText.Result);
-            //Logger.Debug($"Got page text for {url}");
-            return pageText;
-        }
-
-        //public static void AddCookies(CookieContainer newCookies, Uri uri)
-        //{
-        //    lock (HttpClientHandler)
-        //    {
-        //        if (HttpClientHandler.CookieContainer == null)
-        //            HttpClientHandler.CookieContainer = newCookies;
-        //        else
-        //            HttpClientHandler.CookieContainer.Add(newCookies.GetCookies(uri));
-        //    }
-        //}
-
-        //public static void AddCookies(CookieContainer newCookies, string url)
-        //{
-        //    AddCookies(newCookies, new Uri(url));
-        //}
-
-        public async static Task<string> TryGetStringAsync(string url)
-        {
-            using (HttpResponseMessage response = await HttpClient.GetAsync(url).ConfigureAwait(false))
-            {
-                if (response.IsSuccessStatusCode)
-                {
-                    return await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-                }
-                return string.Empty;
             }
         }
     }
@@ -328,9 +192,9 @@ namespace FeedReader
 
             using (Stream contentStream = await content.ReadAsStreamAsync().ConfigureAwait(false))
             {
-                using (Stream streamToWriteTo = File.Open(filename, FileMode.Create, FileAccess.Write, FileShare.None))
+                using (Stream writeStream = File.Open(filename, FileMode.Create, FileAccess.Write, FileShare.None))
                 {
-                    await contentStream.CopyToAsync(streamToWriteTo).ConfigureAwait(false);
+                    await contentStream.CopyToAsync(writeStream).ConfigureAwait(false);
                 }
             }
         }

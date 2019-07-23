@@ -22,6 +22,7 @@ namespace FeedReaderTests.MockClasses.MockTests
                 using (var realResponse = realClient.GetAsync(testUrl).Result)
                 using (var mockResponse = mockClient.GetAsync(testUrl).Result)
                 {
+                    var test = realResponse.Content.ReadAsStringAsync().Result;
                     Assert.AreEqual(realResponse.IsSuccessStatusCode, mockResponse.IsSuccessStatusCode);
                     Assert.AreEqual(realResponse.StatusCode, mockResponse.StatusCode);
                     Assert.AreEqual(realResponse.Content.ContentType, mockResponse.Content.ContentType);

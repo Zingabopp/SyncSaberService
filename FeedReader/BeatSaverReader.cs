@@ -307,7 +307,9 @@ namespace FeedReader
             {
                 await Task.WhenAll(pageReadTasks.ToArray()).ConfigureAwait(false);
             }
+#pragma warning disable CA1031 // Do not catch general exception types
             catch (Exception) // TODO: Better exception handling here, does it even throw here or in the for loop below?
+#pragma warning restore CA1031 // Do not catch general exception types
             {
                 Logger.Error($"Error waiting for pageReadTasks");
             }
@@ -440,7 +442,9 @@ namespace FeedReader
                 Logger.Error($"Error getting songs by UploaderId, {ex.Url} responded with {ex.HttpStatusCode.ToString()}");
                 return songs;
             }
+#pragma warning disable CA1031 // Do not catch general exception types
             catch (Exception ex)
+#pragma warning restore CA1031 // Do not catch general exception types
             {
                 Logger.Exception($"Error getting songs by UploaderId, {authorId}, from {url}", ex);
                 return songs;

@@ -49,6 +49,7 @@ namespace FeedReaderTests.MockClasses
             {
                 using (MemoryStream memStream = new MemoryStream())
                 {
+                    await Task.Yield();
                     await stream.CopyToAsync(memStream).ConfigureAwait(false);
                     return memStream.ToArray();
                 }
@@ -65,6 +66,7 @@ namespace FeedReaderTests.MockClasses
             using (var stream = File.OpenRead(FileSourcePath))
             using (var writeStream = File.OpenWrite(filePath))
             {
+                await Task.Yield();
                 await stream.CopyToAsync(writeStream).ConfigureAwait(false);
             }
 
@@ -72,16 +74,18 @@ namespace FeedReaderTests.MockClasses
 
         public async Task<Stream> ReadAsStreamAsync()
         {
-            using (Stream stream = new FileStream(FileSourcePath, FileMode.Open, FileAccess.Read))
-                return await new Task<Stream>(() => { return stream; }).ConfigureAwait(false);
+            FileStream stream = new FileStream(FileSourcePath, FileMode.Open, FileAccess.Read);
+            await Task.Yield();
+            return stream;
         }
 
         public async Task<string> ReadAsStringAsync()
         {
             using (FileStream stream = new FileStream(FileSourcePath, FileMode.Open, FileAccess.Read))
-            using (StreamReader reader = new StreamReader(stream))
+            using (var sr = new StreamReader(stream))
             {
-                return await reader.ReadToEndAsync().ConfigureAwait(false);
+                await Task.Yield();
+                return await sr.ReadToEndAsync().ConfigureAwait(false);
             }
         }
 

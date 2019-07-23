@@ -15,7 +15,9 @@ namespace FeedReaderTests.MockClasses
         public Task<IWebResponseMessage> GetAsync(string url, bool completeOnHeaders, CancellationToken cancellationToken)
         {
             //var content = new MockHttpContent(url);
-            var response = new MockHttpResponse();
+#pragma warning disable CA2000 // Dispose objects before losing scope
+            var response = new MockHttpResponse(url);
+#pragma warning restore CA2000 // Dispose objects before losing scope
             return Task.Run(() => { return (IWebResponseMessage)response; });
         }
 

@@ -85,7 +85,9 @@ namespace FeedReaderTests.MockClasses
                     else
                         files = files.Where(f => !f.Name.Contains("curator") && f.Name.Contains(page.ToString()));
                 }
-                path = files.FirstOrDefault()?.FullName;
+                else
+                    files = null;
+                path = files?.FirstOrDefault()?.FullName ?? string.Empty;
             }
             else if (url.Contains("scoresaber.com"))
             {
