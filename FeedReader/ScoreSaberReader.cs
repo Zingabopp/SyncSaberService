@@ -7,6 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using FeedReader.Logging;
 using static FeedReader.WebUtils;
+using Newtonsoft.Json;
 
 namespace FeedReader
 {
@@ -23,13 +24,13 @@ namespace FeedReader
         /// 4 = author
         #region Constants
         private const string BEATSAVER_DOWNLOAD_URL_BASE = "http://beatsaver.com/api/download/hash/";
-        public static readonly string NameKey = "ScoreSaberReader";
-        public static readonly string SourceKey = "ScoreSaber";
-        private static readonly string PAGENUMKEY = "{PAGENUM}";
+        public static string NameKey => "ScoreSaberReader";
+        public static string SourceKey => "ScoreSaber";
+        private const string PAGENUMKEY = "{PAGENUM}";
         //private static readonly string CATKEY = "{CAT}";
-        private static readonly string RANKEDKEY = "{RANKKEY}";
-        private static readonly string LIMITKEY = "{LIMIT}";
-        private static readonly string QUERYKEY = "{QUERY}";
+        private const string RANKEDKEY = "{RANKKEY}";
+        private const string LIMITKEY = "{LIMIT}";
+        private const string QUERYKEY = "{QUERY}";
         private const string INVALID_FEED_SETTINGS_MESSAGE = "The IFeedSettings passed is not a ScoreSaberFeedSettings.";
         private const string TOP_RANKED_KEY = "Top Ranked";
         private const string TRENDING_KEY = "Trending";
@@ -37,27 +38,27 @@ namespace FeedReader
         private const string LATEST_RANKED_KEY = "Latest Ranked";
         private const string SEARCH_KEY = "Search";
         #endregion
-
-        public static FeedReaderLoggerBase Logger = new FeedReaderLogger(LoggingController.DefaultLogController);
+        private static FeedReaderLoggerBase _logger = new FeedReaderLogger(LoggingController.DefaultLogController);
+        public static FeedReaderLoggerBase Logger { get { return _logger; } set { _logger = value; } }
         public string Name { get { return NameKey; } }
         public string Source { get { return SourceKey; } }
         public bool Ready { get; private set; }
         public bool StoreRawData { get; set; }
 
-        private static Dictionary<ScoreSaberFeeds, FeedInfo> _feeds;
-        public static Dictionary<ScoreSaberFeeds, FeedInfo> Feeds
+        private static Dictionary<ScoreSaberFeed, FeedInfo> _feeds;
+        public static Dictionary<ScoreSaberFeed, FeedInfo> Feeds
         {
             get
             {
                 if (_feeds == null)
                 {
-                    _feeds = new Dictionary<ScoreSaberFeeds, FeedInfo>()
+                    _feeds = new Dictionary<ScoreSaberFeed, FeedInfo>()
                     {
-                        { (ScoreSaberFeeds)0, new FeedInfo(TRENDING_KEY, $"https://scoresaber.com/api.php?function=get-leaderboards&cat=0&limit={LIMITKEY}&page={PAGENUMKEY}&ranked={RANKEDKEY}") },
-                        { (ScoreSaberFeeds)1, new FeedInfo(LATEST_RANKED_KEY, $"https://scoresaber.com/api.php?function=get-leaderboards&cat=1&limit={LIMITKEY}&page={PAGENUMKEY}&ranked={RANKEDKEY}") },
-                        { (ScoreSaberFeeds)2, new FeedInfo(TOP_PLAYED_KEY, $"https://scoresaber.com/api.php?function=get-leaderboards&cat=2&limit={LIMITKEY}&page={PAGENUMKEY}&ranked={RANKEDKEY}") },
-                        { (ScoreSaberFeeds)3, new FeedInfo(TOP_RANKED_KEY, $"https://scoresaber.com/api.php?function=get-leaderboards&cat=3&limit={LIMITKEY}&page={PAGENUMKEY}&ranked={RANKEDKEY}") },
-                        { (ScoreSaberFeeds)99, new FeedInfo(SEARCH_KEY, $"https://scoresaber.com/api.php?function=get-leaderboards&cat=3&limit={LIMITKEY}&page={PAGENUMKEY}&ranked={RANKEDKEY}&search={QUERYKEY}") }
+                        { (ScoreSaberFeed)0, new FeedInfo(TRENDING_KEY, $"https://scoresaber.com/api.php?function=get-leaderboards&cat=0&limit={LIMITKEY}&page={PAGENUMKEY}&ranked={RANKEDKEY}") },
+                        { (ScoreSaberFeed)1, new FeedInfo(LATEST_RANKED_KEY, $"https://scoresaber.com/api.php?function=get-leaderboards&cat=1&limit={LIMITKEY}&page={PAGENUMKEY}&ranked={RANKEDKEY}") },
+                        { (ScoreSaberFeed)2, new FeedInfo(TOP_PLAYED_KEY, $"https://scoresaber.com/api.php?function=get-leaderboards&cat=2&limit={LIMITKEY}&page={PAGENUMKEY}&ranked={RANKEDKEY}") },
+                        { (ScoreSaberFeed)3, new FeedInfo(TOP_RANKED_KEY, $"https://scoresaber.com/api.php?function=get-leaderboards&cat=3&limit={LIMITKEY}&page={PAGENUMKEY}&ranked={RANKEDKEY}") },
+                        { (ScoreSaberFeed)99, new FeedInfo(SEARCH_KEY, $"https://scoresaber.com/api.php?function=get-leaderboards&cat=3&limit={LIMITKEY}&page={PAGENUMKEY}&ranked={RANKEDKEY}&search={QUERYKEY}") }
                     };
                 }
                 return _feeds;
@@ -76,17 +77,17 @@ namespace FeedReader
             int maxSongs = settings.MaxSongs > 0 ? settings.MaxSongs : settings.SongsPerPage * settings.SongsPerPage;
             switch (settings.Feed)
             {
-                case ScoreSaberFeeds.TRENDING:
+                case ScoreSaberFeed.Trending:
                     retDict = await GetSongsFromScoreSaberAsync(settings).ConfigureAwait(false);
                     break;
-                case ScoreSaberFeeds.LATEST_RANKED:
+                case ScoreSaberFeed.LatestRanked:
                     settings.RankedOnly = true;
                     retDict = await GetSongsFromScoreSaberAsync(settings).ConfigureAwait(false);
                     break;
-                case ScoreSaberFeeds.TOP_PLAYED:
+                case ScoreSaberFeed.TopPlayed:
                     retDict = await GetSongsFromScoreSaberAsync(settings).ConfigureAwait(false);
                     break;
-                case ScoreSaberFeeds.TOP_RANKED:
+                case ScoreSaberFeed.TopRanked:
                     settings.RankedOnly = true;
                     retDict = await GetSongsFromScoreSaberAsync(settings).ConfigureAwait(false);
                     break;
@@ -103,7 +104,7 @@ namespace FeedReader
 
         public static void GetPageUrl(ref StringBuilder baseUrl, Dictionary<string, string> replacements)
         {
-            if(baseUrl == null)
+            if (baseUrl == null)
                 throw new ArgumentNullException(nameof(replacements), "baseUrl cannot be null for ScoreSaberReader.GetPageUrl");
             if (replacements == null)
                 throw new ArgumentNullException(nameof(replacements), "replacements cannot be null for ScoreSaberReader.GetPageUrl");
@@ -151,7 +152,7 @@ namespace FeedReader
             {
                 result = JObject.Parse(pageText);
             }
-            catch (Exception ex)
+            catch (JsonReaderException ex)
             {
                 Logger.Exception("Unable to parse JSON from text", ex);
             }
@@ -218,12 +219,12 @@ namespace FeedReader
                 result = JObject.Parse(pageText);
 
             }
-            catch (Exception ex)
+            catch (JsonReaderException ex)
             {
                 Logger.Exception("Unable to parse JSON from text", ex);
             }
             List<ScrapedSong> songs = new List<ScrapedSong>();
-            
+
             var songJSONAry = result["songs"]?.ToArray();
             if (songJSONAry == null)
             {
@@ -258,9 +259,9 @@ namespace FeedReader
 
     public class ScoreSaberFeedSettings : IFeedSettings
     {
-        
+
         public string FeedName { get { return ScoreSaberReader.Feeds[Feed].Name; } }
-        public ScoreSaberFeeds Feed { get { return (ScoreSaberFeeds)FeedIndex; } set { FeedIndex = (int)value; } }
+        public ScoreSaberFeed Feed { get { return (ScoreSaberFeed)FeedIndex; } set { FeedIndex = (int)value; } }
         public int FeedIndex { get; set; }
 
         /// <summary>
@@ -296,12 +297,12 @@ namespace FeedReader
         }
     }
 
-    public enum ScoreSaberFeeds
+    public enum ScoreSaberFeed
     {
-        TRENDING = 0,
-        LATEST_RANKED = 1,
-        TOP_PLAYED = 2,
-        TOP_RANKED = 3,
-        SEARCH = 99
+        Trending = 0,
+        LatestRanked = 1,
+        TopPlayed = 2,
+        TopRanked = 3,
+        Search = 99
     }
 }

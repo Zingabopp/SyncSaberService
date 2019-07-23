@@ -105,7 +105,7 @@ namespace FeedReader.Logging
             {
                 return;
             }
-            Console.WriteLine($"[{Path.GetFileName(file)}_{member}({line}) @ {DateTime.Now.ToString("HH:mm")} - Exception] {message} - {e.GetType().FullName}-{e.Message}\n{e.StackTrace}");
+            Console.WriteLine($"[{Path.GetFileName(file)}_{member}({line}) @ {DateTime.Now.ToString("HH:mm")} - Exception] {message} - {e?.GetType().FullName}-{e?.Message}\n{e?.StackTrace}");
         }
     }
 }

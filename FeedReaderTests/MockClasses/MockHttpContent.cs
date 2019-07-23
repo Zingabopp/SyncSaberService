@@ -21,7 +21,7 @@ namespace FeedReaderTests.MockClasses
             if (headers == null)
                 _headers = new Dictionary<string, IEnumerable<string>>();
             FileSourcePath = filePath;
-            if (File.Exists(FileSourcePath))
+            if (!string.IsNullOrEmpty(filePath) && File.Exists(FileSourcePath))
             {
                 if (FileSourcePath.EndsWith("json"))
                     _contentType = @"application/json";

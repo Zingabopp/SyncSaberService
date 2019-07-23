@@ -15,7 +15,7 @@ namespace FeedReaderTests.MockClasses
         public Task<IWebResponseMessage> GetAsync(string url, bool completeOnHeaders, CancellationToken cancellationToken)
         {
             //var content = new MockHttpContent(url);
-            var response = new MockHttpResponse(url);
+            var response = new MockHttpResponse();
             return Task.Run(() => { return (IWebResponseMessage)response; });
         }
 

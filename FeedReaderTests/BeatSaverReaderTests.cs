@@ -22,7 +22,7 @@ namespace FeedReaderTests
         {
             var reader = new BeatSaverReader() { StoreRawData = true };
             var authorList = new string[] { "BlackBlazon", "greatyazer" };
-            var settings = new BeatSaverFeedSettings((int)BeatSaverFeeds.AUTHOR) { Authors = authorList, MaxSongs = 59 };
+            var settings = new BeatSaverFeedSettings((int)BeatSaverFeed.Author) { Authors = authorList, MaxSongs = 59 };
             var songsByAuthor = reader.GetSongsFromFeed(settings);
             var detectedAuthors = songsByAuthor.Values.Select(s => s.MapperName.ToLower()).Distinct();
             foreach (var song in songsByAuthor)
@@ -51,7 +51,7 @@ namespace FeedReaderTests
         public void GetSongsFromFeed_Newest_Test()
         {
             var reader = new BeatSaverReader() { StoreRawData = true };
-            var settings = new BeatSaverFeedSettings((int)BeatSaverFeeds.LATEST) { MaxSongs = 50 };
+            var settings = new BeatSaverFeedSettings((int)BeatSaverFeed.Latest) { MaxSongs = 50 };
             var songList = reader.GetSongsFromFeed(settings);
             Assert.IsTrue(songList.Count == settings.MaxSongs);
             foreach (var song in songList.Values)
@@ -64,7 +64,7 @@ namespace FeedReaderTests
         public void GetSongsFromFeed_Hot_Test()
         {
             var reader = new BeatSaverReader() { StoreRawData = true };
-            var settings = new BeatSaverFeedSettings((int)BeatSaverFeeds.HOT) { MaxSongs = 50 };
+            var settings = new BeatSaverFeedSettings((int)BeatSaverFeed.Hot) { MaxSongs = 50 };
             var songList = reader.GetSongsFromFeed(settings);
             Assert.IsTrue(songList.Count == settings.MaxSongs);
             foreach (var song in songList.Values)
@@ -76,7 +76,7 @@ namespace FeedReaderTests
         public void GetSongsFromFeed_Plays_Test()
         {
             var reader = new BeatSaverReader() { StoreRawData = true };
-            var settings = new BeatSaverFeedSettings((int)BeatSaverFeeds.PLAYS) { MaxSongs = 50 };
+            var settings = new BeatSaverFeedSettings((int)BeatSaverFeed.Plays) { MaxSongs = 50 };
             var songList = reader.GetSongsFromFeed(settings);
             Assert.IsTrue(songList.Count == settings.MaxSongs);
             foreach (var song in songList.Values)
@@ -88,7 +88,7 @@ namespace FeedReaderTests
         public void GetSongsFromFeed_Downloads_Test()
         {
             var reader = new BeatSaverReader() { StoreRawData = true };
-            var settings = new BeatSaverFeedSettings((int)BeatSaverFeeds.DOWNLOADS) { MaxSongs = 50 };
+            var settings = new BeatSaverFeedSettings((int)BeatSaverFeed.Downloads) { MaxSongs = 50 };
             var songList = reader.GetSongsFromFeed(settings);
             Assert.IsTrue(songList.Count == settings.MaxSongs);
             foreach (var song in songList.Values)
@@ -101,7 +101,7 @@ namespace FeedReaderTests
         public void GetSongsFromFeed_Search_Test()
         {
             var reader = new BeatSaverReader() { StoreRawData = true };
-            var settings = new BeatSaverFeedSettings((int)BeatSaverFeeds.SEARCH) { MaxSongs = 50, SearchCriteria = "Believer" };
+            var settings = new BeatSaverFeedSettings((int)BeatSaverFeed.Search) { MaxSongs = 50, SearchCriteria = "Believer" };
             var songList = reader.GetSongsFromFeed(settings);
             Assert.IsTrue(songList.Count > 0);
             foreach (var song in songList.Values)

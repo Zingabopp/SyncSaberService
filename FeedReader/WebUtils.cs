@@ -13,9 +13,10 @@ namespace FeedReader
 {
     public static class WebUtils
     {
-        public static FeedReaderLoggerBase Logger = new FeedReaderLogger(LoggingController.DefaultLogController);
+        private static FeedReaderLoggerBase _logger = new FeedReaderLogger(LoggingController.DefaultLogController);
+        public static FeedReaderLoggerBase Logger { get { return _logger; } set { _logger = value; } }
         public static bool IsInitialized { get; private set; }
-        private static readonly object lockObject = new object();
+        //private static readonly object lockObject = new object();
         //private static HttpClientHandler _httpClientHandler;
         //public static HttpClientHandler HttpClientHandler
         //{

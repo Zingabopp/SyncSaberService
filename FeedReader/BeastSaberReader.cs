@@ -25,28 +25,35 @@ namespace FeedReader
         #region Constants
         public static readonly string NameKey = "BeastSaberReader";
         public static readonly string SourceKey = "BeastSaber";
-        private static readonly string USERNAMEKEY = "{USERNAME}";
-        private static readonly string PAGENUMKEY = "{PAGENUM}";
+        private const string USERNAMEKEY = "{USERNAME}";
+        private const string PAGENUMKEY = "{PAGENUM}";
         private static readonly Dictionary<string, ContentType> ContentDictionary =
             new Dictionary<string, ContentType>() { { "text/xml", ContentType.XML }, { "application/json", ContentType.JSON } };
-        private const string DefaultLoginUri = "https://bsaber.com/wp-login.php?jetpack-sso-show-default-form=1";
+        //private const string DefaultLoginUri = "https://bsaber.com/wp-login.php?jetpack-sso-show-default-form=1";
         private const string BeatSaverDownloadURL_Base = "https://beatsaver.com/api/download/key/";
         private static readonly Uri FeedRootUri = new Uri("https://bsaber.com");
-        public const int SONGS_PER_XML_PAGE = 50;
-        public const int SONGS_PER_JSON_PAGE = 50;
+        public const int SongsPerXmlPage = 50;
+        public const int SongsPerJsonPage = 50;
         private const string XML_TITLE_KEY = "SongTitle";
         private const string XML_DOWNLOADURL_KEY = "DownloadURL";
         private const string XML_HASH_KEY = "Hash";
         private const string XML_AUTHOR_KEY = "LevelAuthorName";
         private const string XML_SONGKEY_KEY = "SongKey";
         #endregion
-        public static FeedReaderLoggerBase Logger = new FeedReaderLogger(LoggingController.DefaultLogController);
+
+        private static FeedReaderLoggerBase _logger = new FeedReaderLogger(LoggingController.DefaultLogController);
+        public static FeedReaderLoggerBase Logger { get { return _logger; } set { _logger = value; } }
         public string Name { get { return NameKey; } }
         public string Source { get { return SourceKey; } }
         public bool Ready { get; private set; }
         public bool StoreRawData { get; set; }
 
         private string _username;
+        public string Username
+        {
+            get { return _username; }
+            set { _username = value; }
+        }
         private int _maxConcurrency;
 
         /// <summary>
@@ -64,18 +71,18 @@ namespace FeedReader
             }
         }
 
-        private static Dictionary<BeastSaberFeeds, FeedInfo> _feeds;
-        public static Dictionary<BeastSaberFeeds, FeedInfo> Feeds
+        private static Dictionary<BeastSaberFeed, FeedInfo> _feeds;
+        public static Dictionary<BeastSaberFeed, FeedInfo> Feeds
         {
             get
             {
                 if (_feeds == null)
                 {
-                    _feeds = new Dictionary<BeastSaberFeeds, FeedInfo>()
+                    _feeds = new Dictionary<BeastSaberFeed, FeedInfo>()
                     {
-                        { (BeastSaberFeeds)0, new FeedInfo("followings", "https://bsaber.com/members/" + USERNAMEKEY + "/wall/followings/feed/?acpage=" + PAGENUMKEY) },
-                        { (BeastSaberFeeds)1, new FeedInfo("bookmarks", "https://bsaber.com/wp-json/bsaber-api/songs/?bookmarked_by=" + USERNAMEKEY + "&page=" + PAGENUMKEY + "&count=" + SONGS_PER_JSON_PAGE)},
-                        { (BeastSaberFeeds)2, new FeedInfo("curator recommended", "https://bsaber.com/wp-json/bsaber-api/songs/?bookmarked_by=curatorrecommended&page=" + PAGENUMKEY + "&count=" + SONGS_PER_JSON_PAGE) }
+                        { (BeastSaberFeed)0, new FeedInfo("followings", "https://bsaber.com/members/" + USERNAMEKEY + "/wall/followings/feed/?acpage=" + PAGENUMKEY) },
+                        { (BeastSaberFeed)1, new FeedInfo("bookmarks", "https://bsaber.com/wp-json/bsaber-api/songs/?bookmarked_by=" + USERNAMEKEY + "&page=" + PAGENUMKEY + "&count=" + SongsPerJsonPage)},
+                        { (BeastSaberFeed)2, new FeedInfo("curator recommended", "https://bsaber.com/wp-json/bsaber-api/songs/?bookmarked_by=curatorrecommended&page=" + PAGENUMKEY + "&count=" + SongsPerJsonPage) }
                     };
                 }
                 return _feeds;
@@ -93,7 +100,7 @@ namespace FeedReader
         public BeastSaberReader(string username, int maxConcurrency = 0)
         {
             Ready = false;
-            _username = username;
+            Username = username;
             MaxConcurrency = maxConcurrency;
         }
 
@@ -224,7 +231,7 @@ namespace FeedReader
                 result = JObject.Parse(pageText);
 
             }
-            catch (Exception ex)
+            catch (JsonReaderException ex)
             {
                 Logger.Exception("Unable to parse JSON from text", ex);
             }
@@ -276,7 +283,7 @@ namespace FeedReader
 
         public string GetPageUrl(int feedIndex, int page)
         {
-            return GetPageUrl(Feeds[(BeastSaberFeeds)feedIndex].BaseUrl, page);
+            return GetPageUrl(Feeds[(BeastSaberFeed)feedIndex].BaseUrl, page);
         }
 
         private const string INVALIDFEEDSETTINGSMESSAGE = "The IFeedSettings passed is not a BeastSaberFeedSettings.";
@@ -429,7 +436,7 @@ namespace FeedReader
         /// </summary>
         public string FeedName { get { return BeastSaberReader.Feeds[Feed].Name; } }
         public int FeedIndex { get; set; }
-        public BeastSaberFeeds Feed { get { return (BeastSaberFeeds)FeedIndex; } set { FeedIndex = (int)value; } }
+        public BeastSaberFeed Feed { get { return (BeastSaberFeed)FeedIndex; } set { FeedIndex = (int)value; } }
 
         /// <summary>
         /// Maximum songs to retrieve, will stop the reader before MaxPages is met. Use 0 for unlimited.
@@ -454,10 +461,10 @@ namespace FeedReader
         }
     }
 
-    public enum BeastSaberFeeds
+    public enum BeastSaberFeed
     {
-        FOLLOWING = 0,
-        BOOKMARKS = 1,
-        CURATOR_RECOMMENDED = 2
+        Following = 0,
+        Bookmarks = 1,
+        CuratorRecommended = 2
     }
 }

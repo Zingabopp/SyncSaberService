@@ -21,6 +21,11 @@ namespace FeedReader.Logging
                     return;
                 if(_loggingController != null)
                     _loggingController.PropertyChanged -= Controller_PropertyChanged;
+                if (value == null)
+                {
+                    _loggingController = null;
+                    return;
+                }
                 _loggingController = value;
                 LoggerName = _loggingController.LoggerName;
                 LogLevel = _loggingController.LogLevel;
@@ -36,7 +41,7 @@ namespace FeedReader.Logging
             switch (propertyName)
             {
                 case "LoggerName":
-                    LoggerName = propertyValue.ToString();
+                    LoggerName = propertyValue?.ToString();
                     break;
                 case "LogLevel":
                     LogLevel = (LogLevel)propertyValue;
