@@ -175,6 +175,7 @@ namespace FeedReader
                 else
                     urlReplacements[PAGENUMKEY] = pageNum.ToString();
                 GetPageUrl(ref url, urlReplacements);
+                uri = new Uri(url.ToString());
                 foreach (var song in await GetSongsFromPageAsync(uri).ConfigureAwait(false))
                 {
                     diffCount++;
