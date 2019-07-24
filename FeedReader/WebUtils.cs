@@ -55,7 +55,11 @@ namespace FeedReader
         private const string RATE_LIMIT_REMAINING_KEY = "Rate-Limit-Remaining";
         private const string RATE_LIMIT_RESET_KEY = "Rate-Limit-Reset";
         private const string RATE_LIMIT_TOTAL_KEY = "Rate-Limit-Total";
+#pragma warning disable IDE0051 // Remove unused private members
+#pragma warning disable CA1823 // Remove unused private members
         private const string RATE_LIMIT_PREFIX = "Rate-Limit";
+#pragma warning restore CA1823 // Remove unused private members
+#pragma warning restore IDE0051 // Remove unused private members
         private static readonly string[] RateLimitKeys = new string[] { RATE_LIMIT_REMAINING_KEY, RATE_LIMIT_RESET_KEY, RATE_LIMIT_TOTAL_KEY };
         public static RateLimit ParseRateLimit(Dictionary<string, string> headers)
         {

@@ -31,7 +31,7 @@ namespace FeedReader
             new Dictionary<string, ContentType>() { { "text/xml", ContentType.XML }, { "application/json", ContentType.JSON } };
         //private const string DefaultLoginUri = "https://bsaber.com/wp-login.php?jetpack-sso-show-default-form=1";
         private const string BeatSaverDownloadURL_Base = "https://beatsaver.com/api/download/key/";
-        private static readonly Uri FeedRootUri = new Uri("https://bsaber.com");
+        public Uri RootUri { get { return new Uri("https://bsaber.com"); } }
         public const int SongsPerXmlPage = 50;
         public const int SongsPerJsonPage = 50;
         private const string XML_TITLE_KEY = "SongTitle";

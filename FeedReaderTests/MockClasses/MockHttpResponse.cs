@@ -117,16 +117,25 @@ namespace FeedReaderTests.MockClasses
             return path;
         }
 
+        public MockHttpResponse(Uri url, Dictionary<string, IEnumerable<string>> headers)
+            : this(url)
+        {
+            _headers = headers;
+        }
         public MockHttpResponse(Uri url)
         {
+            if (_headers == null)
+                _headers = new Dictionary<string, IEnumerable<string>>();
             FileSourcePath = GetFileForUrl(url);
             Content = new MockHttpContent(FileSourcePath);
+            
             if (!File.Exists(FileSourcePath))
             {
                 StatusCode = HttpStatusCode.NotFound;
                 ReasonPhrase = "Not Found";
             }
         }
+
 
         public string FileSourcePath { get; set; }
 

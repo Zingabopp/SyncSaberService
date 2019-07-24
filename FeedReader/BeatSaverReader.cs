@@ -26,6 +26,7 @@ namespace FeedReader
         public string Name { get { return NameKey; } }
         public static readonly string SourceKey = "BeatSaver";
         public string Source { get { return SourceKey; } }
+        public Uri RootUri { get { return new Uri("https://beatsaver.com"); } }
         public bool Ready { get; private set; }
         public bool StoreRawData { get; set; }
         #region Constants
@@ -39,7 +40,11 @@ namespace FeedReader
         private const string BEATSAVER_DOWNLOAD_URL_BASE = "https://beatsaver.com/api/download/key/";
         private const string BEATSAVER_DETAILS_BASE_URL = "https://beatsaver.com/api/maps/detail/";
         private const string BEATSAVER_GETBYHASH_BASE_URL = "https://beatsaver.com/api/maps/by-hash/";
+#pragma warning disable IDE0051 // Remove unused private members
+#pragma warning disable CA1823 // Remove unused private members
         private const string BEATSAVER_NIGHTLYDUMP_URL = "https://beatsaver.com/api/download/dumps/maps";
+#pragma warning restore CA1823 // Remove unused private members
+#pragma warning restore IDE0051 // Remove unused private members
         #endregion
 
         private static ConcurrentDictionary<string, string> _authors = new ConcurrentDictionary<string, string>();
@@ -741,10 +746,14 @@ namespace FeedReader
         public BeatSaverFeed Feed { get { return (BeatSaverFeed)FeedIndex; } set { FeedIndex = (int)value; } } // Which feed to use
         public int FeedIndex { get; private set; } // Which feed to use
 
-        /// <summary>
-        /// List of authors, only used for the AUTHOR feed
-        /// </summary>
+#pragma warning disable CA1819 // Properties should not return arrays
+
+
+                              /// <summary>
+                              /// List of authors, only used for the AUTHOR feed
+                              /// </summary>
         public string[] Authors { get; set; }
+#pragma warning restore CA1819 // Properties should not return arrays
 
         /// <summary>
         /// Criteria for search, only used for SEARCH feed.

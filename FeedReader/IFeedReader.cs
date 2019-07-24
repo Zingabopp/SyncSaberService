@@ -10,6 +10,7 @@ namespace FeedReader
     {
         string Name { get; } // Name of the reader
         string Source { get; } // Name of the site
+        Uri RootUri { get; }
         bool Ready { get; } // Reader is ready
         bool StoreRawData { get; set; } // Save the raw data in ScrapedSong
 

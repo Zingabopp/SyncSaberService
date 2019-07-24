@@ -42,6 +42,7 @@ namespace FeedReader
         public static FeedReaderLoggerBase Logger { get { return _logger; } set { _logger = value; } }
         public string Name { get { return NameKey; } }
         public string Source { get { return SourceKey; } }
+        public Uri RootUri { get { return new Uri("https://scoresaber.com/"); } }
         public bool Ready { get; private set; }
         public bool StoreRawData { get; set; }
 
