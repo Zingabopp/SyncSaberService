@@ -135,15 +135,15 @@ namespace FeedReader
                 {RANKEDKEY, settings.RankedOnly ? "1" : "0" }
             };
             GetPageUrl(ref url, urlReplacements);
-
+            var uri = new Uri(url.ToString());
             string pageText = "";
-            using (var response = await WebUtils.WebClient.GetAsync(url.ToString()).ConfigureAwait(false))
+            using (var response = await WebUtils.WebClient.GetAsync(uri).ConfigureAwait(false))
             {
                 if (response.IsSuccessStatusCode)
                     pageText = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
                 else
                 {
-                    Logger.Error($"Error getting text from {url.ToString()}, HTTP Status Code is: {response.StatusCode.ToString()}: {response.ReasonPhrase}");
+                    Logger.Error($"Error getting text from {uri}, HTTP Status Code is: {response.StatusCode.ToString()}: {response.ReasonPhrase}");
                 }
             }
 
@@ -156,7 +156,7 @@ namespace FeedReader
             {
                 Logger.Exception("Unable to parse JSON from text", ex);
             }
-            foreach (var song in GetSongsFromPageText(pageText, url.ToString()))
+            foreach (var song in GetSongsFromPageText(pageText, uri))
             {
                 if (!songs.ContainsKey(song.Hash) && songs.Count < settings.MaxSongs)
                     songs.Add(song.Hash, song);
@@ -175,7 +175,7 @@ namespace FeedReader
                 else
                     urlReplacements[PAGENUMKEY] = pageNum.ToString();
                 GetPageUrl(ref url, urlReplacements);
-                foreach (var song in await GetSongsFromPageAsync(url.ToString()).ConfigureAwait(false))
+                foreach (var song in await GetSongsFromPageAsync(uri).ConfigureAwait(false))
                 {
                     diffCount++;
                     if (!songs.ContainsKey(song.Hash) && songs.Count < settings.MaxSongs)
@@ -192,26 +192,37 @@ namespace FeedReader
             return songs;
         }
 
-
-        public async Task<List<ScrapedSong>> GetSongsFromPageAsync(string url)
+        public Task<List<ScrapedSong>> GetSongsFromPageAsync(string url)
         {
+            return GetSongsFromPageAsync(Util.GetUriFromString(url));
+        }
+
+        public async Task<List<ScrapedSong>> GetSongsFromPageAsync(Uri uri)
+        {
+            if (uri == null)
+                throw new ArgumentNullException(nameof(uri), "uri cannot be null in ScoreSaberReader.GetSongsFromPageAsync");
             List<ScrapedSong> songs = null;
-            using (var response = await WebUtils.WebClient.GetAsync(url).ConfigureAwait(false))
+            using (var response = await WebUtils.WebClient.GetAsync(uri).ConfigureAwait(false))
             {
                 if (response.IsSuccessStatusCode)
                 {
                     var pageText = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-                    songs = GetSongsFromPageText(pageText, url);
+                    songs = GetSongsFromPageText(pageText, uri);
                 }
                 else
                 {
-                    Logger.Error($"Error getting page {url}, response was {response.StatusCode.ToString()}: {response.ReasonPhrase}");
+                    Logger.Error($"Error getting page {uri?.ToString()}, response was {response.StatusCode.ToString()}: {response.ReasonPhrase}");
                 }
             }
             return songs ?? new List<ScrapedSong>();
         }
 
         public List<ScrapedSong> GetSongsFromPageText(string pageText, string sourceUrl)
+        {
+            return GetSongsFromPageText(pageText, Util.GetUriFromString(sourceUrl));
+        }
+
+        public List<ScrapedSong> GetSongsFromPageText(string pageText, Uri sourceUri)
         {
             JObject result = new JObject();
             try
@@ -239,8 +250,8 @@ namespace FeedReader
                 if (!string.IsNullOrEmpty(hash))
                     songs.Add(new ScrapedSong(hash)
                     {
-                        DownloadUrl = BEATSAVER_DOWNLOAD_URL_BASE + hash,
-                        SourceUrl = sourceUrl,
+                        DownloadUri = Util.GetUriFromString(BEATSAVER_DOWNLOAD_URL_BASE + hash),
+                        SourceUri = sourceUri,
                         SongName = songName,
                         MapperName = mapperName,
                         RawData = StoreRawData ? song.ToString(Newtonsoft.Json.Formatting.None) : string.Empty

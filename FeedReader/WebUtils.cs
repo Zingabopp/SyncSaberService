@@ -120,51 +120,51 @@ namespace FeedReader
         public int CallsPerReset { get; set; }
     }
 
-    public class HttpGetException : Exception
-    {
-        public HttpStatusCode HttpStatusCode { get; private set; }
-        public string Url { get; private set; }
+    //public class HttpGetException : Exception
+    //{
+    //    public HttpStatusCode HttpStatusCode { get; private set; }
+    //    public string Url { get; private set; }
 
-        public HttpGetException()
-            : base()
-        {
-            base.Data.Add("StatusCode", HttpStatusCode.BadRequest);
-            base.Data.Add("Url", string.Empty);
-        }
+    //    public HttpGetException()
+    //        : base()
+    //    {
+    //        base.Data.Add("StatusCode", HttpStatusCode.BadRequest);
+    //        base.Data.Add("Url", string.Empty);
+    //    }
 
-        public HttpGetException(string message)
-            : base(message)
-        {
+    //    public HttpGetException(string message)
+    //        : base(message)
+    //    {
 
-            base.Data.Add("StatusCode", HttpStatusCode.BadRequest);
-            base.Data.Add("Url", string.Empty);
-        }
+    //        base.Data.Add("StatusCode", HttpStatusCode.BadRequest);
+    //        base.Data.Add("Url", string.Empty);
+    //    }
 
-        public HttpGetException(string message, Exception inner)
-            : base(message, inner)
-        {
-            base.Data.Add("StatusCode", HttpStatusCode.BadRequest);
-            base.Data.Add("Url", string.Empty);
-        }
+    //    public HttpGetException(string message, Exception inner)
+    //        : base(message, inner)
+    //    {
+    //        base.Data.Add("StatusCode", HttpStatusCode.BadRequest);
+    //        base.Data.Add("Url", string.Empty);
+    //    }
 
-        public HttpGetException(HttpStatusCode code, string url)
-            : base()
-        {
-            base.Data.Add("StatusCode", code);
-            base.Data.Add("Url", url);
-            HttpStatusCode = code;
-            Url = url;
-        }
+    //    public HttpGetException(HttpStatusCode code, string url)
+    //        : base()
+    //    {
+    //        base.Data.Add("StatusCode", code);
+    //        base.Data.Add("Url", url);
+    //        HttpStatusCode = code;
+    //        Url = url;
+    //    }
 
-        public HttpGetException(HttpStatusCode code, string url, string message)
-        : base(message)
-        {
-            base.Data.Add("StatusCode", code);
-            base.Data.Add("Url", url);
-            HttpStatusCode = code;
-            Url = url;
-        }
-    }
+    //    public HttpGetException(HttpStatusCode code, string url, string message)
+    //    : base(message)
+    //    {
+    //        base.Data.Add("StatusCode", code);
+    //        base.Data.Add("Url", url);
+    //        HttpStatusCode = code;
+    //        Url = url;
+    //    }
+    //}
 
     // From https://stackoverflow.com/questions/45711428/download-file-with-webclient-or-httpclient
     public static class HttpContentExtensions

@@ -42,7 +42,7 @@ namespace FeedReaderTests.MockClasses.MockResponseTemplates
 
         }
 
-        private Dictionary<string, object> GetNormalResponse()
+        private static Dictionary<string, object> GetNormalResponse()
         {
             return new Dictionary<string, object>()
             {
@@ -52,7 +52,7 @@ namespace FeedReaderTests.MockClasses.MockResponseTemplates
             };
         }
 
-        private Dictionary<string, object> GetNotFoundResponse()
+        private static Dictionary<string, object> GetNotFoundResponse()
         {
             return new Dictionary<string, object>()
             {
@@ -62,7 +62,7 @@ namespace FeedReaderTests.MockClasses.MockResponseTemplates
             };
         }
 
-        private Dictionary<string, object> GetBadGatewayResponse()
+        private static Dictionary<string, object> GetBadGatewayResponse()
         {
             return new Dictionary<string, object>()
             {
@@ -72,7 +72,7 @@ namespace FeedReaderTests.MockClasses.MockResponseTemplates
             };
         }
 
-        private Dictionary<string, object> GetRateLimitExceededResponse()
+        private static Dictionary<string, object> GetRateLimitExceededResponse()
         {
             return new Dictionary<string, object>()
             {

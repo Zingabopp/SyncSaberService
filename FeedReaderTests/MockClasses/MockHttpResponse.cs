@@ -43,19 +43,26 @@ namespace FeedReaderTests.MockClasses
             Query = 4
         }
         #endregion
-
+#pragma warning disable CA1055 // Uri return values should not be strings
         public static string GetFileForUrl(string url)
+#pragma warning restore CA1055 // Uri return values should not be strings
+        {
+            Uri urlAsUri = string.IsNullOrEmpty(url) ? null : new Uri(url);
+            return GetFileForUrl(urlAsUri);
+        }
+
+        public static string GetFileForUrl(Uri url)
         {
             if (url == null)
                 throw new ArgumentNullException(nameof(url), "url cannot be null for MockHttpContent.GetFileForUrl");
-            url = url.ToLower();
+            var urlStr = url.ToString().ToLower();
             string directory = "Data";
             string path = string.Empty;
             IEnumerable<FileInfo> files = null;
-            if (url.Contains("beatsaver.com"))
+            if (urlStr.Contains("beatsaver.com"))
             {
                 directory = Path.Combine(directory, "BeatSaver");
-                var match = BeatSaverRegex.Match(url);
+                var match = BeatSaverRegex.Match(urlStr);
                 var uploader = match.Groups[(int)BeatSaverGroup.Uploader]?.Value;
                 var pageStr = match.Groups[(int)BeatSaverGroup.Page].Value;
                 var page = string.IsNullOrEmpty(pageStr) ? 0 : int.Parse(pageStr);
@@ -63,9 +70,9 @@ namespace FeedReaderTests.MockClasses
                 throw new NotImplementedException();
                 //path = files.Single().FullName;
             }
-            else if (url.Contains("bsaber.com"))
+            else if (urlStr.Contains("bsaber.com"))
             {
-                var match = BeastSaberRegex.Match(url);
+                var match = BeastSaberRegex.Match(urlStr);
                 var username = match.Groups[(int)BeastSaberGroup.Username].Value;
                 var pageStr = match.Groups[(int)BeastSaberGroup.Page].Value;
                 var page = string.IsNullOrEmpty(pageStr) ? 0 : int.Parse(pageStr);
@@ -75,12 +82,12 @@ namespace FeedReaderTests.MockClasses
                 directory = Path.Combine(directory, "BeastSaber");
                 //var dInfo = new DirectoryInfo(directory);
                 files = new DirectoryInfo(directory).GetFiles();
-                if (url.Contains("followings"))
+                if (urlStr.Contains("followings"))
                     files = files.Where(f => f.Name.Contains("followings") && f.Name.Contains(page.ToString()));
-                else if (url.Contains("bookmarked"))
+                else if (urlStr.Contains("bookmarked"))
                 {
                     files = files.Where(f => f.Name.Contains("bookmarked"));
-                    if (url.Contains("curator"))
+                    if (urlStr.Contains("curator"))
                         files = files.Where(f => f.Name.Contains("curator") && f.Name.Contains(page.ToString()));
                     else
                         files = files.Where(f => !f.Name.Contains("curator") && f.Name.Contains(page.ToString()));
@@ -89,9 +96,9 @@ namespace FeedReaderTests.MockClasses
                     files = null;
                 path = files?.FirstOrDefault()?.FullName ?? string.Empty;
             }
-            else if (url.Contains("scoresaber.com"))
+            else if (urlStr.Contains("scoresaber.com"))
             {
-                var match = ScoreSaberRegex.Match(url);
+                var match = ScoreSaberRegex.Match(urlStr);
                 var catStr = match.Groups[(int)ScoreSaberGroup.Catalog].Value;
                 var pageStr = match.Groups[(int)ScoreSaberGroup.Page].Value;
                 var rankedStr = match.Groups[(int)ScoreSaberGroup.Ranked].Value;
@@ -110,7 +117,7 @@ namespace FeedReaderTests.MockClasses
             return path;
         }
 
-        public MockHttpResponse(string url)
+        public MockHttpResponse(Uri url)
         {
             FileSourcePath = GetFileForUrl(url);
             Content = new MockHttpContent(FileSourcePath);

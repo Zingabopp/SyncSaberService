@@ -5,6 +5,7 @@ using System.IO;
 using FeedReader;
 using WebUtilities;
 using Newtonsoft.Json.Linq;
+using System;
 
 namespace FeedReaderTests.MockClasses.MockTests
 {
@@ -17,7 +18,7 @@ namespace FeedReaderTests.MockClasses.MockTests
             using (var mockClient = new MockWebClient())
             using (var realClient = new HttpClientWrapper())
             {
-                var testUrl = "https://bsaber.com/wp-jsoasdfn/bsabasdfer-api/songs/";
+                var testUrl = new Uri("https://bsaber.com/wp-jsoasdfn/bsabasdfer-api/songs/");
                 WebUtils.Initialize();
                 using (var realResponse = realClient.GetAsync(testUrl).Result)
                 using (var mockResponse = mockClient.GetAsync(testUrl).Result)

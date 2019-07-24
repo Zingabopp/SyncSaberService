@@ -117,20 +117,37 @@ namespace FeedReader
         /// <param name="pageText"></param>
         /// <exception cref="XmlException">Invalid XML in pageText</exception>
         /// <returns></returns>
-        public List<ScrapedSong> GetSongsFromPageText(string pageText, string sourceUrl, ContentType contentType)
+        public List<ScrapedSong> GetSongsFromPageText(string pageText, Uri sourceUri, ContentType contentType)
         {
             List<ScrapedSong> songsOnPage = new List<ScrapedSong>();
             //if (pageText.ToLower().StartsWith(@"<?xml"))
             if (contentType == ContentType.XML)
             {
-                songsOnPage = ParseXMLPage(pageText, sourceUrl);
+                songsOnPage = ParseXMLPage(pageText, sourceUri);
             }
             else if (contentType == ContentType.JSON) // Page is JSON
             {
-                songsOnPage = ParseJsonPage(pageText, sourceUrl);
+                songsOnPage = ParseJsonPage(pageText, sourceUri);
             }
             //Logger.Debug($"{songsOnPage.Count} songs on page at {sourceUrl}");
             return songsOnPage;
+        }
+
+        /// <summary>
+        /// Parses the page text and returns all the songs it can find.
+        /// </summary>
+        /// <param name="pageText"></param>
+        /// <exception cref="XmlException">Invalid XML in pageText</exception>
+        /// <returns></returns>
+        public List<ScrapedSong> GetSongsFromPageText(string pageText, string sourceUrl, ContentType contentType)
+        {
+            return GetSongsFromPageText(pageText, Util.GetUriFromString(sourceUrl), contentType);
+        }
+
+
+        public List<ScrapedSong> ParseXMLPage(string pageText, string sourceUrl)
+        {
+            return ParseXMLPage(pageText, Util.GetUriFromString(sourceUrl));
         }
 
         /// <summary>
@@ -139,7 +156,7 @@ namespace FeedReader
         /// </summary>
         /// <param name="pageText"></param>
         /// <returns></returns>
-        public List<ScrapedSong> ParseXMLPage(string pageText, string sourceUrl)
+        public List<ScrapedSong> ParseXMLPage(string pageText, Uri sourceUrl)
         {
             if (string.IsNullOrEmpty(pageText))
                 return new List<ScrapedSong>();
@@ -209,8 +226,8 @@ namespace FeedReader
 
                             songsOnPage.Add(new ScrapedSong(hash)
                             {
-                                DownloadUrl = downloadUrl,
-                                SourceUrl = sourceUrl,
+                                DownloadUri = Util.GetUriFromString(downloadUrl),
+                                SourceUri = sourceUrl,
                                 SongName = songName,
                                 MapperName = authorName,
                                 RawData = jObject != null ? jObject.ToString(Newtonsoft.Json.Formatting.None) : string.Empty
@@ -222,7 +239,7 @@ namespace FeedReader
             return songsOnPage;
         }
 
-        public List<ScrapedSong> ParseJsonPage(string pageText, string sourceUrl)
+        public List<ScrapedSong> ParseJsonPage(string pageText, Uri sourceUri)
         {
             JObject result = new JObject();
             var songsOnPage = new List<ScrapedSong>();
@@ -253,8 +270,8 @@ namespace FeedReader
                 {
                     songsOnPage.Add(new ScrapedSong(songHash)
                     {
-                        DownloadUrl = downloadUrl,
-                        SourceUrl = sourceUrl,
+                        DownloadUri = Util.GetUriFromString(downloadUrl),
+                        SourceUri = sourceUri,
                         SongName = songName,
                         MapperName = mapperName,
                         RawData = StoreRawData ? bSong.ToString(Newtonsoft.Json.Formatting.None) : string.Empty
@@ -264,26 +281,33 @@ namespace FeedReader
             return songsOnPage;
         }
 
+        public List<ScrapedSong> ParseJsonPage(string pageText, string sourceUrl)
+        {
+            return ParseJsonPage(pageText, Util.GetUriFromString(sourceUrl));
+        }
 
-        /// <summary>
-        /// Gets the page URL for a given UrlBase and page number.
-        /// </summary>
-        /// <param name="feedUrlBase"></param>
-        /// <param name="page"></param>
-        /// <exception cref="ArgumentNullException">Thrown when feedUrlBase is null or empty.</exception>
-        /// <returns></returns>
-        public string GetPageUrl(string feedUrlBase, int page)
+
+#pragma warning disable CA1054 // Uri parameters should not be strings
+                              /// <summary>
+                              /// Gets the page URI for a given UrlBase and page number.
+                              /// </summary>
+                              /// <param name="feedUrlBase"></param>
+                              /// <param name="page"></param>
+                              /// <exception cref="ArgumentNullException">Thrown when feedUrlBase is null or empty.</exception>
+                              /// <returns></returns>
+        public Uri GetPageUri(string feedUrlBase, int page)
+#pragma warning restore CA1054 // Uri parameters should not be strings
         {
             if (string.IsNullOrEmpty(feedUrlBase))
                 throw new ArgumentNullException(nameof(feedUrlBase), "feedUrlBase cannot be null or empty for GetPageUrl");
             string feedUrl = feedUrlBase.Replace(USERNAMEKEY, _username).Replace(PAGENUMKEY, page.ToString());
             //Logger.Debug($"Replacing {USERNAMEKEY} with {_username} in base URL:\n   {feedUrlBase}");
-            return feedUrl;
+            return Util.GetUriFromString(feedUrl);
         }
 
-        public string GetPageUrl(int feedIndex, int page)
+        public Uri GetPageUrl(int feedIndex, int page)
         {
-            return GetPageUrl(Feeds[(BeastSaberFeed)feedIndex].BaseUrl, page);
+            return GetPageUri(Feeds[(BeastSaberFeed)feedIndex].BaseUrl, page);
         }
 
         private const string INVALIDFEEDSETTINGSMESSAGE = "The IFeedSettings passed is not a BeastSaberFeedSettings.";
@@ -311,7 +335,7 @@ namespace FeedReader
             bool useMaxPages = maxPages != 0;
             if (useMaxPages && pageIndex > 1)
                 maxPages = maxPages + pageIndex - 1;
-            var ProcessPageBlock = new TransformBlock<string, List<ScrapedSong>>(async feedUrl =>
+            var ProcessPageBlock = new TransformBlock<Uri, List<ScrapedSong>>(async feedUrl =>
                {
                    Stopwatch sw = new Stopwatch();
                    sw.Start();
@@ -355,7 +379,7 @@ namespace FeedReader
                 while (continueLooping)
                 {
 
-                    string feedUrl = GetPageUrl(Feeds[_settings.Feed].BaseUrl, pageIndex);
+                    var feedUrl = GetPageUri(Feeds[_settings.Feed].BaseUrl, pageIndex);
                     await ProcessPageBlock.SendAsync(feedUrl).ConfigureAwait(false); // TODO: Need check with SongsPerPage
                     itemsInBlock++;
                     pageIndex++;
@@ -379,7 +403,7 @@ namespace FeedReader
                                 continueLooping = false;
                                 break;
                             }
-                            Logger.Debug($"Receiving {newSongs.Count} potential songs from {newSongs.First().SourceUrl}");
+                            Logger.Debug($"Receiving {newSongs.Count} potential songs from {newSongs.First().SourceUri}");
                             foreach (var song in newSongs)
                             {
                                 if (retDict.ContainsKey(song.Hash))

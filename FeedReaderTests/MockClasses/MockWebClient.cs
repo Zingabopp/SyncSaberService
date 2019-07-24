@@ -12,27 +12,48 @@ namespace FeedReaderTests.MockClasses
         public int Timeout { get; set; }
         public ErrorHandling ErrorHandling { get; set; }
 
-        public Task<IWebResponseMessage> GetAsync(string url, bool completeOnHeaders, CancellationToken cancellationToken)
+        public Task<IWebResponseMessage> GetAsync(Uri uri, bool completeOnHeaders, CancellationToken cancellationToken)
         {
             //var content = new MockHttpContent(url);
 #pragma warning disable CA2000 // Dispose objects before losing scope
-            var response = new MockHttpResponse(url);
+            var response = new MockHttpResponse(uri);
 #pragma warning restore CA2000 // Dispose objects before losing scope
             return Task.Run(() => { return (IWebResponseMessage)response; });
         }
 
         #region GetAsyncOverloads
+        public Task<IWebResponseMessage> GetAsync(string url, bool completeOnHeaders, CancellationToken cancellationToken)
+        {
+            var urlAsUri = string.IsNullOrEmpty(url) ? null : new Uri(url);
+            return GetAsync(urlAsUri, completeOnHeaders, cancellationToken);
+        }
         public Task<IWebResponseMessage> GetAsync(string url)
         {
-            return GetAsync(url, false, CancellationToken.None);
+            var urlAsUri = string.IsNullOrEmpty(url) ? null : new Uri(url);
+            return GetAsync(urlAsUri, false, CancellationToken.None);
         }
         public Task<IWebResponseMessage> GetAsync(string url, bool completeOnHeaders)
         {
-            return GetAsync(url, completeOnHeaders, CancellationToken.None);
+            var urlAsUri = string.IsNullOrEmpty(url) ? null : new Uri(url);
+            return GetAsync(urlAsUri, completeOnHeaders, CancellationToken.None);
         }
         public Task<IWebResponseMessage> GetAsync(string url, CancellationToken cancellationToken)
         {
-            return GetAsync(url, false, cancellationToken);
+            var urlAsUri = string.IsNullOrEmpty(url) ? null : new Uri(url);
+            return GetAsync(urlAsUri, false, cancellationToken);
+        }
+
+        public Task<IWebResponseMessage> GetAsync(Uri uri)
+        {
+            return GetAsync(uri, false, CancellationToken.None);
+        }
+        public Task<IWebResponseMessage> GetAsync(Uri uri, bool completeOnHeaders)
+        {
+            return GetAsync(uri, completeOnHeaders, CancellationToken.None);
+        }
+        public Task<IWebResponseMessage> GetAsync(Uri uri, CancellationToken cancellationToken)
+        {
+            return GetAsync(uri, false, cancellationToken);
         }
         #endregion
 

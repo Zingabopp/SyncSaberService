@@ -23,14 +23,14 @@ namespace WebUtilities
         public int Timeout { get; set; }
         public ErrorHandling ErrorHandling { get; set; }
 
-        public async Task<IWebResponseMessage> GetAsync(string url, bool completeOnHeaders, CancellationToken cancellationToken)
+        public async Task<IWebResponseMessage> GetAsync(Uri uri, bool completeOnHeaders, CancellationToken cancellationToken)
         {
             HttpCompletionOption completionOption = 
                 completeOnHeaders ? HttpCompletionOption.ResponseHeadersRead : HttpCompletionOption.ResponseContentRead;
             try
             {
                 //TODO: Need testing for cancellation token
-                return new HttpResponseWrapper(await httpClient.GetAsync(url, completionOption, cancellationToken).ConfigureAwait(false));
+                return new HttpResponseWrapper(await httpClient.GetAsync(uri, completionOption, cancellationToken).ConfigureAwait(false));
             }
             catch(ArgumentException ex)
             {
@@ -38,7 +38,7 @@ namespace WebUtilities
                     throw;
                 else
                 {
-                    Logger?.Log(LogLevel.Error, $"Invalid URL, {url}, passed to GetAsync()\n{ex.Message}\n{ex.StackTrace}");
+                    Logger?.Log(LogLevel.Error, $"Invalid URL, {uri?.ToString()}, passed to GetAsync()\n{ex.Message}\n{ex.StackTrace}");
                     return new HttpResponseWrapper(null);
                 }
             }
@@ -48,7 +48,7 @@ namespace WebUtilities
                     throw;
                 else
                 {
-                    Logger?.Log(LogLevel.Error, $"Exception getting {url}\n{ex.Message}\n{ex.StackTrace}");
+                    Logger?.Log(LogLevel.Error, $"Exception getting {uri?.ToString()}\n{ex.Message}\n{ex.StackTrace}");
                     return new HttpResponseWrapper(null);
                 }
             }
@@ -56,6 +56,12 @@ namespace WebUtilities
         }
 
         #region GetAsyncOverloads
+
+        public Task<IWebResponseMessage> GetAsync(string url, bool completeOnHeaders, CancellationToken cancellationToken)
+        {
+            var urlAsUri = string.IsNullOrEmpty(url) ? null : new Uri(url);
+            return GetAsync(urlAsUri, completeOnHeaders, cancellationToken);
+        }
         public Task<IWebResponseMessage> GetAsync(string url)
         {
             return GetAsync(url, false, CancellationToken.None);
@@ -67,6 +73,19 @@ namespace WebUtilities
         public Task<IWebResponseMessage> GetAsync(string url, CancellationToken cancellationToken)
         {
             return GetAsync(url, false, cancellationToken);
+        }
+
+        public Task<IWebResponseMessage> GetAsync(Uri uri)
+        {
+            return GetAsync(uri, false, CancellationToken.None);
+        }
+        public Task<IWebResponseMessage> GetAsync(Uri uri, bool completeOnHeaders)
+        {
+            return GetAsync(uri, completeOnHeaders, CancellationToken.None);
+        }
+        public Task<IWebResponseMessage> GetAsync(Uri uri, CancellationToken cancellationToken)
+        {
+            return GetAsync(uri, false, cancellationToken);
         }
         #endregion
 

@@ -27,7 +27,7 @@ namespace FeedReaderTests
             var detectedAuthors = songsByAuthor.Values.Select(s => s.MapperName.ToLower()).Distinct();
             foreach (var song in songsByAuthor)
             {
-                Assert.IsTrue(!string.IsNullOrEmpty(song.Value.DownloadUrl));
+                Assert.IsTrue(song.Value.DownloadUri != null);
                 Assert.IsTrue(authorList.Any(a => a.ToLower() == song.Value.MapperName.ToLower()));
             }
             foreach (var author in authorList)
@@ -39,12 +39,12 @@ namespace FeedReaderTests
             var blazonHash = "58de2d709a45b68fdb1dbbfefb187f59f629bfc5".ToUpper();
             var blazonSong = songsByAuthor[blazonHash];
             Assert.IsTrue(blazonSong != null);
-            Assert.IsTrue(!string.IsNullOrEmpty(blazonSong.DownloadUrl));
+            Assert.IsTrue(blazonSong.DownloadUri != null);
             // GreatYazer check
             var songHash = "bf8c016dc6b9832ece3030f05277bbbe67db790d".ToUpper();
             var yazerSong = songsByAuthor[songHash];
             Assert.IsTrue(yazerSong != null);
-            Assert.IsTrue(!string.IsNullOrEmpty(yazerSong.DownloadUrl));
+            Assert.IsTrue(yazerSong.DownloadUri != null);
         }
 
         [TestMethod]
@@ -115,11 +115,12 @@ namespace FeedReaderTests
         public void ParseSongsFromPage_Test()
         {
             string pageText = File.ReadAllText(@"Data\BeatSaverListPage.json");
-            var songs = BeatSaverReader.ParseSongsFromPage(pageText, "");
+            Uri uri = null;
+            var songs = BeatSaverReader.ParseSongsFromPage(pageText, uri);
             Assert.IsTrue(songs.Count == 10);
             foreach (var song in songs)
             {
-                Assert.IsFalse(string.IsNullOrEmpty(song.DownloadUrl));
+                Assert.IsFalse(song.DownloadUri == null);
                 Assert.IsFalse(string.IsNullOrEmpty(song.Hash));
                 Assert.IsFalse(string.IsNullOrEmpty(song.MapperName));
                 Assert.IsFalse(string.IsNullOrEmpty(song.RawData));

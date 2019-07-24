@@ -50,12 +50,16 @@ namespace FeedReader
     /// </summary>
     public struct FeedInfo : IEquatable<FeedInfo>
     {
+#pragma warning disable CA1054 // Uri parameters should not be strings
         public FeedInfo(string name, string baseUrl)
+#pragma warning restore CA1054 // Uri parameters should not be strings
         {
             Name = name;
             BaseUrl = baseUrl;
         }
+#pragma warning disable CA1056 // Uri properties should not be strings
         public string BaseUrl { get; set; } // Base URL for the feed, has string keys to replace with things like page number/bsaber username
+#pragma warning restore CA1056 // Uri properties should not be strings
         public string Name { get; set; } // Name of the feed
 
         #region EqualsOperators
@@ -84,4 +88,5 @@ namespace FeedReader
         public override int GetHashCode() => (Name, BaseUrl).GetHashCode();
         #endregion
     }
+
 }
