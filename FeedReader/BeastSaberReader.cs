@@ -317,6 +317,7 @@ namespace FeedReader
             return await GetSongsFromFeedAsync(settings, CancellationToken.None).ConfigureAwait(false);
         }
 
+        // TODO: Abort early when bsaber.com is down (check if all items in block failed?)
         public async Task<Dictionary<string, ScrapedSong>> GetSongsFromFeedAsync(IFeedSettings settings, CancellationToken cancellationToken)
         {
             if (settings == null)

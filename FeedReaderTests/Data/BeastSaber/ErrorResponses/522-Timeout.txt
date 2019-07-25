@@ -1,0 +1,15 @@
+﻿{StatusCode: 522, ReasonPhrase: 'Origin Connection Time-out', Version: 1.1, Content: System.Net.Http.HttpConnection+HttpConnectionResponseContent, Headers:
+{
+  Date: Thu, 25 Jul 2019 04:17:43 GMT
+  Transfer-Encoding: chunked
+  Connection: keep-alive
+  Set-Cookie: __cfduid=<removed>; expires=Fri, 24-Jul-20 04:17:12 GMT; path=/; domain=.bsaber.com; HttpOnly
+  Set-Cookie: cf_use_ob=0; path=/; expires=Thu, 25-Jul-19 04:18:13 GMT
+  Expect-CT: max-age=604800, report-uri="https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct"
+  Cache-Control: no-store, must-revalidate, no-cache, post-check=0, pre-check=0
+  Pragma: no-cache
+  Server: cloudflare
+  CF-RAY: 4fbb52a56ab5c530-ORD
+  Content-Type: text/html; charset=UTF-8
+  Expires: Thu, 01 Jan 1970 00:00:01 GMT
+}}
