@@ -39,6 +39,7 @@ namespace FeedReader
         private const string XML_HASH_KEY = "Hash";
         private const string XML_AUTHOR_KEY = "LevelAuthorName";
         private const string XML_SONGKEY_KEY = "SongKey";
+        private const string INVALIDFEEDSETTINGSMESSAGE = "The IFeedSettings passed is not a BeastSaberFeedSettings.";
         #endregion
 
         private static FeedReaderLoggerBase _logger = new FeedReaderLogger(LoggingController.DefaultLogController);
@@ -104,13 +105,6 @@ namespace FeedReader
             MaxConcurrency = maxConcurrency;
         }
 
-        public enum ContentType
-        {
-            Unknown = 0,
-            XML = 1,
-            JSON = 2
-        }
-
         /// <summary>
         /// Parses the page text and returns all the songs it can find.
         /// </summary>
@@ -131,23 +125,6 @@ namespace FeedReader
             }
             //Logger.Debug($"{songsOnPage.Count} songs on page at {sourceUrl}");
             return songsOnPage;
-        }
-
-        /// <summary>
-        /// Parses the page text and returns all the songs it can find.
-        /// </summary>
-        /// <param name="pageText"></param>
-        /// <exception cref="XmlException">Invalid XML in pageText</exception>
-        /// <returns></returns>
-        public List<ScrapedSong> GetSongsFromPageText(string pageText, string sourceUrl, ContentType contentType)
-        {
-            return GetSongsFromPageText(pageText, Util.GetUriFromString(sourceUrl), contentType);
-        }
-
-
-        public List<ScrapedSong> ParseXMLPage(string pageText, string sourceUrl)
-        {
-            return ParseXMLPage(pageText, Util.GetUriFromString(sourceUrl));
         }
 
         /// <summary>
@@ -281,20 +258,14 @@ namespace FeedReader
             return songsOnPage;
         }
 
-        public List<ScrapedSong> ParseJsonPage(string pageText, string sourceUrl)
-        {
-            return ParseJsonPage(pageText, Util.GetUriFromString(sourceUrl));
-        }
-
-
 #pragma warning disable CA1054 // Uri parameters should not be strings
-                              /// <summary>
-                              /// Gets the page URI for a given UrlBase and page number.
-                              /// </summary>
-                              /// <param name="feedUrlBase"></param>
-                              /// <param name="page"></param>
-                              /// <exception cref="ArgumentNullException">Thrown when feedUrlBase is null or empty.</exception>
-                              /// <returns></returns>
+        /// <summary>
+        /// Gets the page URI for a given UrlBase and page number.
+        /// </summary>
+        /// <param name="feedUrlBase"></param>
+        /// <param name="page"></param>
+        /// <exception cref="ArgumentNullException">Thrown when feedUrlBase is null or empty.</exception>
+        /// <returns></returns>
         public Uri GetPageUri(string feedUrlBase, int page)
 #pragma warning restore CA1054 // Uri parameters should not be strings
         {
@@ -305,21 +276,22 @@ namespace FeedReader
             return Util.GetUriFromString(feedUrl);
         }
 
-        public Uri GetPageUrl(int feedIndex, int page)
-        {
-            return GetPageUri(Feeds[(BeastSaberFeed)feedIndex].BaseUrl, page);
-        }
-
-        private const string INVALIDFEEDSETTINGSMESSAGE = "The IFeedSettings passed is not a BeastSaberFeedSettings.";
-
-        public async Task<Dictionary<string, ScrapedSong>> GetSongsFromFeedAsync(IFeedSettings settings)
-        {
-            return await GetSongsFromFeedAsync(settings, CancellationToken.None).ConfigureAwait(false);
-        }
-
+        #region Web Requests
+        #region Async
         // TODO: Abort early when bsaber.com is down (check if all items in block failed?)
+        // TODO: Make cancellationToken actually do something.
+        /// <summary>
+        /// Gets all songs from the feed defined by the provided settings.
+        /// </summary>
+        /// <param name="settings"></param>
+        /// <param name="cancellationToken"></param>
+        /// <exception cref="InvalidCastException">Thrown when the passed IFeedSettings isn't a BeastSaberFeedSettings.</exception>
+        /// <exception cref="ArgumentException">Thrown when trying to access a feed that requires a username and the username wasn't provided.</exception>
+        /// <returns></returns>
         public async Task<Dictionary<string, ScrapedSong>> GetSongsFromFeedAsync(IFeedSettings settings, CancellationToken cancellationToken)
         {
+            if (cancellationToken != CancellationToken.None)
+                Logger.Warning("CancellationToken in GetSongsFromFeedAsync isn't implemented.");
             if (settings == null)
                 throw new ArgumentNullException(nameof(settings), "settings cannot be null for BeastSaberReader.GetSongsFromFeedAsync.");
             Dictionary<string, ScrapedSong> retDict = new Dictionary<string, ScrapedSong>();
@@ -337,42 +309,42 @@ namespace FeedReader
             if (useMaxPages && pageIndex > 1)
                 maxPages = maxPages + pageIndex - 1;
             var ProcessPageBlock = new TransformBlock<Uri, List<ScrapedSong>>(async feedUrl =>
-               {
-                   Stopwatch sw = new Stopwatch();
-                   sw.Start();
-                   //Logger.Debug($"Checking URL: {feedUrl}");
-                   string pageText = "";
+            {
+                Stopwatch sw = new Stopwatch();
+                sw.Start();
+                //Logger.Debug($"Checking URL: {feedUrl}");
+                string pageText = "";
 
-                   ContentType contentType;
-                   string contentTypeStr = string.Empty;
-                   try
-                   {
-                       using (var response = await WebUtils.WebClient.GetAsync(feedUrl).ConfigureAwait(false))
-                       {
-                           contentTypeStr = response.Content.ContentType.ToLower();
-                           if (ContentDictionary.ContainsKey(contentTypeStr))
-                               contentType = ContentDictionary[contentTypeStr];
-                           else
-                               contentType = ContentType.Unknown;
-                           pageText = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-                       }
-                   }
-                   catch (HttpRequestException ex)
-                   {
-                       Logger.Exception($"Error downloading {feedUrl} in TransformBlock.", ex);
-                       return new List<ScrapedSong>();
-                   }
+                ContentType contentType;
+                string contentTypeStr = string.Empty;
+                try
+                {
+                    using (var response = await WebUtils.WebClient.GetAsync(feedUrl).ConfigureAwait(false))
+                    {
+                        contentTypeStr = response.Content.ContentType.ToLower();
+                        if (ContentDictionary.ContainsKey(contentTypeStr))
+                            contentType = ContentDictionary[contentTypeStr];
+                        else
+                            contentType = ContentType.Unknown;
+                        pageText = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+                    }
+                }
+                catch (HttpRequestException ex)
+                {
+                    Logger.Exception($"Error downloading {feedUrl} in TransformBlock.", ex);
+                    return new List<ScrapedSong>();
+                }
 
-                   var newSongs = GetSongsFromPageText(pageText, feedUrl, contentType);
-                   sw.Stop();
-                   //Logger.Debug($"Task for {feedUrl} completed in {sw.ElapsedMilliseconds}ms");
-                   return newSongs.Count > 0 ? newSongs : null;
-               }, new ExecutionDataflowBlockOptions
-               {
-                   MaxDegreeOfParallelism = MaxConcurrency,
-                   BoundedCapacity = MaxConcurrency,
-                   EnsureOrdered = true
-               });
+                var newSongs = GetSongsFromPageText(pageText, feedUrl, contentType);
+                sw.Stop();
+                //Logger.Debug($"Task for {feedUrl} completed in {sw.ElapsedMilliseconds}ms");
+                return newSongs.Count > 0 ? newSongs : null;
+            }, new ExecutionDataflowBlockOptions
+            {
+                MaxDegreeOfParallelism = MaxConcurrency,
+                BoundedCapacity = MaxConcurrency,
+                EnsureOrdered = true
+            });
             bool continueLooping = true;
             int itemsInBlock = 0;
             do
@@ -431,15 +403,17 @@ namespace FeedReader
             return retDict;
         }
 
-        /// <summary>
-        /// Gets all songs from the feed defined by the provided settings.
-        /// </summary>
-        /// <param name="settings"></param>
-        /// <exception cref="InvalidCastException">Thrown when the passed IFeedSettings isn't a BeastSaberFeedSettings.</exception>
-        /// <exception cref="ArgumentException">Thrown when trying to access a feed that requires a username and the username wasn't provided.</exception>
-        /// <returns></returns>
+        public async Task<Dictionary<string, ScrapedSong>> GetSongsFromFeedAsync(IFeedSettings settings)
+        {
+            return await GetSongsFromFeedAsync(settings, CancellationToken.None).ConfigureAwait(false);
+        }
+
+        #endregion
+
+        #region Sync
         public Dictionary<string, ScrapedSong> GetSongsFromFeed(IFeedSettings settings)
         {
+            // Pointless to have these checks here?
             PrepareReader();
             if (!(settings is BeastSaberFeedSettings _settings))
                 throw new InvalidCastException(INVALIDFEEDSETTINGSMESSAGE);
@@ -451,6 +425,43 @@ namespace FeedReader
             var retDict = GetSongsFromFeedAsync(settings).Result;
 
             return retDict;
+        }
+        #endregion
+        #endregion
+
+        #region Overloads
+        public List<ScrapedSong> ParseJsonPage(string pageText, string sourceUrl)
+        {
+            return ParseJsonPage(pageText, Util.GetUriFromString(sourceUrl));
+        }
+        public List<ScrapedSong> ParseXMLPage(string pageText, string sourceUrl)
+        {
+            return ParseXMLPage(pageText, Util.GetUriFromString(sourceUrl));
+        }
+        public Uri GetPageUrl(int feedIndex, int page)
+        {
+            return GetPageUri(Feeds[(BeastSaberFeed)feedIndex].BaseUrl, page);
+        }
+        /// <summary>
+        /// Parses the page text and returns all the songs it can find.
+        /// </summary>
+        /// <param name="pageText"></param>
+        /// <exception cref="XmlException">Invalid XML in pageText</exception>
+        /// <returns></returns>
+        public List<ScrapedSong> GetSongsFromPageText(string pageText, string sourceUrl, ContentType contentType)
+        {
+            return GetSongsFromPageText(pageText, Util.GetUriFromString(sourceUrl), contentType);
+        }
+
+
+        #endregion
+
+
+        public enum ContentType
+        {
+            Unknown = 0,
+            XML = 1,
+            JSON = 2
         }
     }
 

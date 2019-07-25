@@ -46,6 +46,14 @@ namespace FeedReader
         public bool Ready { get; private set; }
         public bool StoreRawData { get; set; }
 
+        public void PrepareReader()
+        {
+            if(!Ready)
+            {
+                Ready = true;
+            }
+        }
+
         private static Dictionary<ScoreSaberFeed, FeedInfo> _feeds;
         public static Dictionary<ScoreSaberFeed, FeedInfo> Feeds
         {
@@ -65,44 +73,7 @@ namespace FeedReader
                 return _feeds;
             }
         }
-        public async Task<Dictionary<string, ScrapedSong>> GetSongsFromFeedAsync(IFeedSettings settings)
-        {
-            return await GetSongsFromFeedAsync(settings, CancellationToken.None).ConfigureAwait(false);
-        }
-        public async Task<Dictionary<string, ScrapedSong>> GetSongsFromFeedAsync(IFeedSettings _settings, CancellationToken cancellationToken)
-        {
-            PrepareReader();
-            if (!(_settings is ScoreSaberFeedSettings settings))
-                throw new InvalidCastException(INVALID_FEED_SETTINGS_MESSAGE);
-            Dictionary<string, ScrapedSong> retDict = new Dictionary<string, ScrapedSong>();
-            int maxSongs = settings.MaxSongs > 0 ? settings.MaxSongs : settings.SongsPerPage * settings.SongsPerPage;
-            switch (settings.Feed)
-            {
-                case ScoreSaberFeed.Trending:
-                    retDict = await GetSongsFromScoreSaberAsync(settings).ConfigureAwait(false);
-                    break;
-                case ScoreSaberFeed.LatestRanked:
-                    settings.RankedOnly = true;
-                    retDict = await GetSongsFromScoreSaberAsync(settings).ConfigureAwait(false);
-                    break;
-                case ScoreSaberFeed.TopPlayed:
-                    retDict = await GetSongsFromScoreSaberAsync(settings).ConfigureAwait(false);
-                    break;
-                case ScoreSaberFeed.TopRanked:
-                    settings.RankedOnly = true;
-                    retDict = await GetSongsFromScoreSaberAsync(settings).ConfigureAwait(false);
-                    break;
-                default:
-                    break;
-            }
-            return retDict;
-        }
-
-        public Dictionary<string, ScrapedSong> GetSongsFromFeed(IFeedSettings _settings)
-        {
-            return GetSongsFromFeedAsync(_settings).Result;
-        }
-
+        
         public static void GetPageUrl(ref StringBuilder baseUrl, Dictionary<string, string> replacements)
         {
             if (baseUrl == null)
@@ -115,6 +86,48 @@ namespace FeedReader
             }
         }
 
+        public List<ScrapedSong> GetSongsFromPageText(string pageText, Uri sourceUri)
+        {
+            JObject result = new JObject();
+            try
+            {
+                result = JObject.Parse(pageText);
+
+            }
+            catch (JsonReaderException ex)
+            {
+                Logger.Exception("Unable to parse JSON from text", ex);
+            }
+            List<ScrapedSong> songs = new List<ScrapedSong>();
+
+            var songJSONAry = result["songs"]?.ToArray();
+            if (songJSONAry == null)
+            {
+                Logger.Error("Invalid page text: 'songs' field not found.");
+            }
+            foreach (var song in songJSONAry)
+            {
+                var hash = song["id"]?.Value<string>();
+                var songName = song["name"]?.Value<string>();
+                var mapperName = song["levelAuthorName"]?.Value<string>();
+
+                if (!string.IsNullOrEmpty(hash))
+                    songs.Add(new ScrapedSong(hash)
+                    {
+                        DownloadUri = Util.GetUriFromString(BEATSAVER_DOWNLOAD_URL_BASE + hash),
+                        SourceUri = sourceUri,
+                        SongName = songName,
+                        MapperName = mapperName,
+                        RawData = StoreRawData ? song.ToString(Newtonsoft.Json.Formatting.None) : string.Empty
+                    });
+                ;
+            }
+            return songs;
+        }
+
+        #region Web Requests
+
+        #region Async
         public async Task<Dictionary<string, ScrapedSong>> GetSongsFromScoreSaberAsync(ScoreSaberFeedSettings settings)
         {
             if (settings == null)
@@ -194,11 +207,34 @@ namespace FeedReader
             return songs;
         }
 
-        public Task<List<ScrapedSong>> GetSongsFromPageAsync(string url)
+        public async Task<Dictionary<string, ScrapedSong>> GetSongsFromFeedAsync(IFeedSettings _settings, CancellationToken cancellationToken)
         {
-            return GetSongsFromPageAsync(Util.GetUriFromString(url));
+            PrepareReader();
+            if (!(_settings is ScoreSaberFeedSettings settings))
+                throw new InvalidCastException(INVALID_FEED_SETTINGS_MESSAGE);
+            Dictionary<string, ScrapedSong> retDict = new Dictionary<string, ScrapedSong>();
+            int maxSongs = settings.MaxSongs > 0 ? settings.MaxSongs : settings.SongsPerPage * settings.SongsPerPage;
+            switch (settings.Feed)
+            {
+                case ScoreSaberFeed.Trending:
+                    retDict = await GetSongsFromScoreSaberAsync(settings).ConfigureAwait(false);
+                    break;
+                case ScoreSaberFeed.LatestRanked:
+                    settings.RankedOnly = true;
+                    retDict = await GetSongsFromScoreSaberAsync(settings).ConfigureAwait(false);
+                    break;
+                case ScoreSaberFeed.TopPlayed:
+                    retDict = await GetSongsFromScoreSaberAsync(settings).ConfigureAwait(false);
+                    break;
+                case ScoreSaberFeed.TopRanked:
+                    settings.RankedOnly = true;
+                    retDict = await GetSongsFromScoreSaberAsync(settings).ConfigureAwait(false);
+                    break;
+                default:
+                    break;
+            }
+            return retDict;
         }
-
         public async Task<List<ScrapedSong>> GetSongsFromPageAsync(Uri uri)
         {
             if (uri == null)
@@ -219,54 +255,35 @@ namespace FeedReader
             return songs ?? new List<ScrapedSong>();
         }
 
+        #endregion
+
+        #region Sync
+        public Dictionary<string, ScrapedSong> GetSongsFromFeed(IFeedSettings _settings)
+        {
+            return GetSongsFromFeedAsync(_settings).Result;
+        }
+
+        #endregion
+
+        #endregion
+
+        #region Overloads
+        public async Task<Dictionary<string, ScrapedSong>> GetSongsFromFeedAsync(IFeedSettings settings)
+        {
+            return await GetSongsFromFeedAsync(settings, CancellationToken.None).ConfigureAwait(false);
+        }
+
+        public Task<List<ScrapedSong>> GetSongsFromPageAsync(string url)
+        {
+            return GetSongsFromPageAsync(Util.GetUriFromString(url));
+        }
+
         public List<ScrapedSong> GetSongsFromPageText(string pageText, string sourceUrl)
         {
             return GetSongsFromPageText(pageText, Util.GetUriFromString(sourceUrl));
         }
 
-        public List<ScrapedSong> GetSongsFromPageText(string pageText, Uri sourceUri)
-        {
-            JObject result = new JObject();
-            try
-            {
-                result = JObject.Parse(pageText);
-
-            }
-            catch (JsonReaderException ex)
-            {
-                Logger.Exception("Unable to parse JSON from text", ex);
-            }
-            List<ScrapedSong> songs = new List<ScrapedSong>();
-
-            var songJSONAry = result["songs"]?.ToArray();
-            if (songJSONAry == null)
-            {
-                Logger.Error("Invalid page text: 'songs' field not found.");
-            }
-            foreach (var song in songJSONAry)
-            {
-                var hash = song["id"]?.Value<string>();
-                var songName = song["name"]?.Value<string>();
-                var mapperName = song["levelAuthorName"]?.Value<string>();
-
-                if (!string.IsNullOrEmpty(hash))
-                    songs.Add(new ScrapedSong(hash)
-                    {
-                        DownloadUri = Util.GetUriFromString(BEATSAVER_DOWNLOAD_URL_BASE + hash),
-                        SourceUri = sourceUri,
-                        SongName = songName,
-                        MapperName = mapperName,
-                        RawData = StoreRawData ? song.ToString(Newtonsoft.Json.Formatting.None) : string.Empty
-                    });
-                ;
-            }
-            return songs;
-        }
-
-        public void PrepareReader()
-        {
-
-        }
+        #endregion
 
     }
 
