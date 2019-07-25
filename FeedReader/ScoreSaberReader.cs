@@ -89,6 +89,7 @@ namespace FeedReader
         public List<ScrapedSong> GetSongsFromPageText(string pageText, Uri sourceUri)
         {
             JObject result = new JObject();
+            List<ScrapedSong> songs = new List<ScrapedSong>();
             try
             {
                 result = JObject.Parse(pageText);
@@ -97,9 +98,8 @@ namespace FeedReader
             catch (JsonReaderException ex)
             {
                 Logger.Exception("Unable to parse JSON from text", ex);
+                return songs;
             }
-            List<ScrapedSong> songs = new List<ScrapedSong>();
-
             var songJSONAry = result["songs"]?.ToArray();
             if (songJSONAry == null)
             {
@@ -161,15 +161,6 @@ namespace FeedReader
                 }
             }
 
-            JObject result;
-            try
-            {
-                result = JObject.Parse(pageText);
-            }
-            catch (JsonReaderException ex)
-            {
-                Logger.Exception("Unable to parse JSON from text", ex);
-            }
             foreach (var song in GetSongsFromPageText(pageText, uri))
             {
                 if (!songs.ContainsKey(song.Hash) && songs.Count < settings.MaxSongs)
