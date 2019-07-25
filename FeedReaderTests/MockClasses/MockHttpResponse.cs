@@ -126,6 +126,7 @@ namespace FeedReaderTests.MockClasses
         {
             if (_headers == null)
                 _headers = new Dictionary<string, IEnumerable<string>>();
+            OriginalUri = url;
             FileSourcePath = GetFileForUrl(url);
             Content = new MockHttpContent(FileSourcePath);
             
@@ -138,6 +139,8 @@ namespace FeedReaderTests.MockClasses
 
 
         public string FileSourcePath { get; set; }
+
+        public Uri OriginalUri { get; set; }
 
         public HttpStatusCode StatusCode { get; set; }
 
