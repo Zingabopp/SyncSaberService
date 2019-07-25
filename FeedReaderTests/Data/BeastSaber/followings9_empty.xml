@@ -1,0 +1,22 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	>
+
+  <channel>
+    <title>BeastSaber | Zingabopp | Following Activity</title>
+    <link>https://bsaber.com/members/zingabopp/wall/followings/</link>
+    <atom:link href="https://bsaber.com/members/zingabopp/wall/followings/feed/?acpage=24" rel="self" type="application/rss+xml" />
+    <description>Activity feed for people that Zingabopp is following.</description>
+    <lastBuildDate>Mon, 22 Jul 2019 04:10:15 +0000</lastBuildDate>
+    <generator>https://buddypress.org/?v=4.3.0</generator>
+    <language>en-US</language>
+    <ttl>30</ttl>
+    <sy:updatePeriod>hourly</sy:updatePeriod>
+    <sy:updateFrequency>2</sy:updateFrequency>
+
+  </channel>
+</rss>

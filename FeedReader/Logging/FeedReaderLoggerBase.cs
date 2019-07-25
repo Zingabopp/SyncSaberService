@@ -21,6 +21,11 @@ namespace FeedReader.Logging
                     return;
                 if(_loggingController != null)
                     _loggingController.PropertyChanged -= Controller_PropertyChanged;
+                if (value == null)
+                {
+                    _loggingController = null;
+                    return;
+                }
                 _loggingController = value;
                 LoggerName = _loggingController.LoggerName;
                 LogLevel = _loggingController.LogLevel;
@@ -31,12 +36,14 @@ namespace FeedReader.Logging
             }
         }
 
+#pragma warning disable CA1707 // Identifiers should not contain underscores
         protected virtual void Controller_PropertyChanged(string propertyName, object propertyValue)
+#pragma warning restore CA1707 // Identifiers should not contain underscores
         {
             switch (propertyName)
             {
                 case "LoggerName":
-                    LoggerName = propertyValue.ToString();
+                    LoggerName = propertyValue?.ToString();
                     break;
                 case "LogLevel":
                     LogLevel = (LogLevel)propertyValue;
@@ -68,7 +75,9 @@ namespace FeedReader.Logging
             [CallerFilePath] string file = "",
             [CallerMemberName] string member = "",
             [CallerLineNumber] int line = 0);
+#pragma warning disable CA1716 // Identifiers should not match keywords
         public abstract void Error(string message,
+#pragma warning restore CA1716 // Identifiers should not match keywords
             [CallerFilePath] string file = "",
             [CallerMemberName] string member = "",
             [CallerLineNumber] int line = 0);

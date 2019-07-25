@@ -1,0 +1,610 @@
+{
+  "docs": [
+    {
+      "metadata": {
+        "difficulties": {
+          "easy": false,
+          "expert": false,
+          "expertPlus": false,
+          "hard": false,
+          "normal": true
+        },
+        "characteristics": [
+          {
+            "difficulties": {
+              "easy": null,
+              "expert": null,
+              "expertPlus": null,
+              "hard": null,
+              "normal": {
+                "duration": 394.4375,
+                "length": 249,
+                "njs": 12,
+                "njsOffset": 0,
+                "bombs": 0,
+                "notes": 397,
+                "obstacles": 0
+              }
+            },
+            "name": "Standard"
+          }
+        ],
+        "levelAuthorName": "Bazinga!",
+        "songAuthorName": "Leo Moracchioli",
+        "songName": "Country Roads",
+        "songSubName": "",
+        "bpm": 95
+      },
+      "stats": {
+        "downloads": 540,
+        "plays": 0,
+        "downVotes": 3,
+        "upVotes": 1,
+        "heat": 854.8526143,
+        "rating": 0.40400296108612577
+      },
+      "description": "Country Roads cover by Leo Moracchioli, check him out on YouTube, I hope seeing some maps of his songs here :)",
+      "deletedAt": null,
+      "_id": "5d32ddf919fc1b000629b37d",
+      "key": "580e",
+      "name": "Country Roads cover by Leo Moracchioli",
+      "uploader": {
+        "_id": "5d245e65b49dd2000689a136",
+        "username": "bazinga!"
+      },
+      "hash": "057ddcb356186dd0340c4fa9251bc85e983c737d",
+      "uploaded": "2019-07-20T09:25:13.993Z",
+      "downloadURL": "/api/download/key/580e",
+      "coverURL": "/cdn/580e/057ddcb356186dd0340c4fa9251bc85e983c737d.jpg"
+    },
+    {
+      "metadata": {
+        "difficulties": {
+          "easy": false,
+          "expert": true,
+          "expertPlus": false,
+          "hard": false,
+          "normal": false
+        },
+        "characteristics": [
+          {
+            "difficulties": {
+              "easy": null,
+              "expert": {
+                "duration": 363.25,
+                "length": 239,
+                "njs": 12,
+                "njsOffset": 0,
+                "bombs": 0,
+                "notes": 863,
+                "obstacles": 4
+              },
+              "expertPlus": null,
+              "hard": null,
+              "normal": null
+            },
+            "name": "Standard"
+          }
+        ],
+        "levelAuthorName": "fun4sport",
+        "songAuthorName": "Enrique Iglesias",
+        "songName": "Bailando",
+        "songSubName": "",
+        "bpm": 91
+      },
+      "stats": {
+        "downloads": 247,
+        "plays": 0,
+        "downVotes": 1,
+        "upVotes": 0,
+        "heat": 855.070605,
+        "rating": 0.40583635249095656
+      },
+      "description": "",
+      "deletedAt": null,
+      "_id": "5d32cf613d0800000671ccf0",
+      "key": "580d",
+      "name": "Bailando - Enrique Iglesias",
+      "uploader": {
+        "_id": "5cff0b7798cc5a672c856173",
+        "username": "fun4sport"
+      },
+      "hash": "99e1e4b38383c5412db9cf6e51109226c418c7d5",
+      "uploaded": "2019-07-20T08:22:57.224Z",
+      "downloadURL": "/api/download/key/580d",
+      "coverURL": "/cdn/580d/99e1e4b38383c5412db9cf6e51109226c418c7d5.jpg"
+    },
+    {
+      "metadata": {
+        "difficulties": {
+          "easy": false,
+          "expert": true,
+          "expertPlus": false,
+          "hard": false,
+          "normal": false
+        },
+        "characteristics": [
+          {
+            "difficulties": {
+              "easy": null,
+              "expert": {
+                "duration": 406.5,
+                "length": 187,
+                "njs": 13,
+                "njsOffset": 0,
+                "bombs": 0,
+                "notes": 569,
+                "obstacles": 5
+              },
+              "expertPlus": null,
+              "hard": null,
+              "normal": null
+            },
+            "name": "Standard"
+          }
+        ],
+        "levelAuthorName": "fun4sport",
+        "songAuthorName": "Michael Schulte",
+        "songName": "Back To The Start",
+        "songSubName": "",
+        "bpm": 130
+      },
+      "stats": {
+        "downloads": 142,
+        "plays": 0,
+        "downVotes": 0,
+        "upVotes": 3,
+        "heat": 855.5364731,
+        "rating": 0.6705937099936721
+      },
+      "description": "",
+      "deletedAt": null,
+      "_id": "5d32cd663d0800000671cb6c",
+      "key": "580c",
+      "name": "Back to the Start - Michael Schulte",
+      "uploader": {
+        "_id": "5cff0b7798cc5a672c856173",
+        "username": "fun4sport"
+      },
+      "hash": "aca75c649e28577bd87a87fdbaff5e81d3d9b2f1",
+      "uploaded": "2019-07-20T08:14:30.833Z",
+      "downloadURL": "/api/download/key/580c",
+      "coverURL": "/cdn/580c/aca75c649e28577bd87a87fdbaff5e81d3d9b2f1.jpg"
+    },
+    {
+      "metadata": {
+        "difficulties": {
+          "easy": false,
+          "expert": true,
+          "expertPlus": true,
+          "hard": true,
+          "normal": false
+        },
+        "characteristics": [
+          {
+            "difficulties": {
+              "easy": null,
+              "expert": {
+                "duration": 547.4744873046875,
+                "length": 149,
+                "njs": 20,
+                "njsOffset": 0,
+                "bombs": 0,
+                "notes": 1780,
+                "obstacles": 49
+              },
+              "expertPlus": {
+                "duration": 547.4744873046875,
+                "length": 149,
+                "njs": 22,
+                "njsOffset": 0,
+                "bombs": 0,
+                "notes": 1772,
+                "obstacles": 171
+              },
+              "hard": {
+                "duration": 547.4744873046875,
+                "length": 149,
+                "njs": 18,
+                "njsOffset": 0,
+                "bombs": 0,
+                "notes": 958,
+                "obstacles": 2
+              },
+              "normal": null
+            },
+            "name": "Standard"
+          }
+        ],
+        "levelAuthorName": "Souk & fraies",
+        "songAuthorName": "goreshit",
+        "songName": "toromi hearts 2",
+        "songSubName": "(Short Ver.)",
+        "bpm": 219
+      },
+      "stats": {
+        "downloads": 301,
+        "plays": 0,
+        "downVotes": 1,
+        "upVotes": 1,
+        "heat": 854.9725836,
+        "rating": 0.5
+      },
+      "description": "telephone +81 country code, yea its japan\n\n#1\n\nSouk Discord : https://discord.gg/NM3qa2f\nSouk#1262\n",
+      "deletedAt": null,
+      "_id": "5d32be26452e91000624c220",
+      "key": "580a",
+      "name": "goreshit - toromi hearts 2 (Short Ver.)",
+      "uploader": {
+        "_id": "5cff0b7698cc5a672c8547fd",
+        "username": "soup"
+      },
+      "hash": "76a44008cb2845299dc209e8b8911cfc2549d3e2",
+      "uploaded": "2019-07-20T07:09:26.262Z",
+      "downloadURL": "/api/download/key/580a",
+      "coverURL": "/cdn/580a/76a44008cb2845299dc209e8b8911cfc2549d3e2.jpg"
+    },
+    {
+      "metadata": {
+        "difficulties": {
+          "easy": false,
+          "expert": true,
+          "expertPlus": true,
+          "hard": true,
+          "normal": false
+        },
+        "characteristics": [
+          {
+            "difficulties": {
+              "easy": null,
+              "expert": {
+                "duration": 424.0797424316406,
+                "length": 159,
+                "njs": 14,
+                "njsOffset": 0,
+                "bombs": 0,
+                "notes": 767,
+                "obstacles": 12
+              },
+              "expertPlus": {
+                "duration": 424.0797424316406,
+                "length": 159,
+                "njs": 20,
+                "njsOffset": 0,
+                "bombs": 0,
+                "notes": 1091,
+                "obstacles": 12
+              },
+              "hard": {
+                "duration": 424.0797424316406,
+                "length": 159,
+                "njs": 12,
+                "njsOffset": 1,
+                "bombs": 0,
+                "notes": 582,
+                "obstacles": 12
+              },
+              "normal": null
+            },
+            "name": "Standard"
+          }
+        ],
+        "levelAuthorName": "Fnyt",
+        "songAuthorName": "F777",
+        "songName": "Sonic Blaster [Nightcore]",
+        "songSubName": "",
+        "bpm": 159.5
+      },
+      "stats": {
+        "downloads": 643,
+        "plays": 0,
+        "downVotes": 3,
+        "upVotes": 19,
+        "heat": 856.1667745,
+        "rating": 0.722139640739154
+      },
+      "description": "My biggest project so far (I'm still an inexperienced mapper) - I have tried to make each difficulty a new experience, but not being totally different at the same time. I hope the pacing and flow is good in each one of them.\n\nBPM: 159.5\nLength: 2:42",
+      "deletedAt": null,
+      "_id": "5d32bc6719fc1b0006299d42",
+      "key": "5809",
+      "name": "F777 - Sonic Blaster [Nightcore]",
+      "uploader": {
+        "_id": "5cff0b7798cc5a672c855758",
+        "username": "fnyt"
+      },
+      "hash": "321ec189f1bacd39e897e2277540e9f541c76081",
+      "uploaded": "2019-07-20T07:01:59.453Z",
+      "downloadURL": "/api/download/key/5809",
+      "coverURL": "/cdn/5809/321ec189f1bacd39e897e2277540e9f541c76081.jpg"
+    },
+    {
+      "metadata": {
+        "difficulties": {
+          "easy": false,
+          "expert": true,
+          "expertPlus": false,
+          "hard": false,
+          "normal": false
+        },
+        "characteristics": [
+          {
+            "difficulties": {
+              "easy": null,
+              "expert": {
+                "duration": 530.9375,
+                "length": 281,
+                "njs": 12,
+                "njsOffset": 0,
+                "bombs": 0,
+                "notes": 795,
+                "obstacles": 17
+              },
+              "expertPlus": null,
+              "hard": null,
+              "normal": null
+            },
+            "name": "Standard"
+          }
+        ],
+        "levelAuthorName": "shinjishazaki",
+        "songAuthorName": "Starset",
+        "songName": "Ricochet",
+        "songSubName": "",
+        "bpm": 113
+      },
+      "stats": {
+        "downloads": 520,
+        "plays": 0,
+        "downVotes": 0,
+        "upVotes": 8,
+        "heat": 855.4852345,
+        "rating": 0.7419437476723167
+      },
+      "description": "Starset as a band and Ricochet as a song lend themselves to a nice time mapping.\n\nFirst use of lighting, nothing major or strobe-y.  I feel I have to label this as Expert because of note count and some patterns, but I don't think it's too bad.\n\nDemo map, without a HUD: https://youtu.be/isI01SnM0vo",
+      "deletedAt": null,
+      "_id": "5d327984452e910006247ddb",
+      "key": "5808",
+      "name": "Starset - Ricochet",
+      "uploader": {
+        "_id": "5cff0b7698cc5a672c853f6e",
+        "username": "shinjishazaki"
+      },
+      "hash": "fa13ad8ade453748faed6a8881b87b840b30f9b2",
+      "uploaded": "2019-07-20T02:16:36.501Z",
+      "downloadURL": "/api/download/key/5808",
+      "coverURL": "/cdn/5808/fa13ad8ade453748faed6a8881b87b840b30f9b2.jpg"
+    },
+    {
+      "metadata": {
+        "difficulties": {
+          "easy": false,
+          "expert": true,
+          "expertPlus": false,
+          "hard": false,
+          "normal": false
+        },
+        "characteristics": [
+          {
+            "difficulties": {
+              "easy": null,
+              "expert": {
+                "duration": 433,
+                "length": 211,
+                "njs": 18,
+                "njsOffset": 0,
+                "bombs": 10,
+                "notes": 1129,
+                "obstacles": 21
+              },
+              "expertPlus": null,
+              "hard": null,
+              "normal": null
+            },
+            "name": "Standard"
+          }
+        ],
+        "levelAuthorName": "Zilby",
+        "songAuthorName": "Breathe Carolina",
+        "songName": "Blackout",
+        "songSubName": "",
+        "bpm": 123
+      },
+      "stats": {
+        "downloads": 220,
+        "plays": 0,
+        "downVotes": 3,
+        "upVotes": 0,
+        "heat": 854.1007359,
+        "rating": 0.3294062900063279
+      },
+      "description": "Blackout by Breathe Carolina\nv2: \n- Changed note jump speed from default (didn't know that was a setting, still learning haha)\n- Modified some problem spots\n- Changed difficulty to expert to better reflect actual map difficulty",
+      "deletedAt": null,
+      "_id": "5d3278c3fdb6a000068eff4e",
+      "key": "5807",
+      "name": "Blackout",
+      "uploader": {
+        "_id": "5d23cecda4cb1600064a1c6e",
+        "username": "zilby"
+      },
+      "hash": "573f0502e9d08d8e82ba2c36f6d8d3e1c5cd0368",
+      "uploaded": "2019-07-20T02:13:23.572Z",
+      "downloadURL": "/api/download/key/5807",
+      "coverURL": "/cdn/5807/573f0502e9d08d8e82ba2c36f6d8d3e1c5cd0368.jpg"
+    },
+    {
+      "metadata": {
+        "difficulties": {
+          "easy": false,
+          "expert": false,
+          "expertPlus": true,
+          "hard": false,
+          "normal": false
+        },
+        "characteristics": [
+          {
+            "difficulties": {
+              "easy": null,
+              "expert": null,
+              "expertPlus": {
+                "duration": 261.32489013671875,
+                "length": 120,
+                "njs": 22,
+                "njsOffset": 0,
+                "bombs": 32,
+                "notes": 1091,
+                "obstacles": 4
+              },
+              "hard": null,
+              "normal": null
+            },
+            "name": "Standard"
+          }
+        ],
+        "levelAuthorName": "nolan121405",
+        "songAuthorName": "Kobaryo feat. t+pazolite",
+        "songName": "Yura-Yura Sweet Genocide",
+        "songSubName": "",
+        "bpm": 129.9499969482422
+      },
+      "stats": {
+        "downloads": 218,
+        "plays": 0,
+        "downVotes": 1,
+        "upVotes": 1,
+        "heat": 854.5581837,
+        "rating": 0.5
+      },
+      "description": "fuck you and me too",
+      "deletedAt": null,
+      "_id": "5d32754e19fc1b00062955e4",
+      "key": "5806",
+      "name": "Kobaryo feat. t+pazolite - Yura-Yura Sweet Genocide",
+      "uploader": {
+        "_id": "5cff0b7498cc5a672c8500b1",
+        "username": "nolan121405"
+      },
+      "hash": "2e3764880e1499a7a75d8cfe2f5aa71512882389",
+      "uploaded": "2019-07-20T01:58:38.267Z",
+      "downloadURL": "/api/download/key/5806",
+      "coverURL": "/cdn/5806/2e3764880e1499a7a75d8cfe2f5aa71512882389.png"
+    },
+    {
+      "metadata": {
+        "difficulties": {
+          "easy": false,
+          "expert": false,
+          "expertPlus": true,
+          "hard": false,
+          "normal": false
+        },
+        "characteristics": [
+          {
+            "difficulties": {
+              "easy": null,
+              "expert": null,
+              "expertPlus": {
+                "duration": 1197.125,
+                "length": 179,
+                "njs": 24,
+                "njsOffset": 0,
+                "bombs": 0,
+                "notes": 1150,
+                "obstacles": 19
+              },
+              "hard": null,
+              "normal": null
+            },
+            "name": "Standard"
+          }
+        ],
+        "levelAuthorName": "JonathanRune",
+        "songAuthorName": "M1dy",
+        "songName": "Here We Go",
+        "songSubName": "",
+        "bpm": 400
+      },
+      "stats": {
+        "downloads": 284,
+        "plays": 0,
+        "downVotes": 0,
+        "upVotes": 3,
+        "heat": 854.9155885,
+        "rating": 0.6705937099936721
+      },
+      "description": "monkaW GG to any beaters",
+      "deletedAt": null,
+      "_id": "5d32604332586a0006a6c346",
+      "key": "5805",
+      "name": "Here We Go",
+      "uploader": {
+        "_id": "5cff0b7498cc5a672c8503ef",
+        "username": "jonathanrune"
+      },
+      "hash": "79d6869fa7cf5b25b3979c8ab1ea35ceb2e2e026",
+      "uploaded": "2019-07-20T00:28:51.026Z",
+      "downloadURL": "/api/download/key/5805",
+      "coverURL": "/cdn/5805/79d6869fa7cf5b25b3979c8ab1ea35ceb2e2e026.jpg"
+    },
+    {
+      "metadata": {
+        "difficulties": {
+          "easy": false,
+          "expert": true,
+          "expertPlus": false,
+          "hard": false,
+          "normal": false
+        },
+        "characteristics": [
+          {
+            "difficulties": {
+              "easy": null,
+              "expert": {
+                "duration": 770,
+                "length": 213,
+                "njs": 12,
+                "njsOffset": 0,
+                "bombs": 0,
+                "notes": 643,
+                "obstacles": 22
+              },
+              "expertPlus": null,
+              "hard": null,
+              "normal": null
+            },
+            "name": "Standard"
+          }
+        ],
+        "levelAuthorName": "ChillOutJimmy",
+        "songAuthorName": "Kim Petras",
+        "songName": "1,2,3 dayz up (feat. SOPHIE)",
+        "songSubName": "",
+        "bpm": 216
+      },
+      "stats": {
+        "downloads": 139,
+        "plays": 0,
+        "downVotes": 0,
+        "upVotes": 0,
+        "heat": 854.4259594,
+        "rating": 0
+      },
+      "description": "First Map! :)\nExpert Difficulty (probably more like hard difficulty though). Any feedback is appreciated. Hope you enjoy!",
+      "deletedAt": null,
+      "_id": "5d325e100d02fe00076137f3",
+      "key": "5804",
+      "name": "Kim Petras - 1,2,3 dayz up (feat. SOPHIE)",
+      "uploader": {
+        "_id": "5d2fdf6a100c8900066289db",
+        "username": "chilloutjimmy"
+      },
+      "hash": "0c793609fbb02fa45be1c1983218c3a5e7d3f664",
+      "uploaded": "2019-07-20T00:19:28.173Z",
+      "downloadURL": "/api/download/key/5804",
+      "coverURL": "/cdn/5804/0c793609fbb02fa45be1c1983218c3a5e7d3f664.jpg"
+    }
+  ],
+  "totalDocs": 57,
+  "lastPage": 5,
+  "prevPage": 3,
+  "nextPage": 5
+}

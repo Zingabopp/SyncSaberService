@@ -11,9 +11,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SyncSaberConsole", "SyncSab
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BeatSaber-PlayerDataReader", "SyncSaberLib\libs\BeatSaber-PlayerDataReader\BeatSaber-PlayerDataReader\BeatSaber-PlayerDataReader.csproj", "{76DEA3A1-3558-4DFE-834B-1FBD597A4DD6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FeedReader", "FeedReader\FeedReader.csproj", "{ADA8C603-A103-4324-A308-6D4236270C13}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FeedReader", "FeedReader\FeedReader.csproj", "{ADA8C603-A103-4324-A308-6D4236270C13}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FeedReaderTests", "FeedReaderTests\FeedReaderTests.csproj", "{A1BE9AFD-24A9-42B4-81E4-83433E1E1C65}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FeedReaderTests", "FeedReaderTests\FeedReaderTests.csproj", "{A1BE9AFD-24A9-42B4-81E4-83433E1E1C65}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebUtilities", "WebUtilities\WebUtilities.csproj", "{1578AEC5-0D16-45F8-8987-AE23FFFE1FFA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -93,6 +95,18 @@ Global
 		{A1BE9AFD-24A9-42B4-81E4-83433E1E1C65}.Release|x64.Build.0 = Release|Any CPU
 		{A1BE9AFD-24A9-42B4-81E4-83433E1E1C65}.Release|x86.ActiveCfg = Release|Any CPU
 		{A1BE9AFD-24A9-42B4-81E4-83433E1E1C65}.Release|x86.Build.0 = Release|Any CPU
+		{1578AEC5-0D16-45F8-8987-AE23FFFE1FFA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1578AEC5-0D16-45F8-8987-AE23FFFE1FFA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1578AEC5-0D16-45F8-8987-AE23FFFE1FFA}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{1578AEC5-0D16-45F8-8987-AE23FFFE1FFA}.Debug|x64.Build.0 = Debug|Any CPU
+		{1578AEC5-0D16-45F8-8987-AE23FFFE1FFA}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{1578AEC5-0D16-45F8-8987-AE23FFFE1FFA}.Debug|x86.Build.0 = Debug|Any CPU
+		{1578AEC5-0D16-45F8-8987-AE23FFFE1FFA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1578AEC5-0D16-45F8-8987-AE23FFFE1FFA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1578AEC5-0D16-45F8-8987-AE23FFFE1FFA}.Release|x64.ActiveCfg = Release|Any CPU
+		{1578AEC5-0D16-45F8-8987-AE23FFFE1FFA}.Release|x64.Build.0 = Release|Any CPU
+		{1578AEC5-0D16-45F8-8987-AE23FFFE1FFA}.Release|x86.ActiveCfg = Release|Any CPU
+		{1578AEC5-0D16-45F8-8987-AE23FFFE1FFA}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

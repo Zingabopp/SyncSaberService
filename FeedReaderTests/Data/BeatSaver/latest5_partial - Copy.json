@@ -1,0 +1,455 @@
+{
+  "docs": [
+    {
+      "metadata": {
+        "difficulties": {
+          "easy": false,
+          "normal": false,
+          "hard": false,
+          "expert": true,
+          "expertPlus": false
+        },
+        "characteristics": [
+          {
+            "name": "Standard",
+            "difficulties": {
+              "easy": null,
+              "normal": null,
+              "hard": null,
+              "expert": {
+                "duration": 395,
+                "length": 137,
+                "bombs": 2,
+                "notes": 526,
+                "obstacles": 47,
+                "njs": 10,
+                "njsOffset": 0
+              },
+              "expertPlus": null
+            }
+          }
+        ],
+        "songName": "Part 1",
+        "songSubName": "Krayysh Remix",
+        "songAuthorName": "Darnoc",
+        "levelAuthorName": "darnoc703",
+        "bpm": 172
+      },
+      "stats": {
+        "downloads": 27434,
+        "plays": 160,
+        "downVotes": 49,
+        "upVotes": 21,
+        "heat": 13.3549531,
+        "rating": 0.3554301052180817
+      },
+      "description": "Expert Only | Time: 2:27 | BPM: 172 | Notes: 526 | Obstacles 47\r\nTook 10 hours to make, and 3 hours to do the custom events. The level is hard, but very unique and very beatable! \r\nhttps://www.youtube.com/watch?v=78cStAuEetI&feature=youtu.be",
+      "deletedAt": null,
+      "_id": "5cff620c48229f7d88fc60e6",
+      "key": "8",
+      "name": "Part 1 (Krayysh Remix)",
+      "uploader": {
+        "_id": "5cff0b7298cc5a672c84e8aa",
+        "username": "darnoc703"
+      },
+      "uploaded": "2018-05-08T17:01:35.000Z",
+      "hash": "3211b98f61a5685872c377b928c2922141d49d23",
+      "downloadURL": "/api/download/key/8",
+      "coverURL": "/cdn/8/3211b98f61a5685872c377b928c2922141d49d23.jpg"
+    },
+    {
+      "metadata": {
+        "difficulties": {
+          "easy": false,
+          "normal": false,
+          "hard": true,
+          "expert": true,
+          "expertPlus": false
+        },
+        "characteristics": [
+          {
+            "name": "Standard",
+            "difficulties": {
+              "easy": null,
+              "normal": null,
+              "hard": {
+                "duration": 183.5,
+                "length": 81,
+                "bombs": 0,
+                "notes": 174,
+                "obstacles": 0,
+                "njs": 10,
+                "njsOffset": 0
+              },
+              "expert": {
+                "duration": 183.5,
+                "length": 81,
+                "bombs": 0,
+                "notes": 262,
+                "obstacles": 0,
+                "njs": 10,
+                "njsOffset": 0
+              },
+              "expertPlus": null
+            }
+          }
+        ],
+        "songName": "Unravel",
+        "songSubName": "(TV Size)",
+        "songAuthorName": "TK",
+        "levelAuthorName": "winepic",
+        "bpm": 135
+      },
+      "stats": {
+        "downloads": 217368,
+        "plays": 52247,
+        "downVotes": 122,
+        "upVotes": 1346,
+        "heat": 17.841337,
+        "rating": 0.8704788981633085
+      },
+      "description": "Map made by me. Includes Hard and Expert difficulties.",
+      "deletedAt": null,
+      "_id": "5cff620c48229f7d88fc60e5",
+      "key": "7",
+      "name": "Unravel (Tokyo Ghoul OP) TV Size",
+      "uploader": {
+        "_id": "5cff0b7298cc5a672c84e8b6",
+        "username": "winepic"
+      },
+      "uploaded": "2018-05-08T16:25:10.000Z",
+      "hash": "b9867cdccf8b27d7a174c861adc69215c86cdab8",
+      "downloadURL": "/api/download/key/7",
+      "coverURL": "/cdn/7/b9867cdccf8b27d7a174c861adc69215c86cdab8.png"
+    },
+    {
+      "metadata": {
+        "difficulties": {
+          "easy": false,
+          "normal": true,
+          "hard": true,
+          "expert": true,
+          "expertPlus": false
+        },
+        "characteristics": [
+          {
+            "name": "Standard",
+            "difficulties": {
+              "easy": null,
+              "normal": {
+                "duration": 275,
+                "length": 165,
+                "bombs": 7,
+                "notes": 293,
+                "obstacles": 0,
+                "njs": 10,
+                "njsOffset": 0
+              },
+              "hard": {
+                "duration": 275,
+                "length": 165,
+                "bombs": 7,
+                "notes": 350,
+                "obstacles": 0,
+                "njs": 10,
+                "njsOffset": 0
+              },
+              "expert": {
+                "duration": 275,
+                "length": 165,
+                "bombs": 7,
+                "notes": 410,
+                "obstacles": 0,
+                "njs": 10,
+                "njsOffset": 0
+              },
+              "expertPlus": null
+            }
+          }
+        ],
+        "songName": "Touch Me",
+        "songSubName": "",
+        "songAuthorName": "Botnek",
+        "levelAuthorName": "jugglernaut",
+        "bpm": 100
+      },
+      "stats": {
+        "downloads": 28936,
+        "plays": 4966,
+        "downVotes": 13,
+        "upVotes": 93,
+        "heat": 16.6037122,
+        "rating": 0.7849208745812696
+      },
+      "description": "Thanks to killthealias#4296 on the beatsaber discord",
+      "deletedAt": null,
+      "_id": "5cff620c48229f7d88fc60e4",
+      "key": "6",
+      "name": "Touch Me - Botnek",
+      "uploader": {
+        "_id": "5cff0b7298cc5a672c84e8ac",
+        "username": "jugglernaut"
+      },
+      "uploaded": "2018-05-08T15:45:28.000Z",
+      "hash": "d8ee87a8694982409f58617d008be038e013b9a2",
+      "downloadURL": "/api/download/key/6",
+      "coverURL": "/cdn/6/d8ee87a8694982409f58617d008be038e013b9a2.jpg"
+    },
+    {
+      "metadata": {
+        "difficulties": {
+          "easy": false,
+          "normal": false,
+          "hard": false,
+          "expert": true,
+          "expertPlus": false
+        },
+        "characteristics": [
+          {
+            "name": "Standard",
+            "difficulties": {
+              "easy": null,
+              "normal": null,
+              "hard": null,
+              "expert": {
+                "duration": 280,
+                "length": 108,
+                "bombs": 0,
+                "notes": 587,
+                "obstacles": 22,
+                "njs": 10,
+                "njsOffset": 0
+              },
+              "expertPlus": null
+            }
+          }
+        ],
+        "songName": "Furioso Melodia",
+        "songSubName": "",
+        "songAuthorName": "gmtn (mapped by Roffle)",
+        "levelAuthorName": "roffle",
+        "bpm": 155
+      },
+      "stats": {
+        "downloads": 32115,
+        "plays": 4207,
+        "downVotes": 60,
+        "upVotes": 197,
+        "heat": 16.8360317,
+        "rating": 0.7164427496187643
+      },
+      "description": "Extremely Hard - 155BPM - No lighting",
+      "deletedAt": null,
+      "_id": "5cff620c48229f7d88fc60e3",
+      "key": "5",
+      "name": "gmtn. - furioso melodia (shortened)",
+      "uploader": {
+        "_id": "5cff0b7298cc5a672c84e8b0",
+        "username": "roffle"
+      },
+      "uploaded": "2018-05-08T15:44:29.000Z",
+      "hash": "5b41efe18e70f4633e84e557a10e66d6251e7b7c",
+      "downloadURL": "/api/download/key/5",
+      "coverURL": "/cdn/5/5b41efe18e70f4633e84e557a10e66d6251e7b7c.jpg"
+    },
+    {
+      "metadata": {
+        "difficulties": {
+          "easy": true,
+          "normal": true,
+          "hard": true,
+          "expert": true,
+          "expertPlus": false
+        },
+        "characteristics": [
+          {
+            "name": "Standard",
+            "difficulties": {
+              "easy": {
+                "duration": 379.8882681564234,
+                "length": 113,
+                "bombs": 0,
+                "notes": 143,
+                "obstacles": 0,
+                "njs": 10,
+                "njsOffset": 0
+              },
+              "normal": {
+                "duration": 379.8882681564234,
+                "length": 113,
+                "bombs": 0,
+                "notes": 233,
+                "obstacles": 0,
+                "njs": 10,
+                "njsOffset": 0
+              },
+              "hard": {
+                "duration": 379.88826815642227,
+                "length": 113,
+                "bombs": 0,
+                "notes": 365,
+                "obstacles": 0,
+                "njs": 10,
+                "njsOffset": 0
+              },
+              "expert": {
+                "duration": 379.8882681564203,
+                "length": 113,
+                "bombs": 0,
+                "notes": 490,
+                "obstacles": 0,
+                "njs": 10,
+                "njsOffset": 0
+              },
+              "expertPlus": null
+            }
+          }
+        ],
+        "songName": "Bassdrop Freaks",
+        "songSubName": "",
+        "songAuthorName": "Camellia feat. nanahira",
+        "levelAuthorName": "jugglernaut",
+        "bpm": 200
+      },
+      "stats": {
+        "downloads": 130448,
+        "plays": 25495,
+        "downVotes": 533,
+        "upVotes": 172,
+        "heat": 12.1400706,
+        "rating": 0.2795112219548482
+      },
+      "description": "Thanks to DCSL#4769 on the beatsaber discord",
+      "deletedAt": null,
+      "_id": "5cff620c48229f7d88fc60e2",
+      "key": "4",
+      "name": "Bassdrop Freaks",
+      "uploader": {
+        "_id": "5cff0b7298cc5a672c84e8ac",
+        "username": "jugglernaut"
+      },
+      "uploaded": "2018-05-08T15:43:11.000Z",
+      "hash": "f378a5c059b2cde9608ba49e4a846e98b525ba7f",
+      "downloadURL": "/api/download/key/4",
+      "coverURL": "/cdn/4/f378a5c059b2cde9608ba49e4a846e98b525ba7f.png"
+    },
+    {
+      "metadata": {
+        "difficulties": {
+          "easy": false,
+          "normal": false,
+          "hard": false,
+          "expert": true,
+          "expertPlus": false
+        },
+        "characteristics": [
+          {
+            "name": "Standard",
+            "difficulties": {
+              "easy": null,
+              "normal": null,
+              "hard": null,
+              "expert": {
+                "duration": 261,
+                "length": 87,
+                "bombs": 0,
+                "notes": 336,
+                "obstacles": 0,
+                "njs": 10,
+                "njsOffset": 0
+              },
+              "expertPlus": null
+            }
+          }
+        ],
+        "songName": "Fatima",
+        "songSubName": "(TV Size)",
+        "songAuthorName": "Kanako Ito",
+        "levelAuthorName": "jugglernaut",
+        "bpm": 179
+      },
+      "stats": {
+        "downloads": 15939,
+        "plays": 2681,
+        "downVotes": 7,
+        "upVotes": 107,
+        "heat": 16.6717778,
+        "rating": 0.8334648871001377
+      },
+      "description": "Beatmap made by WinEpic on the beatsaber discord.",
+      "deletedAt": null,
+      "_id": "5cff620c48229f7d88fc60e0",
+      "key": "2",
+      "name": "Fatima (TV Size) - Kanako Ito (Steins;Gate 0 OP)",
+      "uploader": {
+        "_id": "5cff0b7298cc5a672c84e8ac",
+        "username": "jugglernaut"
+      },
+      "uploaded": "2018-05-08T15:23:50.000Z",
+      "hash": "1178b3cbb90746a210ebba8b6a1f0ac4117b0654",
+      "downloadURL": "/api/download/key/2",
+      "coverURL": "/cdn/2/1178b3cbb90746a210ebba8b6a1f0ac4117b0654.png"
+    },
+    {
+      "metadata": {
+        "difficulties": {
+          "easy": false,
+          "normal": false,
+          "hard": true,
+          "expert": false,
+          "expertPlus": false
+        },
+        "characteristics": [
+          {
+            "name": "Standard",
+            "difficulties": {
+              "easy": null,
+              "normal": null,
+              "hard": {
+                "duration": 188.625,
+                "length": 141,
+                "bombs": 28,
+                "notes": 337,
+                "obstacles": 11,
+                "njs": 10,
+                "njsOffset": 0
+              },
+              "expert": null,
+              "expertPlus": null
+            }
+          }
+        ],
+        "songName": "me & u",
+        "songSubName": "",
+        "songAuthorName": "succducc",
+        "levelAuthorName": "datkami",
+        "bpm": 160
+      },
+      "stats": {
+        "downloads": 68730,
+        "plays": 8377,
+        "downVotes": 35,
+        "upVotes": 218,
+        "heat": 16.8610289,
+        "rating": 0.7933675038434399
+      },
+      "description": "Hard Only / ~330 notes / Event Lighting! / https://soundcloud.com/succducc/me-n-u",
+      "deletedAt": null,
+      "_id": "5cff620c48229f7d88fc60df",
+      "key": "1",
+      "name": "succducc - me & u",
+      "uploader": {
+        "_id": "5cff0b7298cc5a672c84e8a3",
+        "username": "datkami"
+      },
+      "uploaded": "2018-05-08T14:28:56.000Z",
+      "hash": "fda568fc27c20d21f8dc6f3709b49b5cc96723be",
+      "downloadURL": "/api/download/key/1",
+      "coverURL": "/cdn/1/fda568fc27c20d21f8dc6f3709b49b5cc96723be.jpg"
+    }
+  ],
+  "totalDocs": 57,
+  "lastPage": 5,
+  "prevPage": 4,
+  "nextPage": null
+}

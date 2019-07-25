@@ -34,5 +34,15 @@ namespace FeedReader
                 }
             }
         }
+
+        public static Uri GetUriFromString(string uriString)
+        {
+            Uri retVal = null;
+            if(!string.IsNullOrEmpty(uriString))
+            {
+                retVal = new Uri(uriString);
+            }
+            return retVal;
+        }
     }
 }

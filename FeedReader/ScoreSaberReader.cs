@@ -7,6 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using FeedReader.Logging;
 using static FeedReader.WebUtils;
+using Newtonsoft.Json;
 
 namespace FeedReader
 {
@@ -23,38 +24,42 @@ namespace FeedReader
         /// 4 = author
         #region Constants
         private const string BEATSAVER_DOWNLOAD_URL_BASE = "http://beatsaver.com/api/download/hash/";
-        public static readonly string NameKey = "ScoreSaberReader";
-        public static readonly string SourceKey = "ScoreSaber";
-        private static readonly string PAGENUMKEY = "{PAGENUM}";
+        public static string NameKey => "ScoreSaberReader";
+        public static string SourceKey => "ScoreSaber";
+        private const string PAGENUMKEY = "{PAGENUM}";
         //private static readonly string CATKEY = "{CAT}";
-        private static readonly string RANKEDKEY = "{RANKKEY}";
-        private static readonly string LIMITKEY = "{LIMIT}";
+        private const string RANKEDKEY = "{RANKKEY}";
+        private const string LIMITKEY = "{LIMIT}";
+        private const string QUERYKEY = "{QUERY}";
         private const string INVALID_FEED_SETTINGS_MESSAGE = "The IFeedSettings passed is not a ScoreSaberFeedSettings.";
         private const string TOP_RANKED_KEY = "Top Ranked";
         private const string TRENDING_KEY = "Trending";
         private const string TOP_PLAYED_KEY = "Top Played";
         private const string LATEST_RANKED_KEY = "Latest Ranked";
+        private const string SEARCH_KEY = "Search";
         #endregion
-
-        public static FeedReaderLoggerBase Logger = new FeedReaderLogger(LoggingController.DefaultLogController);
+        private static FeedReaderLoggerBase _logger = new FeedReaderLogger(LoggingController.DefaultLogController);
+        public static FeedReaderLoggerBase Logger { get { return _logger; } set { _logger = value; } }
         public string Name { get { return NameKey; } }
         public string Source { get { return SourceKey; } }
+        public Uri RootUri { get { return new Uri("https://scoresaber.com/"); } }
         public bool Ready { get; private set; }
         public bool StoreRawData { get; set; }
 
-        private static Dictionary<ScoreSaberFeeds, FeedInfo> _feeds;
-        public static Dictionary<ScoreSaberFeeds, FeedInfo> Feeds
+        private static Dictionary<ScoreSaberFeed, FeedInfo> _feeds;
+        public static Dictionary<ScoreSaberFeed, FeedInfo> Feeds
         {
             get
             {
                 if (_feeds == null)
                 {
-                    _feeds = new Dictionary<ScoreSaberFeeds, FeedInfo>()
+                    _feeds = new Dictionary<ScoreSaberFeed, FeedInfo>()
                     {
-                        { (ScoreSaberFeeds)0, new FeedInfo(TRENDING_KEY, $"https://scoresaber.com/api.php?function=get-leaderboards&cat=0&limit={LIMITKEY}&page={PAGENUMKEY}&ranked={RANKEDKEY}") },
-                        { (ScoreSaberFeeds)1, new FeedInfo(LATEST_RANKED_KEY, $"https://scoresaber.com/api.php?function=get-leaderboards&cat=1&limit={LIMITKEY}&page={PAGENUMKEY}&ranked={RANKEDKEY}") },
-                        { (ScoreSaberFeeds)2, new FeedInfo(TOP_PLAYED_KEY, $"https://scoresaber.com/api.php?function=get-leaderboards&cat=2&limit={LIMITKEY}&page={PAGENUMKEY}&ranked={RANKEDKEY}") },
-                        { (ScoreSaberFeeds)3, new FeedInfo(TOP_RANKED_KEY, $"https://scoresaber.com/api.php?function=get-leaderboards&cat=3&limit={LIMITKEY}&page={PAGENUMKEY}&ranked={RANKEDKEY}") }
+                        { (ScoreSaberFeed)0, new FeedInfo(TRENDING_KEY, $"https://scoresaber.com/api.php?function=get-leaderboards&cat=0&limit={LIMITKEY}&page={PAGENUMKEY}&ranked={RANKEDKEY}") },
+                        { (ScoreSaberFeed)1, new FeedInfo(LATEST_RANKED_KEY, $"https://scoresaber.com/api.php?function=get-leaderboards&cat=1&limit={LIMITKEY}&page={PAGENUMKEY}&ranked={RANKEDKEY}") },
+                        { (ScoreSaberFeed)2, new FeedInfo(TOP_PLAYED_KEY, $"https://scoresaber.com/api.php?function=get-leaderboards&cat=2&limit={LIMITKEY}&page={PAGENUMKEY}&ranked={RANKEDKEY}") },
+                        { (ScoreSaberFeed)3, new FeedInfo(TOP_RANKED_KEY, $"https://scoresaber.com/api.php?function=get-leaderboards&cat=3&limit={LIMITKEY}&page={PAGENUMKEY}&ranked={RANKEDKEY}") },
+                        { (ScoreSaberFeed)99, new FeedInfo(SEARCH_KEY, $"https://scoresaber.com/api.php?function=get-leaderboards&cat=3&limit={LIMITKEY}&page={PAGENUMKEY}&ranked={RANKEDKEY}&search={QUERYKEY}") }
                     };
                 }
                 return _feeds;
@@ -62,7 +67,7 @@ namespace FeedReader
         }
         public async Task<Dictionary<string, ScrapedSong>> GetSongsFromFeedAsync(IFeedSettings settings)
         {
-            return await GetSongsFromFeedAsync(settings, CancellationToken.None);
+            return await GetSongsFromFeedAsync(settings, CancellationToken.None).ConfigureAwait(false);
         }
         public async Task<Dictionary<string, ScrapedSong>> GetSongsFromFeedAsync(IFeedSettings _settings, CancellationToken cancellationToken)
         {
@@ -73,19 +78,19 @@ namespace FeedReader
             int maxSongs = settings.MaxSongs > 0 ? settings.MaxSongs : settings.SongsPerPage * settings.SongsPerPage;
             switch (settings.Feed)
             {
-                case ScoreSaberFeeds.TRENDING:
-                    retDict = await GetSongsFromScoreSaberAsync(settings);
+                case ScoreSaberFeed.Trending:
+                    retDict = await GetSongsFromScoreSaberAsync(settings).ConfigureAwait(false);
                     break;
-                case ScoreSaberFeeds.LATEST_RANKED:
+                case ScoreSaberFeed.LatestRanked:
                     settings.RankedOnly = true;
-                    retDict = await GetSongsFromScoreSaberAsync(settings);
+                    retDict = await GetSongsFromScoreSaberAsync(settings).ConfigureAwait(false);
                     break;
-                case ScoreSaberFeeds.TOP_PLAYED:
-                    retDict = await GetSongsFromScoreSaberAsync(settings);
+                case ScoreSaberFeed.TopPlayed:
+                    retDict = await GetSongsFromScoreSaberAsync(settings).ConfigureAwait(false);
                     break;
-                case ScoreSaberFeeds.TOP_RANKED:
+                case ScoreSaberFeed.TopRanked:
                     settings.RankedOnly = true;
-                    retDict = await GetSongsFromScoreSaberAsync(settings);
+                    retDict = await GetSongsFromScoreSaberAsync(settings).ConfigureAwait(false);
                     break;
                 default:
                     break;
@@ -98,8 +103,12 @@ namespace FeedReader
             return GetSongsFromFeedAsync(_settings).Result;
         }
 
-        public void GetPageUrl(ref StringBuilder baseUrl, Dictionary<string, string> replacements)
+        public static void GetPageUrl(ref StringBuilder baseUrl, Dictionary<string, string> replacements)
         {
+            if (baseUrl == null)
+                throw new ArgumentNullException(nameof(replacements), "baseUrl cannot be null for ScoreSaberReader.GetPageUrl");
+            if (replacements == null)
+                throw new ArgumentNullException(nameof(replacements), "replacements cannot be null for ScoreSaberReader.GetPageUrl");
             foreach (var key in replacements.Keys)
             {
                 baseUrl.Replace(key, replacements[key]);
@@ -108,6 +117,8 @@ namespace FeedReader
 
         public async Task<Dictionary<string, ScrapedSong>> GetSongsFromScoreSaberAsync(ScoreSaberFeedSettings settings)
         {
+            if (settings == null)
+                throw new ArgumentNullException(nameof(settings), "settings cannot be null for ScoreSaberReader.GetSongsFromScoreSaberAsync");
             // "https://scoresaber.com/api.php?function=get-leaderboards&cat={CATKEY}&limit={LIMITKEY}&page={PAGENUMKEY}&ranked={RANKEDKEY}"
             int songsPerPage = settings.SongsPerPage;
             int pageNum = settings.StartingPage;
@@ -125,15 +136,15 @@ namespace FeedReader
                 {RANKEDKEY, settings.RankedOnly ? "1" : "0" }
             };
             GetPageUrl(ref url, urlReplacements);
-
+            var uri = new Uri(url.ToString());
             string pageText = "";
-            using (var response = await GetPageAsync(url.ToString()))
+            using (var response = await WebUtils.WebClient.GetAsync(uri).ConfigureAwait(false))
             {
                 if (response.IsSuccessStatusCode)
-                    pageText = await response.Content.ReadAsStringAsync();
+                    pageText = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
                 else
                 {
-                    Logger.Error($"Error getting text from {url.ToString()}, HTTP Status Code is: {response.StatusCode.ToString()}: {response.ReasonPhrase}");
+                    Logger.Error($"Error getting text from {uri}, HTTP Status Code is: {response.StatusCode.ToString()}: {response.ReasonPhrase}");
                 }
             }
 
@@ -142,11 +153,11 @@ namespace FeedReader
             {
                 result = JObject.Parse(pageText);
             }
-            catch (Exception ex)
+            catch (JsonReaderException ex)
             {
                 Logger.Exception("Unable to parse JSON from text", ex);
             }
-            foreach (var song in GetSongsFromPageText(pageText, url.ToString()))
+            foreach (var song in GetSongsFromPageText(pageText, uri))
             {
                 if (!songs.ContainsKey(song.Hash) && songs.Count < settings.MaxSongs)
                     songs.Add(song.Hash, song);
@@ -165,7 +176,8 @@ namespace FeedReader
                 else
                     urlReplacements[PAGENUMKEY] = pageNum.ToString();
                 GetPageUrl(ref url, urlReplacements);
-                foreach (var song in await GetSongsFromPageAsync(url.ToString()))
+                uri = new Uri(url.ToString());
+                foreach (var song in await GetSongsFromPageAsync(uri).ConfigureAwait(false))
                 {
                     diffCount++;
                     if (!songs.ContainsKey(song.Hash) && songs.Count < settings.MaxSongs)
@@ -182,25 +194,37 @@ namespace FeedReader
             return songs;
         }
 
-
-        public async Task<List<ScrapedSong>> GetSongsFromPageAsync(string url)
+        public Task<List<ScrapedSong>> GetSongsFromPageAsync(string url)
         {
-            var response = await GetPageAsync(url).ConfigureAwait(false);
-            List<ScrapedSong> songs;
-            if (response.IsSuccessStatusCode)
+            return GetSongsFromPageAsync(Util.GetUriFromString(url));
+        }
+
+        public async Task<List<ScrapedSong>> GetSongsFromPageAsync(Uri uri)
+        {
+            if (uri == null)
+                throw new ArgumentNullException(nameof(uri), "uri cannot be null in ScoreSaberReader.GetSongsFromPageAsync");
+            List<ScrapedSong> songs = null;
+            using (var response = await WebUtils.WebClient.GetAsync(uri).ConfigureAwait(false))
             {
-                var pageText = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-                songs = GetSongsFromPageText(pageText, url);
+                if (response.IsSuccessStatusCode)
+                {
+                    var pageText = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+                    songs = GetSongsFromPageText(pageText, uri);
+                }
+                else
+                {
+                    Logger.Error($"Error getting page {uri?.ToString()}, response was {response.StatusCode.ToString()}: {response.ReasonPhrase}");
+                }
             }
-            else
-            {
-                Logger.Error($"Error getting page {url}, response was {response.StatusCode.ToString()}: {response.ReasonPhrase}");
-                songs = new List<ScrapedSong>();
-            }
-            return songs;
+            return songs ?? new List<ScrapedSong>();
         }
 
         public List<ScrapedSong> GetSongsFromPageText(string pageText, string sourceUrl)
+        {
+            return GetSongsFromPageText(pageText, Util.GetUriFromString(sourceUrl));
+        }
+
+        public List<ScrapedSong> GetSongsFromPageText(string pageText, Uri sourceUri)
         {
             JObject result = new JObject();
             try
@@ -208,12 +232,12 @@ namespace FeedReader
                 result = JObject.Parse(pageText);
 
             }
-            catch (Exception ex)
+            catch (JsonReaderException ex)
             {
                 Logger.Exception("Unable to parse JSON from text", ex);
             }
             List<ScrapedSong> songs = new List<ScrapedSong>();
-            
+
             var songJSONAry = result["songs"]?.ToArray();
             if (songJSONAry == null)
             {
@@ -228,8 +252,8 @@ namespace FeedReader
                 if (!string.IsNullOrEmpty(hash))
                     songs.Add(new ScrapedSong(hash)
                     {
-                        DownloadUrl = BEATSAVER_DOWNLOAD_URL_BASE + hash,
-                        SourceUrl = sourceUrl,
+                        DownloadUri = Util.GetUriFromString(BEATSAVER_DOWNLOAD_URL_BASE + hash),
+                        SourceUri = sourceUri,
                         SongName = songName,
                         MapperName = mapperName,
                         RawData = StoreRawData ? song.ToString(Newtonsoft.Json.Formatting.None) : string.Empty
@@ -248,9 +272,9 @@ namespace FeedReader
 
     public class ScoreSaberFeedSettings : IFeedSettings
     {
-        
+
         public string FeedName { get { return ScoreSaberReader.Feeds[Feed].Name; } }
-        public ScoreSaberFeeds Feed { get { return (ScoreSaberFeeds)FeedIndex; } set { FeedIndex = (int)value; } }
+        public ScoreSaberFeed Feed { get { return (ScoreSaberFeed)FeedIndex; } set { FeedIndex = (int)value; } }
         public int FeedIndex { get; set; }
 
         /// <summary>
@@ -286,11 +310,12 @@ namespace FeedReader
         }
     }
 
-    public enum ScoreSaberFeeds
+    public enum ScoreSaberFeed
     {
-        TRENDING = 0,
-        LATEST_RANKED = 1,
-        TOP_PLAYED = 2,
-        TOP_RANKED = 3,
+        Trending = 0,
+        LatestRanked = 1,
+        TopPlayed = 2,
+        TopRanked = 3,
+        Search = 99
     }
 }

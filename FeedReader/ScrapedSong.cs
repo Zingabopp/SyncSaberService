@@ -15,11 +15,11 @@ namespace FeedReader
         /// <summary>
         /// Full URL to download song.
         /// </summary>
-        public string DownloadUrl { get; set; }
+        public Uri DownloadUri { get; set; }
         /// <summary>
         /// What web page this song was scraped from.
         /// </summary>
-        public string SourceUrl { get; set; }
+        public Uri SourceUri { get; set; }
         public string SongName { get; set; }
         public string MapperName { get; set; }
         /// <summary>

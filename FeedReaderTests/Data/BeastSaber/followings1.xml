@@ -1,0 +1,773 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	>
+
+  <channel>
+    <title>BeastSaber | Zingabopp | Following Activity</title>
+    <link>https://bsaber.com/members/zingabopp/wall/followings/</link>
+    <atom:link href="https://bsaber.com/members/zingabopp/wall/followings/feed/?acpage=1" rel="self" type="application/rss+xml" />
+    <description>Activity feed for people that Zingabopp is following.</description>
+    <lastBuildDate>Mon, 22 Jul 2019 04:00:40 +0000</lastBuildDate>
+    <generator>https://buddypress.org/?v=4.3.0</generator>
+    <language>en-US</language>
+    <ttl>30</ttl>
+    <sy:updatePeriod>hourly</sy:updatePeriod>
+    <sy:updateFrequency>2</sy:updateFrequency>
+
+    <item>
+      <guid isPermaLink="false">0743e16406ee5719e974f0339bc29109</guid>
+      <title>uncurated wrote a new post</title>
+      <link>https://bsaber.com/?p=1168915</link>
+      <pubDate>Mon, 22 Jul 2019 00:11:12 +0000</pubDate>
+
+
+      <slash:comments>0</slash:comments>
+
+      <SongKey>5853</SongKey>
+      <DownloadURL>https://beatsaver.com/api/download/key/5853</DownloadURL>
+      <Hash>7524ad214364ff6d708bb5da4ef64571290f857f</Hash>
+      <LevelAuthorName>Tony the Tiger</LevelAuthorName>
+      <SongTitle>test</SongTitle>
+    </item>
+    <item>
+      <guid isPermaLink="false">e0529b399068a8856dc74cb3684c5c58</guid>
+      <title>uncurated wrote a new post</title>
+      <link>https://bsaber.com/?p=1168879</link>
+      <pubDate>Sun, 21 Jul 2019 19:24:14 +0000</pubDate>
+
+
+      <slash:comments>0</slash:comments>
+
+      <SongKey>5847</SongKey>
+      <DownloadURL>https://beatsaver.com/api/download/key/5847</DownloadURL>
+      <Hash>4e823653dc33ed7f6121dacf7409832b8a54fb05</Hash>
+      <LevelAuthorName>Joetastic</LevelAuthorName>
+      <SongTitle>Kimagure Mercy &#8211; Hachioji-P ft. Hatsune Miku</SongTitle>
+    </item>
+    <item>
+      <guid isPermaLink="false">aa8eee2d2db93a5f585bdd2018de73fd</guid>
+      <title>uncurated wrote a new post</title>
+      <link>https://bsaber.com/?p=1168837</link>
+      <pubDate>Sun, 21 Jul 2019 13:20:44 +0000</pubDate>
+
+
+      <slash:comments>0</slash:comments>
+
+      <SongKey>583a</SongKey>
+      <DownloadURL>https://beatsaver.com/api/download/key/583a</DownloadURL>
+      <Hash>e33bb284ce5af33ad2341c31c8be466c2b384381</Hash>
+      <LevelAuthorName>Heisenberg</LevelAuthorName>
+      <SongTitle>PUPPE &#8211; Rammstein</SongTitle>
+    </item>
+    <item>
+      <guid isPermaLink="false">838a2da38350b243b356ac7654ee227c</guid>
+      <title>uncurated wrote a new post</title>
+      <link>https://bsaber.com/?p=1168820</link>
+      <pubDate>Sun, 21 Jul 2019 06:12:36 +0000</pubDate>
+
+
+      <slash:comments>0</slash:comments>
+
+      <SongKey>5836</SongKey>
+      <DownloadURL>https://beatsaver.com/api/download/key/5836</DownloadURL>
+      <Hash>6f2a1653350f6d7306c71ab9a05a562b25934901</Hash>
+      <LevelAuthorName>Test</LevelAuthorName>
+      <SongTitle>test</SongTitle>
+    </item>
+    <item>
+      <guid isPermaLink="false">f99ef6ff412268e69af7f21292155f89</guid>
+      <title>uncurated wrote a new post</title>
+      <link>https://bsaber.com/?p=1168722</link>
+      <pubDate>Sat, 20 Jul 2019 14:21:18 +0000</pubDate>
+
+
+      <slash:comments>0</slash:comments>
+
+      <SongKey>5815</SongKey>
+      <DownloadURL>https://beatsaver.com/api/download/key/5815</DownloadURL>
+      <Hash>b72f9c495505648f08c082365a2c09fb06415b04</Hash>
+      <LevelAuthorName>Joetastic</LevelAuthorName>
+      <SongTitle>Aoi Shiori [BanG Dream! Soundtrack] &#8211; Afterglow</SongTitle>
+    </item>
+    <item>
+      <guid isPermaLink="false">7e872c81f4e3e67679335bf6123e4d0c</guid>
+      <title>uncurated wrote a new post</title>
+      <link>https://bsaber.com/?p=1168581</link>
+      <pubDate>Fri, 19 Jul 2019 18:24:56 +0000</pubDate>
+
+
+      <slash:comments>0</slash:comments>
+
+      <SongKey>57f1</SongKey>
+      <DownloadURL>https://beatsaver.com/api/download/key/57f1</DownloadURL>
+      <Hash>84b16b7e9fe6e3b8f356be4f2dc0edc0a4178228</Hash>
+      <LevelAuthorName>Joetastic</LevelAuthorName>
+      <SongTitle>Impossible Geometry &#8211; The Stupendium ft. Chi-chi</SongTitle>
+    </item>
+    <item>
+      <guid isPermaLink="false">8d01f1ed66079df158900ce0332e04d5</guid>
+      <title>uncurated wrote a new post</title>
+      <link>https://bsaber.com/?p=1168578</link>
+      <pubDate>Fri, 19 Jul 2019 18:17:46 +0000</pubDate>
+
+
+      <slash:comments>0</slash:comments>
+
+      <SongKey>57f0</SongKey>
+      <DownloadURL>https://beatsaver.com/api/download/key/57f0</DownloadURL>
+      <Hash>74a5d942161597151e6d7a066f09ecb522ac79a8</Hash>
+      <LevelAuthorName>Joetastic</LevelAuthorName>
+      <SongTitle>Bad Luck Charm (RWBY: Volume 4 Soundtrack) &#8211; Jeff Williams ft. Casey Lee Williams (Testing 15 NJS)</SongTitle>
+    </item>
+    <item>
+      <guid isPermaLink="false">70aa0e44a99eef3e9daf6e33a970c37f</guid>
+      <title>uncurated wrote a new post</title>
+      <link>https://bsaber.com/?p=1168574</link>
+      <pubDate>Fri, 19 Jul 2019 18:04:56 +0000</pubDate>
+
+
+      <slash:comments>0</slash:comments>
+
+      <SongKey>57ef</SongKey>
+      <DownloadURL>https://beatsaver.com/api/download/key/57ef</DownloadURL>
+      <Hash>340c50be717cec6937dbf197c536f5b811460189</Hash>
+      <LevelAuthorName>ConnorJC</LevelAuthorName>
+      <SongTitle>The Phoenix &#8211; Fall Out Boy</SongTitle>
+    </item>
+    <item>
+      <guid isPermaLink="false">9ad7f479d309cec075e36a93648fd4fd</guid>
+      <title>uncurated wrote a new post</title>
+      <link>https://bsaber.com/?p=1168487</link>
+      <pubDate>Fri, 19 Jul 2019 01:47:40 +0000</pubDate>
+
+
+      <slash:comments>0</slash:comments>
+
+      <SongKey>57d3</SongKey>
+      <DownloadURL>https://beatsaver.com/api/download/key/57d3</DownloadURL>
+      <Hash>6240baee13632d6c0a2991d87dec49bf32184354</Hash>
+      <LevelAuthorName>Heisenberg</LevelAuthorName>
+      <SongTitle>MEIN TEIL &#8211; Rammstein</SongTitle>
+    </item>
+    <item>
+      <guid isPermaLink="false">dd169691e96715caa328e323e098dea5</guid>
+      <title>uncurated wrote a new post</title>
+      <link>https://bsaber.com/?p=1168407</link>
+      <pubDate>Thu, 18 Jul 2019 17:57:03 +0000</pubDate>
+
+
+      <slash:comments>0</slash:comments>
+
+      <SongKey>57b8</SongKey>
+      <DownloadURL>https://beatsaver.com/api/download/key/57b8</DownloadURL>
+      <Hash>48f5b7252a06be1b4d4651ed10d74556ab79373b</Hash>
+      <LevelAuthorName>Heisenberg (Lights by Rexxz)</LevelAuthorName>
+      <SongTitle>Harder Better Faster Stronger &#8211; Far Out Remix &#8211; Daft Punk</SongTitle>
+    </item>
+    <item>
+      <guid isPermaLink="false">364e7acb91962349b263c6777a2f5ec1</guid>
+      <title>uncurated wrote a new post</title>
+      <link>https://bsaber.com/?p=1168369</link>
+      <pubDate>Thu, 18 Jul 2019 13:49:20 +0000</pubDate>
+
+
+      <slash:comments>0</slash:comments>
+
+      <SongKey>57ad</SongKey>
+      <DownloadURL>https://beatsaver.com/api/download/key/57ad</DownloadURL>
+      <Hash>bc97155519c2f9d3b65a2f4c97e7d078d9f17823</Hash>
+      <LevelAuthorName>Joetastic</LevelAuthorName>
+      <SongTitle>Starboy &#8211; The Weeknd ft. Daft Punk</SongTitle>
+    </item>
+    <item>
+      <guid isPermaLink="false">13907abbce08a85cbab763db13bf6723</guid>
+      <title>uncurated wrote a new post</title>
+      <link>https://bsaber.com/?p=1168339</link>
+      <pubDate>Thu, 18 Jul 2019 07:41:56 +0000</pubDate>
+
+
+      <slash:comments>0</slash:comments>
+
+      <SongKey>57a3</SongKey>
+      <DownloadURL>https://beatsaver.com/api/download/key/57a3</DownloadURL>
+      <Hash>d4310e78738c824e5c9d63c7b04139facc9df551</Hash>
+      <LevelAuthorName>Joetastic</LevelAuthorName>
+      <SongTitle>Let&#8217;s Just Live (RWBY: Volume 4 Soundtrack) &#8211; Jeff Williams ft. Casey Lee Williams</SongTitle>
+    </item>
+    <item>
+      <guid isPermaLink="false">be833d9aa721ebe6db73217ba26becf3</guid>
+      <title>uncurated wrote a new post</title>
+      <link>https://bsaber.com/?p=1168242</link>
+      <pubDate>Wed, 17 Jul 2019 10:53:02 +0000</pubDate>
+
+
+      <slash:comments>0</slash:comments>
+
+      <SongKey>5788</SongKey>
+      <DownloadURL>https://beatsaver.com/api/download/key/5788</DownloadURL>
+      <Hash>b13d6691ec3182663dd81e9c8aa0c79ddaba27be</Hash>
+      <LevelAuthorName>Joetastic</LevelAuthorName>
+      <SongTitle>Tsukiakari no Michishirube [BanG Dream! Soundtrack] &#8211; Roselia</SongTitle>
+    </item>
+    <item>
+      <guid isPermaLink="false">7fbe45181bb74e4e6300243467ebd2d6</guid>
+      <title>uncurated wrote a new post</title>
+      <link>https://bsaber.com/?p=1168151</link>
+      <pubDate>Tue, 16 Jul 2019 20:32:43 +0000</pubDate>
+
+
+      <slash:comments>0</slash:comments>
+
+      <SongKey>5768</SongKey>
+      <DownloadURL>https://beatsaver.com/api/download/key/5768</DownloadURL>
+      <Hash>f2c7de64e9539cf983b073944c268653467e0cdf</Hash>
+      <LevelAuthorName>Nuketime</LevelAuthorName>
+      <SongTitle>Pokemon Theme Song (Metal Cover)</SongTitle>
+    </item>
+    <item>
+      <guid isPermaLink="false">acb8fca036b9b56e82b089e948eb064b</guid>
+      <title>uncurated wrote a new post</title>
+      <link>https://bsaber.com/?p=1168114</link>
+      <pubDate>Tue, 16 Jul 2019 18:18:12 +0000</pubDate>
+
+
+      <slash:comments>0</slash:comments>
+
+      <SongKey>575e</SongKey>
+      <DownloadURL>https://beatsaver.com/api/download/key/575e</DownloadURL>
+      <Hash>183f89b97371457fe3500c55f1350cb4fa82a10f</Hash>
+      <LevelAuthorName>Hexagonial &amp; Xhera</LevelAuthorName>
+      <SongTitle>bibuko &#8211; Reizouko Mitara Pudding ga Nai</SongTitle>
+    </item>
+    <item>
+      <guid isPermaLink="false">92bb2b084b959a26037594456f34f18a</guid>
+      <title>uncurated wrote a new post</title>
+      <link>https://bsaber.com/?p=1168095</link>
+      <pubDate>Tue, 16 Jul 2019 14:50:41 +0000</pubDate>
+
+
+      <slash:comments>0</slash:comments>
+
+      <SongKey>5758</SongKey>
+      <DownloadURL>https://beatsaver.com/api/download/key/5758</DownloadURL>
+      <Hash>0cd0bc69c4989daa941e015eb91f08ee9577c72a</Hash>
+      <LevelAuthorName>Joetastic</LevelAuthorName>
+      <SongTitle>Blame &#8211; Calvin Harris ft. John Newman</SongTitle>
+    </item>
+    <item>
+      <guid isPermaLink="false">d596d319fa0240dcfb607ea57cc6d296</guid>
+      <title>uncurated wrote a new post</title>
+      <link>https://bsaber.com/?p=1168065</link>
+      <pubDate>Tue, 16 Jul 2019 06:20:33 +0000</pubDate>
+
+
+      <slash:comments>0</slash:comments>
+
+      <SongKey>574f</SongKey>
+      <DownloadURL>https://beatsaver.com/api/download/key/574f</DownloadURL>
+      <Hash>6e6af01a4416e2b684de520a8fbd82323ffbf749</Hash>
+      <LevelAuthorName>Joetastic</LevelAuthorName>
+      <SongTitle>IGNITE (TV size) [Sword Art Online Season 2 Opening] &#8211; Aoi Eir</SongTitle>
+    </item>
+    <item>
+      <guid isPermaLink="false">8dc2a5c9d8ac09ce09987d74b1070010</guid>
+      <title>uncurated wrote a new post</title>
+      <link>https://bsaber.com/?p=1168001</link>
+      <pubDate>Mon, 15 Jul 2019 15:50:32 +0000</pubDate>
+
+
+      <slash:comments>0</slash:comments>
+
+      <SongKey>573a</SongKey>
+      <DownloadURL>https://beatsaver.com/api/download/key/573a</DownloadURL>
+      <Hash>149f624cf2f2c993583174b6f22ba6a5411a28ca</Hash>
+      <LevelAuthorName>Joetastic</LevelAuthorName>
+      <SongTitle>This Dream (Rock Cover) &#8211; Jonathan Young</SongTitle>
+    </item>
+    <item>
+      <guid isPermaLink="false">13effc6bacc3f9e8b8f74fccfd712dcd</guid>
+      <title>uncurated wrote a new post</title>
+      <link>https://bsaber.com/?p=1167954</link>
+      <pubDate>Mon, 15 Jul 2019 08:10:41 +0000</pubDate>
+
+
+      <slash:comments>0</slash:comments>
+
+      <SongKey>5728</SongKey>
+      <DownloadURL>https://beatsaver.com/api/download/key/5728</DownloadURL>
+      <Hash>5616af185fc5f473f7326f7001026521f967132e</Hash>
+      <LevelAuthorName>Rustic</LevelAuthorName>
+      <SongTitle>Bossfight &#8211; U got me</SongTitle>
+    </item>
+    <item>
+      <guid isPermaLink="false">770e48eeaa1d401af6ec04dc702d463b</guid>
+      <title>uncurated wrote a new post</title>
+      <link>https://bsaber.com/?p=1167943</link>
+      <pubDate>Mon, 15 Jul 2019 07:01:36 +0000</pubDate>
+
+
+      <slash:comments>0</slash:comments>
+
+      <SongKey>5725</SongKey>
+      <DownloadURL>https://beatsaver.com/api/download/key/5725</DownloadURL>
+      <Hash>13d4f57a62f8725b39e607914637625e1edaf58d</Hash>
+      <LevelAuthorName>Joetastic</LevelAuthorName>
+      <SongTitle>Livin&#8217; La Vida Loca &#8211; Ricky Martin</SongTitle>
+    </item>
+    <item>
+      <guid isPermaLink="false">e6a916fc6734f688c7e622857c27b6fc</guid>
+      <title>uncurated wrote a new post</title>
+      <link>https://bsaber.com/?p=1167855</link>
+      <pubDate>Sun, 14 Jul 2019 20:25:09 +0000</pubDate>
+
+
+      <slash:comments>0</slash:comments>
+
+      <SongKey>570e</SongKey>
+      <DownloadURL>https://beatsaver.com/api/download/key/570e</DownloadURL>
+      <Hash>3da2e9d29da2bfa4bdd43fcabc339c975cd833d1</Hash>
+      <LevelAuthorName>Heisenberg</LevelAuthorName>
+      <SongTitle>Play That Funky Music Rammstein</SongTitle>
+    </item>
+    <item>
+      <guid isPermaLink="false">bce4f7fd5cbb7dbc41abf28e024c53f6</guid>
+      <title>uncurated wrote a new post</title>
+      <link>https://bsaber.com/?p=1167802</link>
+      <pubDate>Sun, 14 Jul 2019 15:32:26 +0000</pubDate>
+
+
+      <slash:comments>0</slash:comments>
+
+      <SongKey>56ff</SongKey>
+      <DownloadURL>https://beatsaver.com/api/download/key/56ff</DownloadURL>
+      <Hash>74575254ae759f3f836eb521b4b80093ca52cd3d</Hash>
+      <LevelAuthorName>Rustic</LevelAuthorName>
+      <SongTitle>Xilent &#8211; Code Blood</SongTitle>
+    </item>
+    <item>
+      <guid isPermaLink="false">e2dae6f0c16c38f6c278070622952647</guid>
+      <title>uncurated wrote a new post</title>
+      <link>https://bsaber.com/?p=1167793</link>
+      <pubDate>Sun, 14 Jul 2019 15:31:26 +0000</pubDate>
+
+
+      <slash:comments>0</slash:comments>
+
+      <SongKey>56fe</SongKey>
+      <DownloadURL>https://beatsaver.com/api/download/key/56fe</DownloadURL>
+      <Hash>8c260c424d2c5601f6d64139715f935f704e4b29</Hash>
+      <LevelAuthorName>Rustic</LevelAuthorName>
+      <SongTitle>Xilent &#8211; The Darkness</SongTitle>
+    </item>
+    <item>
+      <guid isPermaLink="false">8eb5751156bb7bf2aaf3de7a1030c53a</guid>
+      <title>uncurated wrote a new post</title>
+      <link>https://bsaber.com/?p=1167796</link>
+      <pubDate>Sun, 14 Jul 2019 15:30:51 +0000</pubDate>
+
+
+      <slash:comments>0</slash:comments>
+
+      <SongKey>56fd</SongKey>
+      <DownloadURL>https://beatsaver.com/api/download/key/56fd</DownloadURL>
+      <Hash>c85c16376dfa3bed7288fcaa68297f151224567b</Hash>
+      <LevelAuthorName>Rustic</LevelAuthorName>
+      <SongTitle>Xilent &#8211; Blue Shadows</SongTitle>
+    </item>
+    <item>
+      <guid isPermaLink="false">40fd6ee6fffd5209cc95e7e98aa80fd4</guid>
+      <title>uncurated wrote a new post</title>
+      <link>https://bsaber.com/?p=1167799</link>
+      <pubDate>Sun, 14 Jul 2019 15:30:06 +0000</pubDate>
+
+
+      <slash:comments>0</slash:comments>
+
+      <SongKey>56fc</SongKey>
+      <DownloadURL>https://beatsaver.com/api/download/key/56fc</DownloadURL>
+      <Hash>efdc54725bca3471366b81e757978b17d03e05cc</Hash>
+      <LevelAuthorName>Rustic</LevelAuthorName>
+      <SongTitle>Xilent &#8211; You Rise</SongTitle>
+    </item>
+    <item>
+      <guid isPermaLink="false">5237212acaa1802f7c1880de7d74e9ea</guid>
+      <title>uncurated wrote a new post</title>
+      <link>https://bsaber.com/?p=1167665</link>
+      <pubDate>Sat, 13 Jul 2019 18:21:07 +0000</pubDate>
+
+
+      <slash:comments>0</slash:comments>
+
+      <SongKey>56d1</SongKey>
+      <DownloadURL>https://beatsaver.com/api/download/key/56d1</DownloadURL>
+      <Hash>54448e80b2caaea5be87e98edd9fc06ec912254e</Hash>
+      <LevelAuthorName>Joetastic</LevelAuthorName>
+      <SongTitle>Ringing Bloom [BanG Dream! Soundtrack] &#8211; Roselia</SongTitle>
+    </item>
+    <item>
+      <guid isPermaLink="false">740a452160c18da0406f18a0acac18c3</guid>
+      <title>uncurated wrote a new post</title>
+      <link>https://bsaber.com/?p=1167526</link>
+      <pubDate>Sat, 13 Jul 2019 01:47:26 +0000</pubDate>
+
+
+      <slash:comments>0</slash:comments>
+
+      <SongKey>56a8</SongKey>
+      <DownloadURL>https://beatsaver.com/api/download/key/56a8</DownloadURL>
+      <Hash>97df7b3a2cccedd9ce5473aff669c693e46a1778</Hash>
+      <LevelAuthorName>KuritsaDBS</LevelAuthorName>
+      <SongTitle>Walking On The Moon &#8211; Infected Mushroom</SongTitle>
+    </item>
+    <item>
+      <guid isPermaLink="false">69dcfc47a27c27d9b366e010c1427fcd</guid>
+      <title>uncurated wrote a new post</title>
+      <link>https://bsaber.com/?p=1167373</link>
+      <pubDate>Fri, 12 Jul 2019 07:05:12 +0000</pubDate>
+
+
+      <slash:comments>0</slash:comments>
+
+      <SongKey>5681</SongKey>
+      <DownloadURL>https://beatsaver.com/api/download/key/5681</DownloadURL>
+      <Hash>c9c76a57f4ea43a635513e7fa30c7779dd674561</Hash>
+      <LevelAuthorName>Joetastic</LevelAuthorName>
+      <SongTitle>Bleeding Rose (泣血薔薇) &#8211; Jinny Ng</SongTitle>
+    </item>
+    <item>
+      <guid isPermaLink="false">1fea79a4757dab512869577a9c998225</guid>
+      <title>uncurated wrote a new post</title>
+      <link>https://bsaber.com/?p=1167249</link>
+      <pubDate>Thu, 11 Jul 2019 12:16:14 +0000</pubDate>
+
+
+      <slash:comments>0</slash:comments>
+
+      <SongKey>5664</SongKey>
+      <DownloadURL>https://beatsaver.com/api/download/key/5664</DownloadURL>
+      <Hash>d64f5400f932ecb1dc924b4e96d2b08918fcc5e4</Hash>
+      <LevelAuthorName>Heisenberg</LevelAuthorName>
+      <SongTitle>Holding Out For A Hero</SongTitle>
+    </item>
+    <item>
+      <guid isPermaLink="false">b9fa730136fe09af65106c7bb2056c0b</guid>
+      <title>uncurated wrote a new post</title>
+      <link>https://bsaber.com/?p=1167244</link>
+      <pubDate>Thu, 11 Jul 2019 09:23:03 +0000</pubDate>
+
+
+      <slash:comments>0</slash:comments>
+
+      <SongKey>5663</SongKey>
+      <DownloadURL>https://beatsaver.com/api/download/key/5663</DownloadURL>
+      <Hash>e4920d139ac012ea912a43b224bb80b55397ce40</Hash>
+      <LevelAuthorName>Joetastic</LevelAuthorName>
+      <SongTitle>Tamashii no Refrain [BanG Dream! Soundtrack] &#8211; Roselia</SongTitle>
+    </item>
+    <item>
+      <guid isPermaLink="false">677a2d3e4d9666e73f45126a8056d5d0</guid>
+      <title>uncurated wrote a new post</title>
+      <link>https://bsaber.com/?p=1167122</link>
+      <pubDate>Wed, 10 Jul 2019 09:04:08 +0000</pubDate>
+
+
+      <slash:comments>0</slash:comments>
+
+      <SongKey>5641</SongKey>
+      <DownloadURL>https://beatsaver.com/api/download/key/5641</DownloadURL>
+      <Hash>c0929ba4250944307ad97230a38da1c450eae54c</Hash>
+      <LevelAuthorName>Joetastic</LevelAuthorName>
+      <SongTitle>Miiro [BanG Dream! Soundtrack] &#8211; Roselia</SongTitle>
+    </item>
+    <item>
+      <guid isPermaLink="false">a0257874054f4ed7adf0c0f3507f3c2c</guid>
+      <title>uncurated wrote a new post</title>
+      <link>https://bsaber.com/?p=1167009</link>
+      <pubDate>Tue, 09 Jul 2019 19:24:09 +0000</pubDate>
+
+
+      <slash:comments>0</slash:comments>
+
+      <SongKey>562a</SongKey>
+      <DownloadURL>https://beatsaver.com/api/download/key/562a</DownloadURL>
+      <Hash>e0a2ac2516867582d96ba72d4bd7f76ec98f98f4</Hash>
+      <LevelAuthorName>Joetastic</LevelAuthorName>
+      <SongTitle>Last Resort &#8211; Papa Roach</SongTitle>
+    </item>
+    <item>
+      <guid isPermaLink="false">d7e2a6d2fb1fc4ef7be7dce963abba12</guid>
+      <title>uncurated wrote a new post</title>
+      <link>https://bsaber.com/?p=1166813</link>
+      <pubDate>Mon, 08 Jul 2019 12:37:25 +0000</pubDate>
+
+
+      <slash:comments>0</slash:comments>
+
+      <SongKey>55f5</SongKey>
+      <DownloadURL>https://beatsaver.com/api/download/key/55f5</DownloadURL>
+      <Hash>ae3f34db204c0ea649a1009f6679c285e98cd88b</Hash>
+      <LevelAuthorName>Joetastic</LevelAuthorName>
+      <SongTitle>Ruling Me &#8211; Weezer</SongTitle>
+    </item>
+    <item>
+      <guid isPermaLink="false">ba8b09dc8c7793ce86acd2c93ea4cdec</guid>
+      <title>uncurated wrote a new post</title>
+      <link>https://bsaber.com/?p=1166743</link>
+      <pubDate>Mon, 08 Jul 2019 07:52:24 +0000</pubDate>
+
+
+      <slash:comments>0</slash:comments>
+
+      <SongKey>55f1</SongKey>
+      <DownloadURL>https://beatsaver.com/api/download/key/55f1</DownloadURL>
+      <Hash>5dab65e6c56a1657d53d2dcf9c8c796ad2ae9357</Hash>
+      <LevelAuthorName>Joetastic</LevelAuthorName>
+      <SongTitle>Shin Ai [BanG Dream! Soundtrack] &#8211; Roselia</SongTitle>
+    </item>
+    <item>
+      <guid isPermaLink="false">7071a0ace00fb7e0c82aab8c0f27d501</guid>
+      <title>uncurated wrote a new post</title>
+      <link>https://bsaber.com/?p=1166508</link>
+      <pubDate>Sun, 07 Jul 2019 05:51:39 +0000</pubDate>
+
+
+      <slash:comments>0</slash:comments>
+
+      <SongKey>55d6</SongKey>
+      <DownloadURL>https://beatsaver.com/api/download/key/55d6</DownloadURL>
+      <Hash>18fc2b140f04041bf67c6cde01137634f814d841</Hash>
+      <LevelAuthorName>BennyDaBeast</LevelAuthorName>
+      <SongTitle>(6 Lane) Perfect Situation &#8211; Weezer</SongTitle>
+    </item>
+    <item>
+      <guid isPermaLink="false">99fdbde1c2fc3e9b785976e59f3d263b</guid>
+      <title>uncurated wrote a new post</title>
+      <link>https://bsaber.com/?p=1166336</link>
+      <pubDate>Sat, 06 Jul 2019 17:22:37 +0000</pubDate>
+
+
+      <slash:comments>0</slash:comments>
+
+      <SongKey>55c7</SongKey>
+      <DownloadURL>https://beatsaver.com/api/download/key/55c7</DownloadURL>
+      <Hash>c4345b1ac5de502254cbc2e3bae117f79d922b11</Hash>
+      <LevelAuthorName>Joetastic</LevelAuthorName>
+      <SongTitle>DDD &#8211; EXID</SongTitle>
+    </item>
+    <item>
+      <guid isPermaLink="false">27efef9ed88034e207a3377b78e1907d</guid>
+      <title>uncurated wrote a new post</title>
+      <link>https://bsaber.com/?p=1166125</link>
+      <pubDate>Fri, 05 Jul 2019 14:41:46 +0000</pubDate>
+
+
+      <slash:comments>0</slash:comments>
+
+      <SongKey>55ab</SongKey>
+      <DownloadURL>https://beatsaver.com/api/download/key/55ab</DownloadURL>
+      <Hash>659e12ca4791b0b292a7528f7131d7a0e32564d5</Hash>
+      <LevelAuthorName>Joetastic</LevelAuthorName>
+      <SongTitle>It&#8217;s My Turn (RWBY: Volume 3 Soundtrack) &#8211; Jeff Williams ft. Casey Lee Williams (Fixed version)</SongTitle>
+    </item>
+    <item>
+      <guid isPermaLink="false">b3ca68c6206fcbe8d366d6c0942c5fbc</guid>
+      <title>uncurated wrote a new post</title>
+      <link>https://bsaber.com/?p=1166004</link>
+      <pubDate>Fri, 05 Jul 2019 08:16:52 +0000</pubDate>
+
+
+      <slash:comments>0</slash:comments>
+
+      <SongKey>55a5</SongKey>
+      <DownloadURL>https://beatsaver.com/api/download/key/55a5</DownloadURL>
+      <Hash>a01f855fbd0a927b48e07464f09a2172c47ce3cd</Hash>
+      <LevelAuthorName>Joetastic</LevelAuthorName>
+      <SongTitle>The Middle &#8211; Jimmy Eat World</SongTitle>
+    </item>
+    <item>
+      <guid isPermaLink="false">c80a24b5ab65562e9269ed662cfcfec2</guid>
+      <title>uncurated wrote a new post</title>
+      <link>https://bsaber.com/?p=1165665</link>
+      <pubDate>Thu, 04 Jul 2019 22:10:32 +0000</pubDate>
+
+
+      <slash:comments>0</slash:comments>
+
+      <SongKey>559c</SongKey>
+      <DownloadURL>https://beatsaver.com/api/download/key/559c</DownloadURL>
+      <Hash>26e25d4f0c676e5865a015437da391c480627eb4</Hash>
+      <LevelAuthorName>Hexagonial</LevelAuthorName>
+      <SongTitle>Mewhan &#8211; Boku no Friend</SongTitle>
+    </item>
+    <item>
+      <guid isPermaLink="false">2d2ff9ae070f5f5e5cfcf83a7f548b20</guid>
+      <title>uncurated wrote a new post</title>
+      <link>https://bsaber.com/?p=1165646</link>
+      <pubDate>Thu, 04 Jul 2019 21:10:07 +0000</pubDate>
+
+
+      <slash:comments>0</slash:comments>
+
+      <SongKey>5596</SongKey>
+      <DownloadURL>https://beatsaver.com/api/download/key/5596</DownloadURL>
+      <Hash>546aaabee304b7d8a128b7bc1cb6894dcb35f986</Hash>
+      <LevelAuthorName>Nuketime</LevelAuthorName>
+      <SongTitle>Snow Drive &#8211; Araki</SongTitle>
+    </item>
+    <item>
+      <guid isPermaLink="false">5b9e654e74d42308c890d38cedcadad4</guid>
+      <title>uncurated wrote a new post</title>
+      <link>https://bsaber.com/?p=1165573</link>
+      <pubDate>Thu, 04 Jul 2019 13:21:52 +0000</pubDate>
+
+
+      <slash:comments>0</slash:comments>
+
+      <SongKey>557f</SongKey>
+      <DownloadURL>https://beatsaver.com/api/download/key/557f</DownloadURL>
+      <Hash>2b61e7bd12379b9c1c193de7e28d1e816942c948</Hash>
+      <LevelAuthorName>Joetastic</LevelAuthorName>
+      <SongTitle>Enormous Penis &#8211; Da Vinci&#8217;s Notebook</SongTitle>
+    </item>
+    <item>
+      <guid isPermaLink="false">4e388ad9a4bde431339caae861c5308e</guid>
+      <title>uncurated wrote a new post</title>
+      <link>https://bsaber.com/?p=1164627</link>
+      <pubDate>Wed, 03 Jul 2019 02:05:21 +0000</pubDate>
+
+
+      <slash:comments>0</slash:comments>
+
+      <SongKey>555b</SongKey>
+      <DownloadURL>https://beatsaver.com/api/download/key/555b</DownloadURL>
+      <Hash>7cb234029565e880aaf7fee33c96b5b6c7d3e037</Hash>
+      <LevelAuthorName>Joetastic</LevelAuthorName>
+      <SongTitle>Rising (RWBY: Volume 6 Soundtrack) &#8211; Jeff Williams ft. Casey Lee Williams</SongTitle>
+    </item>
+    <item>
+      <guid isPermaLink="false">d1f5366e9d2018573a23b7c062d4f4a5</guid>
+      <title>uncurated wrote a new post</title>
+      <link>https://bsaber.com/?p=1163987</link>
+      <pubDate>Tue, 02 Jul 2019 17:23:10 +0000</pubDate>
+
+
+      <slash:comments>0</slash:comments>
+
+      <SongKey>5552</SongKey>
+      <DownloadURL>https://beatsaver.com/api/download/key/5552</DownloadURL>
+      <Hash>9027d4274febf8722078a5f70b51da58cf433322</Hash>
+      <LevelAuthorName>Joetastic</LevelAuthorName>
+      <SongTitle>It&#8217;s Tricky &#8211; Run DMC</SongTitle>
+    </item>
+    <item>
+      <guid isPermaLink="false">9afcfd655b06c64c055b722037816902</guid>
+      <title>uncurated wrote a new post</title>
+      <link>https://bsaber.com/?p=1163943</link>
+      <pubDate>Tue, 02 Jul 2019 12:06:23 +0000</pubDate>
+
+
+      <slash:comments>0</slash:comments>
+
+      <SongKey>554a</SongKey>
+      <DownloadURL>https://beatsaver.com/api/download/key/554a</DownloadURL>
+      <Hash>559ad8ac4c54197e0d5a908e77d3803b73f23ae7</Hash>
+      <LevelAuthorName>Nuketime</LevelAuthorName>
+      <SongTitle>The Empress &#8211; UNDEAD CORPORATION</SongTitle>
+    </item>
+    <item>
+      <guid isPermaLink="false">7b325b4d8ca49e8664eb3ced7f001d99</guid>
+      <title>uncurated wrote a new post</title>
+      <link>https://bsaber.com/?p=1161030</link>
+      <pubDate>Mon, 01 Jul 2019 15:19:23 +0000</pubDate>
+
+
+      <slash:comments>0</slash:comments>
+
+      <SongKey>553b</SongKey>
+      <DownloadURL>https://beatsaver.com/api/download/key/553b</DownloadURL>
+      <Hash>b56a448b5240733a8aba59175b1a6129292deb15</Hash>
+      <LevelAuthorName>Joetastic</LevelAuthorName>
+      <SongTitle>Sacrifice (RWBY: Volume 2 Soundtrack) &#8211; Jeff Williams ft. Casey Lee Williams</SongTitle>
+    </item>
+    <item>
+      <guid isPermaLink="false">6cf7031ec2419f64032b845770731f5b</guid>
+      <title>uncurated wrote a new post</title>
+      <link>https://bsaber.com/?p=1160077</link>
+      <pubDate>Mon, 01 Jul 2019 09:28:51 +0000</pubDate>
+
+
+      <slash:comments>0</slash:comments>
+
+      <SongKey>5535</SongKey>
+      <DownloadURL>https://beatsaver.com/api/download/key/5535</DownloadURL>
+      <Hash>6d4bb0fa4063952c06054eb49f0f944a1207cd2c</Hash>
+      <LevelAuthorName>Joetastic</LevelAuthorName>
+      <SongTitle>Rising (RWBY: Volume 6 Soundtrack) &#8211; Jeff Williams ft. Casey Lee Williams</SongTitle>
+    </item>
+    <item>
+      <guid isPermaLink="false">1b1e39aec68bb1de3d0706e57dda91fd</guid>
+      <title>uncurated wrote a new post</title>
+      <link>https://bsaber.com/?p=1159921</link>
+      <pubDate>Mon, 01 Jul 2019 05:24:38 +0000</pubDate>
+
+
+      <slash:comments>0</slash:comments>
+
+      <SongKey>552f</SongKey>
+      <DownloadURL>https://beatsaver.com/api/download/key/552f</DownloadURL>
+      <Hash>9c0a1509cb446812b2c8deab3e0b9ae774651252</Hash>
+      <LevelAuthorName>Joetastic</LevelAuthorName>
+      <SongTitle>Big Metal Shoe (RWBY: Volume 6 Soundtrack) &#8211; Jeff Williams ft. Casey Lee Williams &amp; Lamar Hall</SongTitle>
+    </item>
+    <item>
+      <guid isPermaLink="false">3bdf7bc98728f556d72071820d2de783</guid>
+      <title>uncurated wrote a new post</title>
+      <link>https://bsaber.com/?p=1159894</link>
+      <pubDate>Mon, 01 Jul 2019 01:42:57 +0000</pubDate>
+
+
+      <slash:comments>0</slash:comments>
+
+      <SongKey>5527</SongKey>
+      <DownloadURL>https://beatsaver.com/api/download/key/5527</DownloadURL>
+      <Hash>dd6e13ba5a7ab6196f0e25258652fe9763e6596d</Hash>
+      <LevelAuthorName>Nuketime</LevelAuthorName>
+      <SongTitle>Big Daddy &#8211; USAO</SongTitle>
+    </item>
+    <item>
+      <guid isPermaLink="false">db7200737c20713d8eaea4f2428d651b</guid>
+      <title>uncurated wrote a new post</title>
+      <link>https://bsaber.com/?p=1159897</link>
+      <pubDate>Mon, 01 Jul 2019 01:40:33 +0000</pubDate>
+
+
+      <slash:comments>0</slash:comments>
+
+      <SongKey>5526</SongKey>
+      <DownloadURL>https://beatsaver.com/api/download/key/5526</DownloadURL>
+      <Hash>1bce982acb7c45378005f954a1f16b8c2377db77</Hash>
+      <LevelAuthorName>Nuketime</LevelAuthorName>
+      <SongTitle>Donut Hole &#8211; Kokoro Tsurumaki</SongTitle>
+    </item>
+    <item>
+      <guid isPermaLink="false">97e954661e09de894106c55aba558261</guid>
+      <title>uncurated wrote a new post</title>
+      <link>https://bsaber.com/?p=1159729</link>
+      <pubDate>Sat, 29 Jun 2019 16:16:06 +0000</pubDate>
+
+
+      <slash:comments>0</slash:comments>
+
+      <SongKey>54f2</SongKey>
+      <DownloadURL>https://beatsaver.com/api/download/key/54f2</DownloadURL>
+      <Hash>2f4572111932fd8c276a72d3fea4ae570515df21</Hash>
+      <LevelAuthorName>Joetastic</LevelAuthorName>
+      <SongTitle>ETERNAL BLAZE [BanG Dream! Soundtrack] &#8211; Roselia</SongTitle>
+    </item>
+
+  </channel>
+</rss>

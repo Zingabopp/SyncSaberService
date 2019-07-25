@@ -1,0 +1,652 @@
+﻿{
+  "docs": [
+    {
+      "metadata": {
+        "difficulties": {
+          "easy": false,
+          "expert": true,
+          "expertPlus": true,
+          "hard": true,
+          "normal": true
+        },
+        "characteristics": [
+          {
+            "difficulties": {
+              "easy": null,
+              "expert": {
+                "duration": 371,
+                "length": 173,
+                "njs": 18,
+                "njsOffset": 0,
+                "bombs": 0,
+                "notes": 1226,
+                "obstacles": 0
+              },
+              "expertPlus": {
+                "duration": 371,
+                "length": 173,
+                "njs": 18,
+                "njsOffset": 0,
+                "bombs": 0,
+                "notes": 1226,
+                "obstacles": 1515
+              },
+              "hard": {
+                "duration": 372,
+                "length": 174,
+                "njs": 18,
+                "njsOffset": 0,
+                "bombs": 1,
+                "notes": 0,
+                "obstacles": 1515
+              },
+              "normal": {
+                "duration": 372,
+                "length": 174,
+                "njs": 18,
+                "njsOffset": 0,
+                "bombs": 1,
+                "notes": 0,
+                "obstacles": 0
+              }
+            },
+            "name": "Standard"
+          }
+        ],
+        "levelAuthorName": "Excession, Aeroluna",
+        "songAuthorName": "Creo",
+        "songName": "Challenger",
+        "songSubName": "",
+        "bpm": 128
+      },
+      "stats": {
+        "downloads": 482,
+        "plays": 0,
+        "downVotes": 1,
+        "upVotes": 13,
+        "heat": 859.1383144,
+        "rating": 0.7389076196210433
+      },
+      "description": "Here we go, second time uploading because last time it broke every page the map was on.\n\nFirst of all thanks to AeroLuna for the amazing chroma lights!  Be sure to check his other maps out.  For the best experience make sure you have the chroma plugin.\n\nThis is my second wall map and I think you'll be able to see vast improvements from The Prophecy.  I did include a No Walls option in case the sheer number of walls causes lag however, so hopefully there's something here for everyone!\n\nAeroluna:  https://beatsaver.com/uploader/5cff0b7698cc5a672c854907\nExcession:  https://beatsaver.com/uploader/5d0b1a7adee26200065154ef\n\nAs always, follow Exce55ion on twitch!\n",
+      "deletedAt": null,
+      "_id": "5d34dcb4452e9100062699fd",
+      "key": "584b",
+      "name": "Challenger",
+      "uploader": {
+        "_id": "5d0b1a7adee26200065154ef",
+        "username": "excession"
+      },
+      "hash": "2cd4a8b87ac6dda9a81c1f8f658707b74f9306e3",
+      "uploaded": "2019-07-21T21:44:20.992Z",
+      "downloadURL": "/api/download/key/584b",
+      "coverURL": "/cdn/584b/2cd4a8b87ac6dda9a81c1f8f658707b74f9306e3.jpg"
+    },
+    {
+      "metadata": {
+        "difficulties": {
+          "easy": true,
+          "expert": true,
+          "expertPlus": true,
+          "hard": true,
+          "normal": false
+        },
+        "characteristics": [
+          {
+            "difficulties": {
+              "easy": null,
+              "expert": {
+                "duration": 319.13299560546875,
+                "length": 136,
+                "njs": 16,
+                "njsOffset": 0,
+                "bombs": 228,
+                "notes": 506,
+                "obstacles": 14
+              },
+              "expertPlus": {
+                "duration": 319.13299560546875,
+                "length": 136,
+                "njs": 18,
+                "njsOffset": 0,
+                "bombs": 52,
+                "notes": 778,
+                "obstacles": 18
+              },
+              "hard": {
+                "duration": 319.13299560546875,
+                "length": 136,
+                "njs": 13,
+                "njsOffset": 1,
+                "bombs": 224,
+                "notes": 364,
+                "obstacles": 30
+              },
+              "normal": null
+            },
+            "name": "Standard"
+          },
+          {
+            "difficulties": {
+              "easy": {
+                "duration": null,
+                "length": null,
+                "njs": 10,
+                "njsOffset": 0,
+                "bombs": 0,
+                "notes": 0,
+                "obstacles": 0
+              },
+              "expert": null,
+              "expertPlus": null,
+              "hard": null,
+              "normal": null
+            },
+            "name": "Lightshow"
+          }
+        ],
+        "levelAuthorName": "TranquillizeMe",
+        "songAuthorName": "Various Artists",
+        "songName": "Cracks",
+        "songSubName": "(Flux Pavilion Remix)",
+        "bpm": 140
+      },
+      "stats": {
+        "downloads": 116,
+        "plays": 0,
+        "downVotes": 0,
+        "upVotes": 1,
+        "heat": 858.0496955,
+        "rating": 0.5941636475090435
+      },
+      "description": "Another collab! This one is meant to be more geared towards playability, (and possibly even rankability) so I hope you like it.\n\nIt also has Chroma lighting courtesy of Aeroluna. He's awesome for doing the lights, go check out his stuff too! There is a lightshow mode too :)\n\nCracks (Flux Pavilion Remix) - Belle Humble, Freestylers | 140 BPM | Lightshow (Easy), Hard, Expert, Expert+ | Fully Mapped with Chroma Lighting by Aeroluna",
+      "deletedAt": null,
+      "_id": "5d34db0c19fc1b00062b7601",
+      "key": "584a",
+      "name": "Cracks (Flux Pavilion Remix)",
+      "uploader": {
+        "_id": "5cff0b7798cc5a672c85609e",
+        "username": "tranquillizeme"
+      },
+      "hash": "b18abe0c0ea3c64cba2af65a49f7e48bc4ff6992",
+      "uploaded": "2019-07-21T21:37:16.296Z",
+      "downloadURL": "/api/download/key/584a",
+      "coverURL": "/cdn/584a/b18abe0c0ea3c64cba2af65a49f7e48bc4ff6992.jpg"
+    },
+    {
+      "metadata": {
+        "difficulties": {
+          "easy": false,
+          "expert": true,
+          "expertPlus": false,
+          "hard": false,
+          "normal": false
+        },
+        "characteristics": [
+          {
+            "difficulties": {
+              "easy": null,
+              "expert": {
+                "duration": 423.95001220703125,
+                "length": 169,
+                "njs": 16,
+                "njsOffset": 0,
+                "bombs": 4,
+                "notes": 542,
+                "obstacles": 108
+              },
+              "expertPlus": null,
+              "hard": null,
+              "normal": null
+            },
+            "name": "Standard"
+          }
+        ],
+        "levelAuthorName": "TranquillizeMe",
+        "songAuthorName": "Seven Lions, Unlike Pluto",
+        "songName": "Rescue Me",
+        "songSubName": "",
+        "bpm": 150
+      },
+      "stats": {
+        "downloads": 91,
+        "plays": 0,
+        "downVotes": 0,
+        "upVotes": 0,
+        "heat": 857.9819479,
+        "rating": 0
+      },
+      "description": "Re-submission of my one of my first songs. Edited the map to be less bad. Removed several hand claps, vision blocks, and (distasteful) double downs. \n\nI'll leave the other one live as well.\n\nRescue Me - Seven Lions, Unlike Pluto | 150 BPM | Expert Only | Fully Mapped with Custom Lights",
+      "deletedAt": null,
+      "_id": "5d34cf238d9a800006f488cb",
+      "key": "5849",
+      "name": "Rescue Me (v. 2)",
+      "uploader": {
+        "_id": "5cff0b7798cc5a672c85609e",
+        "username": "tranquillizeme"
+      },
+      "hash": "d5a4fb61f85cee11f21fc32840bb6506fdb91190",
+      "uploaded": "2019-07-21T20:46:27.656Z",
+      "downloadURL": "/api/download/key/5849",
+      "coverURL": "/cdn/5849/d5a4fb61f85cee11f21fc32840bb6506fdb91190.jpg"
+    },
+    {
+      "metadata": {
+        "difficulties": {
+          "easy": false,
+          "expert": false,
+          "expertPlus": true,
+          "hard": false,
+          "normal": false
+        },
+        "characteristics": [
+          {
+            "difficulties": {
+              "easy": null,
+              "expert": null,
+              "expertPlus": {
+                "duration": 545.5249633789062,
+                "length": 187,
+                "njs": 16,
+                "njsOffset": 0,
+                "bombs": 134,
+                "notes": 1739,
+                "obstacles": 84
+              },
+              "hard": null,
+              "normal": null
+            },
+            "name": "Standard"
+          }
+        ],
+        "levelAuthorName": "Wilzy",
+        "songAuthorName": "MC Amense ",
+        "songName": "THE QUEEN SMOKES GREEN",
+        "songSubName": "",
+        "bpm": 175
+      },
+      "stats": {
+        "downloads": 54,
+        "plays": 0,
+        "downVotes": 0,
+        "upVotes": 0,
+        "heat": 857.9045015,
+        "rating": 0
+      },
+      "description": "Kinda Pepega but here you go! He's like MC Mental's little cousin :) ",
+      "deletedAt": null,
+      "_id": "5d34c1868d9a800006f478df",
+      "key": "5848",
+      "name": "The Queen Smokes Green",
+      "uploader": {
+        "_id": "5cff0b7798cc5a672c8565f8",
+        "username": "wilzy"
+      },
+      "hash": "79aa2657dd281d1138849b961eb7a6cd7f0b4b8d",
+      "uploaded": "2019-07-21T19:48:22.569Z",
+      "downloadURL": "/api/download/key/5848",
+      "coverURL": "/cdn/5848/79aa2657dd281d1138849b961eb7a6cd7f0b4b8d.png"
+    },
+    {
+      "metadata": {
+        "difficulties": {
+          "easy": false,
+          "expert": false,
+          "expertPlus": true,
+          "hard": false,
+          "normal": false
+        },
+        "characteristics": [
+          {
+            "difficulties": {
+              "easy": null,
+              "expert": null,
+              "expertPlus": {
+                "duration": 528.0533447265625,
+                "length": 198,
+                "njs": 18,
+                "njsOffset": 0,
+                "bombs": 11,
+                "notes": 1167,
+                "obstacles": 4
+              },
+              "hard": null,
+              "normal": null
+            },
+            "name": "Standard"
+          }
+        ],
+        "levelAuthorName": "Joetastic",
+        "songAuthorName": "Hachioji-P ft. Hatsune Miku",
+        "songName": "Kimagure Mercy",
+        "songSubName": "",
+        "bpm": 160
+      },
+      "stats": {
+        "downloads": 602,
+        "plays": 0,
+        "downVotes": 0,
+        "upVotes": 21,
+        "heat": 859.1945417,
+        "rating": 0.802821067737918
+      },
+      "description": "Kimagure Mercy (気まぐれメルシィ) is an original song by Hachioji-P. It tells the story of a girl (Miku) who is sick of dealing with a man who is shallow, and only interested in her when he wants something from her.\n\nThis song entered the Hall of Legend and exceeded over 10 million YouTube views. Hence, this Hachioji-P's most notable song, and one of Miku's most notable songs.\n\nEDIT: Fixed a stupid mismap where I miss clicked a block -.-",
+      "deletedAt": null,
+      "_id": "5d34bbdefdb6a0000690f73f",
+      "key": "5847",
+      "name": "Kimagure Mercy - Hachioji-P ft. Hatsune Miku",
+      "uploader": {
+        "_id": "5cff0b7498cc5a672c85050e",
+        "username": "joetastic"
+      },
+      "hash": "4e823653dc33ed7f6121dacf7409832b8a54fb05",
+      "uploaded": "2019-07-21T19:24:14.510Z",
+      "downloadURL": "/api/download/key/5847",
+      "coverURL": "/cdn/5847/4e823653dc33ed7f6121dacf7409832b8a54fb05.jpg"
+    },
+    {
+      "metadata": {
+        "difficulties": {
+          "easy": false,
+          "expert": false,
+          "expertPlus": false,
+          "hard": true,
+          "normal": false
+        },
+        "characteristics": [
+          {
+            "difficulties": {
+              "easy": null,
+              "expert": null,
+              "expertPlus": null,
+              "hard": {
+                "duration": 435,
+                "length": 207,
+                "njs": 12,
+                "njsOffset": 0,
+                "bombs": 0,
+                "notes": 619,
+                "obstacles": 29
+              },
+              "normal": null
+            },
+            "name": "Standard"
+          }
+        ],
+        "levelAuthorName": "Majorpickle",
+        "songAuthorName": "Jax Jones ",
+        "songName": "Breathe ( feat. Ina Wroldsen )",
+        "songSubName": "",
+        "bpm": 126
+      },
+      "stats": {
+        "downloads": 295,
+        "plays": 0,
+        "downVotes": 0,
+        "upVotes": 11,
+        "heat": 858.9023792,
+        "rating": 0.7633513242757667
+      },
+      "description": "",
+      "deletedAt": null,
+      "_id": "5d34b9e0fdb6a0000690f544",
+      "key": "5846",
+      "name": "Jax Jones - Breathe ft. Ina Wroldsen",
+      "uploader": {
+        "_id": "5cff0b7398cc5a672c84f792",
+        "username": "majorpickle"
+      },
+      "hash": "277ebba235ed6fda9cff7a1981ec11ead11e7d7a",
+      "uploaded": "2019-07-21T19:15:44.394Z",
+      "downloadURL": "/api/download/key/5846",
+      "coverURL": "/cdn/5846/277ebba235ed6fda9cff7a1981ec11ead11e7d7a.jpg"
+    },
+    {
+      "metadata": {
+        "difficulties": {
+          "easy": false,
+          "expert": true,
+          "expertPlus": false,
+          "hard": true,
+          "normal": true
+        },
+        "characteristics": [
+          {
+            "difficulties": {
+              "easy": null,
+              "expert": {
+                "duration": 463.6066589355469,
+                "length": 235,
+                "njs": 15,
+                "njsOffset": 0,
+                "bombs": 0,
+                "notes": 929,
+                "obstacles": 7
+              },
+              "expertPlus": null,
+              "hard": {
+                "duration": 463.6066589355469,
+                "length": 235,
+                "njs": 15,
+                "njsOffset": 0,
+                "bombs": 0,
+                "notes": 745,
+                "obstacles": 7
+              },
+              "normal": {
+                "duration": 463.6066589355469,
+                "length": 235,
+                "njs": 13,
+                "njsOffset": 0,
+                "bombs": 0,
+                "notes": 471,
+                "obstacles": 7
+              }
+            },
+            "name": "Standard"
+          }
+        ],
+        "levelAuthorName": "VR_RiftMatrix",
+        "songAuthorName": "John Newman",
+        "songName": "Lights Down",
+        "songSubName": "",
+        "bpm": 118
+      },
+      "stats": {
+        "downloads": 120,
+        "plays": 0,
+        "downVotes": 0,
+        "upVotes": 3,
+        "heat": 858.3091979,
+        "rating": 0.6705937099936721
+      },
+      "description": "Expert | Hard | Normal with Lighting FX\n",
+      "deletedAt": null,
+      "_id": "5d34b4cbfdb6a0000690eece",
+      "key": "5843",
+      "name": "Lights Down - John Newman",
+      "uploader": {
+        "_id": "5cff0b7698cc5a672c854757",
+        "username": "vrriftmatrix"
+      },
+      "hash": "cc712820acaf97a294dd88918ca6f2ace3a82136",
+      "uploaded": "2019-07-21T18:54:03.450Z",
+      "downloadURL": "/api/download/key/5843",
+      "coverURL": "/cdn/5843/cc712820acaf97a294dd88918ca6f2ace3a82136.jpg"
+    },
+    {
+      "metadata": {
+        "difficulties": {
+          "easy": false,
+          "expert": false,
+          "expertPlus": true,
+          "hard": false,
+          "normal": false
+        },
+        "characteristics": [
+          {
+            "difficulties": {
+              "easy": null,
+              "expert": null,
+              "expertPlus": {
+                "duration": 645.61669921875,
+                "length": 258,
+                "njs": 18,
+                "njsOffset": 0,
+                "bombs": 67,
+                "notes": 1765,
+                "obstacles": 288
+              },
+              "hard": null,
+              "normal": null
+            },
+            "name": "Standard"
+          }
+        ],
+        "levelAuthorName": "TranquillizeMe",
+        "songAuthorName": "Seven Lions, Kill The Noise",
+        "songName": "The Blood",
+        "songSubName": "",
+        "bpm": 150
+      },
+      "stats": {
+        "downloads": 116,
+        "plays": 0,
+        "downVotes": 1,
+        "upVotes": 4,
+        "heat": 858.3069167,
+        "rating": 0.625065935366517
+      },
+      "description": "Hello, it's been a while!\n\nThis song is one of my favorite songs to play, and is IMO the best map I've ever made. It's a shame that the NJS on the old version was too high, so I'm resubmitting it with nerfed NJS and a few minor edits. Should still feel like the same difficulty and energy, just better to read and play! This song has sampling from the game Bloodborne\n\nThe Blood - Seven Lions, Kill The Noise | 150 BPM | Expert+(+ish) Only | Fully mapped with Custom Lights and Red/Black colors",
+      "deletedAt": null,
+      "_id": "5d34b464452e910006266cb6",
+      "key": "5842",
+      "name": "The Blood",
+      "uploader": {
+        "_id": "5cff0b7798cc5a672c85609e",
+        "username": "tranquillizeme"
+      },
+      "hash": "f2ce1ff3cbd6f9eee210adec08a48036f605d95e",
+      "uploaded": "2019-07-21T18:52:20.793Z",
+      "downloadURL": "/api/download/key/5842",
+      "coverURL": "/cdn/5842/f2ce1ff3cbd6f9eee210adec08a48036f605d95e.jpg"
+    },
+    {
+      "metadata": {
+        "difficulties": {
+          "easy": false,
+          "expert": true,
+          "expertPlus": false,
+          "hard": false,
+          "normal": false
+        },
+        "characteristics": [
+          {
+            "difficulties": {
+              "easy": null,
+              "expert": {
+                "duration": 403.5,
+                "length": 166,
+                "njs": 19,
+                "njsOffset": 0,
+                "bombs": 0,
+                "notes": 722,
+                "obstacles": 0
+              },
+              "expertPlus": null,
+              "hard": null,
+              "normal": null
+            },
+            "name": "Standard"
+          }
+        ],
+        "levelAuthorName": "OkDisplay",
+        "songAuthorName": "Bryan Mason & Karner H",
+        "songName": "Nightcore - Bassjump",
+        "songSubName": "",
+        "bpm": 145
+      },
+      "stats": {
+        "downloads": 316,
+        "plays": 0,
+        "downVotes": 0,
+        "upVotes": 6,
+        "heat": 858.6028553,
+        "rating": 0.7216635107643746
+      },
+      "description": "Lenght: 2:48\nBpm: 145\nNJ: 19",
+      "deletedAt": null,
+      "_id": "5d34b37f452e910006266bc9",
+      "key": "5841",
+      "name": "Nightcore - Bassjump (Bryan Mason & Karner H)",
+      "uploader": {
+        "_id": "5cff0b7398cc5a672c84eda2",
+        "username": "okdisplay"
+      },
+      "hash": "52be5ff19704f64325971f03a2f70d3bdafda800",
+      "uploaded": "2019-07-21T18:48:31.683Z",
+      "downloadURL": "/api/download/key/5841",
+      "coverURL": "/cdn/5841/52be5ff19704f64325971f03a2f70d3bdafda800.jpg"
+    },
+    {
+      "metadata": {
+        "difficulties": {
+          "easy": false,
+          "expert": false,
+          "expertPlus": true,
+          "hard": false,
+          "normal": false
+        },
+        "characteristics": [
+          {
+            "difficulties": {
+              "easy": null,
+              "expert": null,
+              "expertPlus": {
+                "duration": 438.75,
+                "length": 118,
+                "njs": 20,
+                "njsOffset": 0,
+                "bombs": 0,
+                "notes": 984,
+                "obstacles": 0
+              },
+              "hard": null,
+              "normal": null
+            },
+            "name": "Standard"
+          }
+        ],
+        "levelAuthorName": "ODC",
+        "songAuthorName": "Yooh",
+        "songName": "Destiny",
+        "songSubName": "",
+        "bpm": 222
+      },
+      "stats": {
+        "downloads": 152,
+        "plays": 0,
+        "downVotes": 0,
+        "upVotes": 2,
+        "heat": 858.0304729,
+        "rating": 0.6407951473548253
+      },
+      "description": "Gameplay : https://youtu.be/AkF7maRqDv8\nLength 2:02\n222 bpm\n20 NJS (Note jump speed)\n984 Notes\nNotes/sec : 8.04\nExpert + Only\nLighting Events +",
+      "deletedAt": null,
+      "_id": "5d34a2c0452e910006265c04",
+      "key": "5840",
+      "name": "Yooh - Destiny ",
+      "uploader": {
+        "_id": "5cff0b7498cc5a672c850219",
+        "username": "odc"
+      },
+      "hash": "1cddae09ee119ea9858db530be4fcd208d447c95",
+      "uploaded": "2019-07-21T17:37:04.931Z",
+      "downloadURL": "/api/download/key/5840",
+      "coverURL": "/cdn/5840/1cddae09ee119ea9858db530be4fcd208d447c95.jpg"
+    }
+  ],
+  "totalDocs": 57,
+  "lastPage": 5,
+  "prevPage": 1,
+  "nextPage": 3
+}

@@ -1,0 +1,610 @@
+{
+  "docs": [
+    {
+      "metadata": {
+        "difficulties": {
+          "easy": false,
+          "expert": false,
+          "expertPlus": true,
+          "hard": false,
+          "normal": false
+        },
+        "characteristics": [
+          {
+            "difficulties": {
+              "easy": null,
+              "expert": null,
+              "expertPlus": {
+                "duration": 233.2050018310547,
+                "length": 93,
+                "njs": 24,
+                "njsOffset": 0.3,
+                "bombs": 0,
+                "notes": 687,
+                "obstacles": 27
+              },
+              "hard": null,
+              "normal": null
+            },
+            "name": "Standard"
+          }
+        ],
+        "levelAuthorName": "Dr_Marc",
+        "songAuthorName": "TAG",
+        "songName": "Romancing Layer",
+        "songSubName": "",
+        "bpm": 150
+      },
+      "stats": {
+        "downloads": 7,
+        "plays": 0,
+        "downVotes": 0,
+        "upVotes": 0,
+        "heat": 859.6914516,
+        "rating": 0
+      },
+      "description": "Updated, now im happy with it\nway faster NJS, feels better.\nRe did most patterns.\n\nEx+ only\n",
+      "deletedAt": null,
+      "_id": "5d35fba3fdb6a0000691cccb",
+      "key": "5861",
+      "name": "TAG - Romancing Layers v2",
+      "uploader": {
+        "_id": "5cff0b7398cc5a672c84ed14",
+        "username": "drmarc"
+      },
+      "hash": "4dc085803719ddc6d77b5d6b75e808a9e6a59978",
+      "uploaded": "2019-07-22T18:08:35.324Z",
+      "downloadURL": "/api/download/key/5861",
+      "coverURL": "/cdn/5861/4dc085803719ddc6d77b5d6b75e808a9e6a59978.jpg"
+    },
+    {
+      "metadata": {
+        "difficulties": {
+          "easy": false,
+          "expert": true,
+          "expertPlus": false,
+          "hard": false,
+          "normal": false
+        },
+        "characteristics": [
+          {
+            "difficulties": {
+              "easy": null,
+              "expert": {
+                "duration": 398.1300048828125,
+                "length": 199,
+                "njs": 18,
+                "njsOffset": 0,
+                "bombs": 0,
+                "notes": 857,
+                "obstacles": 7
+              },
+              "expertPlus": null,
+              "hard": null,
+              "normal": null
+            },
+            "name": "Standard"
+          }
+        ],
+        "levelAuthorName": "Rigid",
+        "songAuthorName": "kanon x kanon",
+        "songName": "The Doll House!",
+        "songSubName": "",
+        "bpm": 120
+      },
+      "stats": {
+        "downloads": 42,
+        "plays": 0,
+        "downVotes": 0,
+        "upVotes": 0,
+        "heat": 859.5662465,
+        "rating": 0
+      },
+      "description": "",
+      "deletedAt": null,
+      "_id": "5d35e5a18d9a800006f53715",
+      "key": "5860",
+      "name": "kanon x kanon - The Doll House!",
+      "uploader": {
+        "_id": "5cff0b7598cc5a672c852224",
+        "username": "rigid"
+      },
+      "hash": "c91dd774da7b6344188d46efa77014e0be8597fd",
+      "uploaded": "2019-07-22T16:34:41.092Z",
+      "downloadURL": "/api/download/key/5860",
+      "coverURL": "/cdn/5860/c91dd774da7b6344188d46efa77014e0be8597fd.jpg"
+    },
+    {
+      "metadata": {
+        "difficulties": {
+          "easy": false,
+          "expert": false,
+          "expertPlus": true,
+          "hard": false,
+          "normal": false
+        },
+        "characteristics": [
+          {
+            "difficulties": {
+              "easy": null,
+              "expert": null,
+              "expertPlus": {
+                "duration": 544,
+                "length": 204,
+                "njs": 18,
+                "njsOffset": 0,
+                "bombs": 0,
+                "notes": 1266,
+                "obstacles": 0
+              },
+              "hard": null,
+              "normal": null
+            },
+            "name": "Standard"
+          }
+        ],
+        "levelAuthorName": "EPG7ENS",
+        "songAuthorName": "Takebo3",
+        "songName": "Lolicon Is Justice",
+        "songSubName": "",
+        "bpm": 160
+      },
+      "stats": {
+        "downloads": 65,
+        "plays": 0,
+        "downVotes": 0,
+        "upVotes": 1,
+        "heat": 859.5556692,
+        "rating": 0.5941636475090435
+      },
+      "description": "I am not proud of this ",
+      "deletedAt": null,
+      "_id": "5d35e3c5fdb6a0000691bab1",
+      "key": "585f",
+      "name": "Lolicon Is Justice",
+      "uploader": {
+        "_id": "5cff0b7798cc5a672c855bb6",
+        "username": "epg7ens"
+      },
+      "hash": "aeaa7af7165276b9f9f481bec67ccb79ce13d02c",
+      "uploaded": "2019-07-22T16:26:45.116Z",
+      "downloadURL": "/api/download/key/585f",
+      "coverURL": "/cdn/585f/aeaa7af7165276b9f9f481bec67ccb79ce13d02c.jpg"
+    },
+    {
+      "metadata": {
+        "difficulties": {
+          "easy": false,
+          "expert": false,
+          "expertPlus": true,
+          "hard": false,
+          "normal": false
+        },
+        "characteristics": [
+          {
+            "difficulties": {
+              "easy": null,
+              "expert": null,
+              "expertPlus": {
+                "duration": 233.25,
+                "length": 117,
+                "njs": 20,
+                "njsOffset": 1,
+                "bombs": 0,
+                "notes": 794,
+                "obstacles": 12
+              },
+              "hard": null,
+              "normal": null
+            },
+            "name": "Standard"
+          }
+        ],
+        "levelAuthorName": "faidra",
+        "songAuthorName": "faidra",
+        "songName": "Fated Fantasy",
+        "songSubName": "",
+        "bpm": 119
+      },
+      "stats": {
+        "downloads": 31,
+        "plays": 0,
+        "downVotes": 0,
+        "upVotes": 0,
+        "heat": 859.5437394,
+        "rating": 0
+      },
+      "description": "",
+      "deletedAt": null,
+      "_id": "5d35e1acfdb6a0000691b97e",
+      "key": "585e",
+      "name": "Fated Fantasy",
+      "uploader": {
+        "_id": "5d35dfa93d080000067436d8",
+        "username": "faidra"
+      },
+      "hash": "b427728fe23f1c68af3b82c2c4dbb6daaadb2e76",
+      "uploaded": "2019-07-22T16:17:48.272Z",
+      "downloadURL": "/api/download/key/585e",
+      "coverURL": "/cdn/585e/b427728fe23f1c68af3b82c2c4dbb6daaadb2e76.png"
+    },
+    {
+      "metadata": {
+        "difficulties": {
+          "easy": false,
+          "expert": false,
+          "expertPlus": true,
+          "hard": false,
+          "normal": false
+        },
+        "characteristics": [
+          {
+            "difficulties": {
+              "easy": null,
+              "expert": null,
+              "expertPlus": {
+                "duration": 823.4998779296875,
+                "length": 238,
+                "njs": 19,
+                "njsOffset": 0,
+                "bombs": 12,
+                "notes": 1771,
+                "obstacles": 43
+              },
+              "hard": null,
+              "normal": null
+            },
+            "name": "Standard"
+          }
+        ],
+        "levelAuthorName": "Aithke & Loloppe",
+        "songAuthorName": "a crowd of rebellion",
+        "songName": "M1917",
+        "songSubName": "",
+        "bpm": 207
+      },
+      "stats": {
+        "downloads": 79,
+        "plays": 0,
+        "downVotes": 0,
+        "upVotes": 3,
+        "heat": 859.9542145,
+        "rating": 0.6705937099936721
+      },
+      "description": "Reupload count - 1\nBig thanks to hoppaw and loloppe\nActual fucking banger if you dont jam to this you're weird \nhttps://streamable.com/ftlm0",
+      "deletedAt": null,
+      "_id": "5d35d5f58d9a800006f52dcb",
+      "key": "585d",
+      "name": "M1917 - a crowd of rebellion ",
+      "uploader": {
+        "_id": "5cff0b7498cc5a672c850616",
+        "username": "aithke"
+      },
+      "hash": "c7505d164fa8e2e6010ae7fbba06576bd5fd687f",
+      "uploaded": "2019-07-22T15:27:49.198Z",
+      "downloadURL": "/api/download/key/585d",
+      "coverURL": "/cdn/585d/c7505d164fa8e2e6010ae7fbba06576bd5fd687f.jpg"
+    },
+    {
+      "metadata": {
+        "difficulties": {
+          "easy": false,
+          "expert": true,
+          "expertPlus": false,
+          "hard": true,
+          "normal": true
+        },
+        "characteristics": [
+          {
+            "difficulties": {
+              "easy": null,
+              "expert": {
+                "duration": 621.125,
+                "length": 219,
+                "njs": 13,
+                "njsOffset": 0,
+                "bombs": 6,
+                "notes": 632,
+                "obstacles": 78
+              },
+              "expertPlus": null,
+              "hard": {
+                "duration": 617,
+                "length": 217,
+                "njs": 12,
+                "njsOffset": 0,
+                "bombs": 0,
+                "notes": 524,
+                "obstacles": 83
+              },
+              "normal": {
+                "duration": 621.25,
+                "length": 219,
+                "njs": 10,
+                "njsOffset": 0,
+                "bombs": 0,
+                "notes": 306,
+                "obstacles": 57
+              }
+            },
+            "name": "Standard"
+          }
+        ],
+        "levelAuthorName": "MASO",
+        "songAuthorName": "Yunomi",
+        "songName": "Sky High (feat.Kizuna AI)",
+        "songSubName": "",
+        "bpm": 170
+      },
+      "stats": {
+        "downloads": 122,
+        "plays": 0,
+        "downVotes": 0,
+        "upVotes": 2,
+        "heat": 859.7675151,
+        "rating": 0.6407951473548253
+      },
+      "description": "I mapped Kizuna AI songs released on July 22nd.",
+      "deletedAt": null,
+      "_id": "5d35d417fdb6a0000691b1af",
+      "key": "585c",
+      "name": "Kizuna AI - Sky High (Prod. Yunomi)",
+      "uploader": {
+        "_id": "5cff0b7698cc5a672c854025",
+        "username": "maso"
+      },
+      "hash": "50d6e648d602b7ab30fbe23849ca63a4830b1beb",
+      "uploaded": "2019-07-22T15:19:51.830Z",
+      "downloadURL": "/api/download/key/585c",
+      "coverURL": "/cdn/585c/50d6e648d602b7ab30fbe23849ca63a4830b1beb.jpg"
+    },
+    {
+      "metadata": {
+        "difficulties": {
+          "easy": false,
+          "expert": true,
+          "expertPlus": true,
+          "hard": true,
+          "normal": false
+        },
+        "characteristics": [
+          {
+            "difficulties": {
+              "easy": null,
+              "expert": {
+                "duration": 392,
+                "length": 188,
+                "njs": 16,
+                "njsOffset": 0,
+                "bombs": 0,
+                "notes": 648,
+                "obstacles": 15
+              },
+              "expertPlus": {
+                "duration": 392,
+                "length": 188,
+                "njs": 17,
+                "njsOffset": 0,
+                "bombs": 0,
+                "notes": 812,
+                "obstacles": 11
+              },
+              "hard": {
+                "duration": 392,
+                "length": 188,
+                "njs": 15,
+                "njsOffset": 0,
+                "bombs": 0,
+                "notes": 484,
+                "obstacles": 15
+              },
+              "normal": null
+            },
+            "name": "Standard"
+          }
+        ],
+        "levelAuthorName": "TophatPandaMagician",
+        "songAuthorName": "Robby East",
+        "songName": "Live Another Day",
+        "songSubName": "",
+        "bpm": 125
+      },
+      "stats": {
+        "downloads": 104,
+        "plays": 0,
+        "downVotes": 0,
+        "upVotes": 2,
+        "heat": 859.6639001,
+        "rating": 0.6407951473548253
+      },
+      "description": "Mapped by TophatPandaMagician\n\nLength: 3:16\n\nHard, Expert, Expert+",
+      "deletedAt": null,
+      "_id": "5d35c1e1452e9100062724b8",
+      "key": "585b",
+      "name": "Robby East - Live Another Day",
+      "uploader": {
+        "_id": "5cff0b7898cc5a672c857026",
+        "username": "crimsonshadow"
+      },
+      "hash": "5d170c5fb3d1730e23d3f7708756876ef614646f",
+      "uploaded": "2019-07-22T14:02:09.156Z",
+      "downloadURL": "/api/download/key/585b",
+      "coverURL": "/cdn/585b/5d170c5fb3d1730e23d3f7708756876ef614646f.jpg"
+    },
+    {
+      "metadata": {
+        "difficulties": {
+          "easy": false,
+          "expert": false,
+          "expertPlus": true,
+          "hard": false,
+          "normal": false
+        },
+        "characteristics": [
+          {
+            "difficulties": {
+              "easy": null,
+              "expert": null,
+              "expertPlus": {
+                "duration": 358.25,
+                "length": 153,
+                "njs": 18,
+                "njsOffset": 0,
+                "bombs": 14,
+                "notes": 742,
+                "obstacles": 48
+              },
+              "hard": null,
+              "normal": null
+            },
+            "name": "Standard"
+          }
+        ],
+        "levelAuthorName": "xScaramouche",
+        "songAuthorName": "Skrillex",
+        "songName": "Mumbai Power ft. Beam",
+        "songSubName": "",
+        "bpm": 140
+      },
+      "stats": {
+        "downloads": 83,
+        "plays": 0,
+        "downVotes": 1,
+        "upVotes": 1,
+        "heat": 859.2859173,
+        "rating": 0.5
+      },
+      "description": "Mumbai Power ft. Beam - Skrillex\n\nThe long-awaited release of Fuji ID is finally here, now mapped for you to enjoy in Beat Saber!\n\nYou can find my previous upload, Fuji Opener, Here: https://beatsaver.com/beatmap/582c\n\nShoutout to SelfBlumpkin for making this chart possible.",
+      "deletedAt": null,
+      "_id": "5d35b45a452e910006271d97",
+      "key": "585a",
+      "name": "Mumbai Power ft. Beam - Skrillex",
+      "uploader": {
+        "_id": "5cff0b7798cc5a672c8558ed",
+        "username": "xscaramouche"
+      },
+      "hash": "332f4c219b3f6ad10a49616f49f709785a94ed2f",
+      "uploaded": "2019-07-22T13:04:26.277Z",
+      "downloadURL": "/api/download/key/585a",
+      "coverURL": "/cdn/585a/332f4c219b3f6ad10a49616f49f709785a94ed2f.jpg"
+    },
+    {
+      "metadata": {
+        "difficulties": {
+          "easy": false,
+          "expert": true,
+          "expertPlus": false,
+          "hard": false,
+          "normal": false
+        },
+        "characteristics": [
+          {
+            "difficulties": {
+              "easy": null,
+              "expert": {
+                "duration": 429.3208312988281,
+                "length": 234,
+                "njs": 12,
+                "njsOffset": 0,
+                "bombs": 12,
+                "notes": 1008,
+                "obstacles": 16
+              },
+              "expertPlus": null,
+              "hard": null,
+              "normal": null
+            },
+            "name": "Standard"
+          }
+        ],
+        "levelAuthorName": "Justiciar_",
+        "songAuthorName": "Kpop - BTS",
+        "songName": "[BTS] Not Today",
+        "songSubName": "",
+        "bpm": 110
+      },
+      "stats": {
+        "downloads": 109,
+        "plays": 0,
+        "downVotes": 0,
+        "upVotes": 0,
+        "heat": 859.1466336,
+        "rating": 0
+      },
+      "description": "[K-POP] BTS - Not Today - by Justiciar_",
+      "deletedAt": null,
+      "_id": "5d359bde3d0800000674118a",
+      "key": "5859",
+      "name": "[BTS] Not Today",
+      "uploader": {
+        "_id": "5d278ee80bfa7c0006b61cba",
+        "username": "justiciar_"
+      },
+      "hash": "734964462a035a1d0e46050a909dd5d9630b65f2",
+      "uploaded": "2019-07-22T11:19:58.512Z",
+      "downloadURL": "/api/download/key/5859",
+      "coverURL": "/cdn/5859/734964462a035a1d0e46050a909dd5d9630b65f2.jpg"
+    },
+    {
+      "metadata": {
+        "difficulties": {
+          "easy": false,
+          "expert": false,
+          "expertPlus": true,
+          "hard": false,
+          "normal": false
+        },
+        "characteristics": [
+          {
+            "difficulties": {
+              "easy": null,
+              "expert": null,
+              "expertPlus": {
+                "duration": 360.0824890136719,
+                "length": 130,
+                "njs": 17,
+                "njsOffset": 0,
+                "bombs": 0,
+                "notes": 1185,
+                "obstacles": 5
+              },
+              "hard": null,
+              "normal": null
+            },
+            "name": "Standard"
+          }
+        ],
+        "levelAuthorName": "Uninstaller",
+        "songAuthorName": "Ykawa",
+        "songName": "To Ocean",
+        "songSubName": "( Lith Harbor Remix )",
+        "bpm": 165
+      },
+      "stats": {
+        "downloads": 111,
+        "plays": 0,
+        "downVotes": 0,
+        "upVotes": 1,
+        "heat": 859.0106212,
+        "rating": 0.5941636475090435
+      },
+      "description": ":)",
+      "deletedAt": null,
+      "_id": "5d3583f58d9a800006f50336",
+      "key": "5858",
+      "name": "To Ocean (Lith Harbor Remix) -Ykawa [Maplestory OST]",
+      "uploader": {
+        "_id": "5cff0b7598cc5a672c85248e",
+        "username": "uninstaller"
+      },
+      "hash": "fb2df1c16b080519735a9d69da7f7ab3350784b3",
+      "uploaded": "2019-07-22T09:37:57.953Z",
+      "downloadURL": "/api/download/key/5858",
+      "coverURL": "/cdn/5858/fb2df1c16b080519735a9d69da7f7ab3350784b3.jpg"
+    }
+  ],
+  "totalDocs": 57,
+  "lastPage": 5,
+  "prevPage": null,
+  "nextPage": 1
+}

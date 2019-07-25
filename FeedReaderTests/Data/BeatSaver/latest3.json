@@ -1,0 +1,586 @@
+{
+  "docs": [
+    {
+      "metadata": {
+        "difficulties": {
+          "easy": false,
+          "expert": false,
+          "expertPlus": true,
+          "hard": false,
+          "normal": false
+        },
+        "characteristics": [
+          {
+            "difficulties": {
+              "easy": null,
+              "expert": null,
+              "expertPlus": {
+                "duration": 552.556640625,
+                "length": 165,
+                "njs": 21,
+                "njsOffset": 0,
+                "bombs": 58,
+                "notes": 1529,
+                "obstacles": 4
+              },
+              "hard": null,
+              "normal": null
+            },
+            "name": "Standard"
+          }
+        ],
+        "levelAuthorName": "ODC",
+        "songAuthorName": "Juggernaut",
+        "songName": "Retaliation",
+        "songSubName": "",
+        "bpm": 200
+      },
+      "stats": {
+        "downloads": 123,
+        "plays": 0,
+        "downVotes": 0,
+        "upVotes": 4,
+        "heat": 858.3312801,
+        "rating": 0.6919940778277485
+      },
+      "description": "good stamina required\nGameplay : https://youtu.be/2YkrXuLGmqE\nLength 2:46\n200 bpm\n21 NJS (Note jump speed)\n1529 Notes\nNotes/sec : 9.17\nExpert + Only\nLighting Events +",
+      "deletedAt": null,
+      "_id": "5d34a2b63d08000006735b1d",
+      "key": "583f",
+      "name": "Juggernaut - Retaliation",
+      "uploader": {
+        "_id": "5cff0b7498cc5a672c850219",
+        "username": "odc"
+      },
+      "hash": "62fdac4a59c2f38d65c30bb367aadeb825e34f4b",
+      "uploaded": "2019-07-21T17:36:54.905Z",
+      "downloadURL": "/api/download/key/583f",
+      "coverURL": "/cdn/583f/62fdac4a59c2f38d65c30bb367aadeb825e34f4b.jpg"
+    },
+    {
+      "metadata": {
+        "difficulties": {
+          "easy": false,
+          "expert": true,
+          "expertPlus": false,
+          "hard": false,
+          "normal": false
+        },
+        "characteristics": [
+          {
+            "difficulties": {
+              "easy": null,
+              "expert": {
+                "duration": 171.6999969482422,
+                "length": 73,
+                "njs": 20,
+                "njsOffset": 0,
+                "bombs": 0,
+                "notes": 343,
+                "obstacles": 0
+              },
+              "expertPlus": null,
+              "hard": null,
+              "normal": null
+            },
+            "name": "Standard"
+          }
+        ],
+        "levelAuthorName": "Playingaim",
+        "songAuthorName": "League of Legends",
+        "songName": "LULUMIX",
+        "songSubName": "",
+        "bpm": 140
+      },
+      "stats": {
+        "downloads": 187,
+        "plays": 0,
+        "downVotes": 0,
+        "upVotes": 4,
+        "heat": 858.2859294,
+        "rating": 0.6919940778277485
+      },
+      "description": "fun map",
+      "deletedAt": null,
+      "_id": "5d349abe3d0800000673531c",
+      "key": "583e",
+      "name": "LULUMIX",
+      "uploader": {
+        "_id": "5cff0b7798cc5a672c85594a",
+        "username": "playingaim"
+      },
+      "hash": "c2062b4564c57dee1a357d46ab73599f36ef13b8",
+      "uploaded": "2019-07-21T17:02:54.122Z",
+      "downloadURL": "/api/download/key/583e",
+      "coverURL": "/cdn/583e/c2062b4564c57dee1a357d46ab73599f36ef13b8.png"
+    },
+    {
+      "metadata": {
+        "difficulties": {
+          "easy": false,
+          "expert": false,
+          "expertPlus": false,
+          "hard": true,
+          "normal": false
+        },
+        "characteristics": [
+          {
+            "difficulties": {
+              "easy": null,
+              "expert": null,
+              "expertPlus": null,
+              "hard": {
+                "duration": 604.75,
+                "length": 270,
+                "njs": 12,
+                "njsOffset": 0,
+                "bombs": 58,
+                "notes": 559,
+                "obstacles": 21
+              },
+              "normal": null
+            },
+            "name": "Standard"
+          }
+        ],
+        "levelAuthorName": "Dragonhunter",
+        "songAuthorName": "Oneeva  - Cores & Shells",
+        "songName": "Cores & Shells",
+        "songSubName": "",
+        "bpm": 134
+      },
+      "stats": {
+        "downloads": 92,
+        "plays": 0,
+        "downVotes": 0,
+        "upVotes": 0,
+        "heat": 857.6034029,
+        "rating": 0
+      },
+      "description": "My second map. Have fun!",
+      "deletedAt": null,
+      "_id": "5d348c99452e910006264503",
+      "key": "583d",
+      "name": "Oneeva  - Cores & Shells",
+      "uploader": {
+        "_id": "5d336fee452e9100062551af",
+        "username": "dragonhunter"
+      },
+      "hash": "0ba5ea21b63d9290d95914bb1728badb25bffb5f",
+      "uploaded": "2019-07-21T16:02:33.130Z",
+      "downloadURL": "/api/download/key/583d",
+      "coverURL": "/cdn/583d/0ba5ea21b63d9290d95914bb1728badb25bffb5f.jpg"
+    },
+    {
+      "metadata": {
+        "difficulties": {
+          "easy": false,
+          "expert": false,
+          "expertPlus": true,
+          "hard": false,
+          "normal": false
+        },
+        "characteristics": [
+          {
+            "difficulties": {
+              "easy": null,
+              "expert": null,
+              "expertPlus": {
+                "duration": 163.6875,
+                "length": 38,
+                "njs": 25,
+                "njsOffset": 0,
+                "bombs": 0,
+                "notes": 574,
+                "obstacles": 1
+              },
+              "hard": null,
+              "normal": null
+            },
+            "name": "Standard"
+          }
+        ],
+        "levelAuthorName": "wh4t",
+        "songAuthorName": "NumNu7s (me)",
+        "songName": "B1rd Up",
+        "songSubName": "",
+        "bpm": 256
+      },
+      "stats": {
+        "downloads": 105,
+        "plays": 0,
+        "downVotes": 2,
+        "upVotes": 2,
+        "heat": 857.5151587,
+        "rating": 0.5
+      },
+      "description": "NumNu7s is me so ye :3\n\nHeres the song: https://www.youtube.com/watch?v=uGRPtb9cXDk",
+      "deletedAt": null,
+      "_id": "5d347d16452e9100062638da",
+      "key": "583c",
+      "name": "B1rd Up (By Me)",
+      "uploader": {
+        "_id": "5cff0b7698cc5a672c854a7f",
+        "username": "wh4t"
+      },
+      "hash": "9adeadf754bba759ed4e7e0d5d200daa22b39f9f",
+      "uploaded": "2019-07-21T14:56:22.140Z",
+      "downloadURL": "/api/download/key/583c",
+      "coverURL": "/cdn/583c/9adeadf754bba759ed4e7e0d5d200daa22b39f9f.jpg"
+    },
+    {
+      "metadata": {
+        "difficulties": {
+          "easy": false,
+          "expert": true,
+          "expertPlus": false,
+          "hard": false,
+          "normal": false
+        },
+        "characteristics": [
+          {
+            "difficulties": {
+              "easy": null,
+              "expert": {
+                "duration": 483,
+                "length": 247,
+                "njs": 17,
+                "njsOffset": 0,
+                "bombs": 6,
+                "notes": 656,
+                "obstacles": 131
+              },
+              "expertPlus": null,
+              "hard": null,
+              "normal": null
+            },
+            "name": "Standard"
+          }
+        ],
+        "levelAuthorName": "Heisenberg",
+        "songAuthorName": "Rammstein",
+        "songName": "PUPPE",
+        "songSubName": "",
+        "bpm": 117
+      },
+      "stats": {
+        "downloads": 334,
+        "plays": 0,
+        "downVotes": 1,
+        "upVotes": 7,
+        "heat": 858.1658016,
+        "rating": 0.6814578107542375
+      },
+      "description": "I recommend playing with lower slash sound.",
+      "deletedAt": null,
+      "_id": "5d3466ac19fc1b00062b0562",
+      "key": "583a",
+      "name": "PUPPE - Rammstein",
+      "uploader": {
+        "_id": "5cff0b7298cc5a672c84ec30",
+        "username": "heisenbergirl"
+      },
+      "hash": "e33bb284ce5af33ad2341c31c8be466c2b384381",
+      "uploaded": "2019-07-21T13:20:44.264Z",
+      "downloadURL": "/api/download/key/583a",
+      "coverURL": "/cdn/583a/e33bb284ce5af33ad2341c31c8be466c2b384381.jpg"
+    },
+    {
+      "metadata": {
+        "difficulties": {
+          "easy": false,
+          "expert": true,
+          "expertPlus": false,
+          "hard": true,
+          "normal": false
+        },
+        "characteristics": [
+          {
+            "difficulties": {
+              "easy": null,
+              "expert": {
+                "duration": 117.55000305175781,
+                "length": 39,
+                "njs": 16,
+                "njsOffset": 0,
+                "bombs": 0,
+                "notes": 204,
+                "obstacles": 3
+              },
+              "expertPlus": null,
+              "hard": {
+                "duration": 117.55000305175781,
+                "length": 39,
+                "njs": 14,
+                "njsOffset": 0,
+                "bombs": 0,
+                "notes": 124,
+                "obstacles": 2
+              },
+              "normal": null
+            },
+            "name": "Standard"
+          }
+        ],
+        "levelAuthorName": "Rigid",
+        "songAuthorName": "Parry Gripp",
+        "songName": "Guinea Pig Bridge",
+        "songSubName": "",
+        "bpm": 180
+      },
+      "stats": {
+        "downloads": 83,
+        "plays": 0,
+        "downVotes": 0,
+        "upVotes": 2,
+        "heat": 857.6874802,
+        "rating": 0.6407951473548253
+      },
+      "description": "",
+      "deletedAt": null,
+      "_id": "5d3466763d0800000673271e",
+      "key": "5839",
+      "name": "Parry Gripp - Guinea Pig Bridge",
+      "uploader": {
+        "_id": "5cff0b7598cc5a672c852224",
+        "username": "rigid"
+      },
+      "hash": "aa8379c4ea9f77ea53c210cbbe5ef2bf1dee2c43",
+      "uploaded": "2019-07-21T13:19:50.258Z",
+      "downloadURL": "/api/download/key/5839",
+      "coverURL": "/cdn/5839/aa8379c4ea9f77ea53c210cbbe5ef2bf1dee2c43.png"
+    },
+    {
+      "metadata": {
+        "difficulties": {
+          "easy": false,
+          "expert": true,
+          "expertPlus": false,
+          "hard": false,
+          "normal": false
+        },
+        "characteristics": [
+          {
+            "difficulties": {
+              "easy": null,
+              "expert": {
+                "duration": 339,
+                "length": 162,
+                "njs": 17,
+                "njsOffset": 0,
+                "bombs": 0,
+                "notes": 806,
+                "obstacles": 23
+              },
+              "expertPlus": null,
+              "hard": null,
+              "normal": null
+            },
+            "name": "Standard"
+          }
+        ],
+        "levelAuthorName": "DJXEP",
+        "songAuthorName": "M.I.A.",
+        "songName": "Bring The Noize",
+        "songSubName": "",
+        "bpm": 125
+      },
+      "stats": {
+        "downloads": 320,
+        "plays": 0,
+        "downVotes": 0,
+        "upVotes": 5,
+        "heat": 857.6443923,
+        "rating": 0.7084432256108616
+      },
+      "description": "",
+      "deletedAt": null,
+      "_id": "5d3418f019fc1b00062ad46b",
+      "key": "5837",
+      "name": "M.I.A. - Bring The Noize ",
+      "uploader": {
+        "_id": "5cff0b7698cc5a672c854968",
+        "username": "djxep"
+      },
+      "hash": "930c5e738d3d5d1e92f434ef1eb78f663a0629aa",
+      "uploaded": "2019-07-21T07:49:04.002Z",
+      "downloadURL": "/api/download/key/5837",
+      "coverURL": "/cdn/5837/930c5e738d3d5d1e92f434ef1eb78f663a0629aa.jpg"
+    },
+    {
+      "metadata": {
+        "difficulties": {
+          "easy": true,
+          "expert": false,
+          "expertPlus": false,
+          "hard": false,
+          "normal": false
+        },
+        "characteristics": [
+          {
+            "difficulties": {
+              "easy": {
+                "duration": 313.8933410644531,
+                "length": 147,
+                "njs": 16,
+                "njsOffset": 0,
+                "bombs": 0,
+                "notes": 490,
+                "obstacles": 8
+              },
+              "expert": null,
+              "expertPlus": null,
+              "hard": null,
+              "normal": null
+            },
+            "name": "Standard"
+          }
+        ],
+        "levelAuthorName": "waika",
+        "songAuthorName": "NM",
+        "songName": "Little Doge",
+        "songSubName": "",
+        "bpm": 128
+      },
+      "stats": {
+        "downloads": 166,
+        "plays": 0,
+        "downVotes": 0,
+        "upVotes": 0,
+        "heat": 856.7129965,
+        "rating": 0
+      },
+      "description": "https://www.bilibili.com/video/av60054584/",
+      "deletedAt": null,
+      "_id": "5d33f014452e91000625db73",
+      "key": "5835",
+      "name": "Little Doge",
+      "uploader": {
+        "_id": "5cff0b7698cc5a672c85464f",
+        "username": "waika"
+      },
+      "hash": "3bd48aedbff1bdc92f42bba2d0ffb3b0fc30afeb",
+      "uploaded": "2019-07-21T04:54:44.841Z",
+      "downloadURL": "/api/download/key/5835",
+      "coverURL": "/cdn/5835/3bd48aedbff1bdc92f42bba2d0ffb3b0fc30afeb.jpg"
+    },
+    {
+      "metadata": {
+        "difficulties": {
+          "easy": false,
+          "expert": false,
+          "expertPlus": true,
+          "hard": false,
+          "normal": false
+        },
+        "characteristics": [
+          {
+            "difficulties": {
+              "easy": null,
+              "expert": null,
+              "expertPlus": {
+                "duration": 777,
+                "length": 267,
+                "njs": 17,
+                "njsOffset": 0,
+                "bombs": 322,
+                "notes": 1477,
+                "obstacles": 92
+              },
+              "hard": null,
+              "normal": null
+            },
+            "name": "Standard"
+          }
+        ],
+        "levelAuthorName": "MASO",
+        "songAuthorName": "Riot ",
+        "songName": "Overkill (oneBYone Remix)",
+        "songSubName": "",
+        "bpm": 174
+      },
+      "stats": {
+        "downloads": 1116,
+        "plays": 0,
+        "downVotes": 6,
+        "upVotes": 32,
+        "heat": 858.0595572,
+        "rating": 0.7285514862271631
+      },
+      "description": "Please practice the original overkill\nLength:4:38\nBPM:174\nNots:1477\nNJS:17",
+      "deletedAt": null,
+      "_id": "5d33e40e19fc1b00062aae43",
+      "key": "5834",
+      "name": "Overkill (oneBYone Remix)",
+      "uploader": {
+        "_id": "5cff0b7698cc5a672c854025",
+        "username": "maso"
+      },
+      "hash": "97bf2aa342d1a4d6310c780bac24d04fe1f8f601",
+      "uploaded": "2019-07-21T04:03:26.274Z",
+      "downloadURL": "/api/download/key/5834",
+      "coverURL": "/cdn/5834/97bf2aa342d1a4d6310c780bac24d04fe1f8f601.jpg"
+    },
+    {
+      "metadata": {
+        "difficulties": {
+          "easy": false,
+          "expert": true,
+          "expertPlus": false,
+          "hard": false,
+          "normal": false
+        },
+        "characteristics": [
+          {
+            "difficulties": {
+              "easy": null,
+              "expert": {
+                "duration": 353.125,
+                "length": 176,
+                "njs": 12,
+                "njsOffset": 0,
+                "bombs": 14,
+                "notes": 769,
+                "obstacles": 1
+              },
+              "expertPlus": null,
+              "hard": null,
+              "normal": null
+            },
+            "name": "Standard"
+          }
+        ],
+        "levelAuthorName": "Bubble",
+        "songAuthorName": "IDubbbz",
+        "songName": "Asian Jake Paul",
+        "songSubName": "",
+        "bpm": 120
+      },
+      "stats": {
+        "downloads": 453,
+        "plays": 0,
+        "downVotes": 2,
+        "upVotes": 5,
+        "heat": 857.0696886,
+        "rating": 0.5996985309510746
+      },
+      "description": "132 bpm, there is a lot of notes for expert but they are all easy to hit",
+      "deletedAt": null,
+      "_id": "5d33dae9452e91000625c7c7",
+      "key": "5833",
+      "name": "Asian Jake Paul",
+      "uploader": {
+        "_id": "5d307cb5bc201300063c9892",
+        "username": "bubble"
+      },
+      "hash": "8d439745385935e9f5ba28aa26dbeb8a0f1ceeca",
+      "uploaded": "2019-07-21T03:24:25.532Z",
+      "downloadURL": "/api/download/key/5833",
+      "coverURL": "/cdn/5833/8d439745385935e9f5ba28aa26dbeb8a0f1ceeca.jpg"
+    }
+  ],
+  "totalDocs": 57,
+  "lastPage": 5,
+  "prevPage": 2,
+  "nextPage": 4
+}

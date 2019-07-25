@@ -4,6 +4,7 @@ using System.Linq;
 using System.IO;
 using FeedReader;
 using Newtonsoft.Json.Linq;
+using System;
 
 namespace FeedReaderTests
 {
@@ -21,7 +22,7 @@ namespace FeedReaderTests
         {
             var reader = new ScoreSaberReader();
             int maxSongs = 100;
-            var settings = new ScoreSaberFeedSettings((int)ScoreSaberFeeds.TRENDING) { MaxSongs = maxSongs, SongsPerPage = 40, RankedOnly = true };
+            var settings = new ScoreSaberFeedSettings((int)ScoreSaberFeed.Trending) { MaxSongs = maxSongs, SongsPerPage = 40, RankedOnly = true };
             var songList = reader.GetSongsFromFeed(settings);
             Assert.IsTrue(songList.Count == maxSongs);
             Assert.IsFalse(songList.Keys.Any(k => string.IsNullOrEmpty(k)));
@@ -32,7 +33,8 @@ namespace FeedReaderTests
         {
             var reader = new ScoreSaberReader() { StoreRawData = true };
             var pageText = File.ReadAllText("Data\\ScoreSaberPage.json");
-            var songList = reader.GetSongsFromPageText(pageText, "");
+            Uri sourceUri = null;
+            var songList = reader.GetSongsFromPageText(pageText, sourceUri);
             Assert.IsTrue(songList.Count == 50);
             var firstHash = "0597F8F7D8E396EBFEF511DC9EC98B69635CE532";
             Assert.IsTrue(songList.First().Hash == firstHash);

@@ -1,0 +1,618 @@
+{
+  "docs": [
+    {
+      "metadata": {
+        "difficulties": {
+          "easy": false,
+          "expert": true,
+          "expertPlus": false,
+          "hard": true,
+          "normal": false
+        },
+        "characteristics": [
+          {
+            "difficulties": {
+              "easy": null,
+              "expert": {
+                "duration": 440.76324462890625,
+                "length": 226,
+                "njs": 16,
+                "njsOffset": 0,
+                "bombs": 0,
+                "notes": 1174,
+                "obstacles": 78
+              },
+              "expertPlus": null,
+              "hard": {
+                "duration": 440.76324462890625,
+                "length": 226,
+                "njs": 13,
+                "njsOffset": 0,
+                "bombs": 0,
+                "notes": 724,
+                "obstacles": 63
+              },
+              "normal": null
+            },
+            "name": "Standard"
+          }
+        ],
+        "levelAuthorName": "ejiejidayo",
+        "songAuthorName": "Yui Horie",
+        "songName": "Coloring",
+        "songSubName": "",
+        "bpm": 117
+      },
+      "stats": {
+        "downloads": 400,
+        "plays": 0,
+        "downVotes": 0,
+        "upVotes": 10,
+        "heat": 859.7115432,
+        "rating": 0.7570708845427101
+      },
+      "description": "60",
+      "deletedAt": null,
+      "_id": "5d354f63fdb6a00006917478",
+      "key": "5857",
+      "name": "Coloring - Yui Horie",
+      "uploader": {
+        "_id": "5cff0b7398cc5a672c84fc58",
+        "username": "ejiejidayo"
+      },
+      "hash": "731540a176eb1d72232726013603be885d24f64e",
+      "uploaded": "2019-07-22T05:53:39.443Z",
+      "downloadURL": "/api/download/key/5857",
+      "coverURL": "/cdn/5857/731540a176eb1d72232726013603be885d24f64e.jpg"
+    },
+    {
+      "metadata": {
+        "difficulties": {
+          "easy": true,
+          "expert": true,
+          "expertPlus": false,
+          "hard": true,
+          "normal": true
+        },
+        "characteristics": [
+          {
+            "difficulties": {
+              "easy": {
+                "duration": 463.75,
+                "length": 195,
+                "njs": 10,
+                "njsOffset": 0,
+                "bombs": 0,
+                "notes": 259,
+                "obstacles": 11
+              },
+              "expert": {
+                "duration": 463.75,
+                "length": 195,
+                "njs": 10,
+                "njsOffset": 0,
+                "bombs": 0,
+                "notes": 599,
+                "obstacles": 49
+              },
+              "expertPlus": null,
+              "hard": {
+                "duration": 463.75,
+                "length": 195,
+                "njs": 10,
+                "njsOffset": 0,
+                "bombs": 0,
+                "notes": 365,
+                "obstacles": 61
+              },
+              "normal": {
+                "duration": 463.75,
+                "length": 195,
+                "njs": 10,
+                "njsOffset": 0,
+                "bombs": 0,
+                "notes": 306,
+                "obstacles": 39
+              }
+            },
+            "name": "Standard"
+          }
+        ],
+        "levelAuthorName": "YUNYU, Michael Sheridan, Kirke Godfrey",
+        "songAuthorName": "YUNYU",
+        "songName": "Pirates of the Silk Road ",
+        "songSubName": "",
+        "bpm": 142
+      },
+      "stats": {
+        "downloads": 138,
+        "plays": 0,
+        "downVotes": 0,
+        "upVotes": 1,
+        "heat": 858.4529491,
+        "rating": 0.5941636475090435
+      },
+      "description": "Pirates of the Silk Road combines martial arts and the art of dance",
+      "deletedAt": null,
+      "_id": "5d3521ee452e91000626d7d3",
+      "key": "5856",
+      "name": "Pirates of the Silk Road",
+      "uploader": {
+        "_id": "5cff0b7698cc5a672c8552e5",
+        "username": "yunyu"
+      },
+      "hash": "42b0a557a427bdc311230f0e912fc41b801f5157",
+      "uploaded": "2019-07-22T02:39:42.709Z",
+      "downloadURL": "/api/download/key/5856",
+      "coverURL": "/cdn/5856/42b0a557a427bdc311230f0e912fc41b801f5157.jpg"
+    },
+    {
+      "metadata": {
+        "difficulties": {
+          "easy": false,
+          "expert": true,
+          "expertPlus": false,
+          "hard": false,
+          "normal": false
+        },
+        "characteristics": [
+          {
+            "difficulties": {
+              "easy": null,
+              "expert": {
+                "duration": 767,
+                "length": 230,
+                "njs": 0,
+                "njsOffset": 0,
+                "bombs": 10,
+                "notes": 1089,
+                "obstacles": 3
+              },
+              "expertPlus": null,
+              "hard": null,
+              "normal": null
+            },
+            "name": "Standard"
+          }
+        ],
+        "levelAuthorName": "Copper Badger",
+        "songAuthorName": "Shawn Wasabi",
+        "songName": "Hotto Dogu",
+        "songSubName": "",
+        "bpm": 200
+      },
+      "stats": {
+        "downloads": 181,
+        "plays": 0,
+        "downVotes": 1,
+        "upVotes": 1,
+        "heat": 858.3027274,
+        "rating": 0.5
+      },
+      "description": "\"Hotto Dogu,\" Shawn Wasabi | 200 bpm | Expert\n\nHotdog dance! First map, took so long that it might be my only one.\n\nShawn: https://youtu.be/GOJTG8E0bwU",
+      "deletedAt": null,
+      "_id": "5d350786fdb6a000069140c7",
+      "key": "5855",
+      "name": "HOTTO DOGU",
+      "uploader": {
+        "_id": "5d34ec958d9a800006f4a491",
+        "username": "copperbadger"
+      },
+      "hash": "2dd67413bf07431abdde4f2fd9d5bfac72628652",
+      "uploaded": "2019-07-22T00:47:02.735Z",
+      "downloadURL": "/api/download/key/5855",
+      "coverURL": "/cdn/5855/2dd67413bf07431abdde4f2fd9d5bfac72628652.png"
+    },
+    {
+      "metadata": {
+        "difficulties": {
+          "easy": false,
+          "expert": false,
+          "expertPlus": true,
+          "hard": false,
+          "normal": false
+        },
+        "characteristics": [
+          {
+            "difficulties": {
+              "easy": null,
+              "expert": null,
+              "expertPlus": {
+                "duration": 766.245361328125,
+                "length": 249,
+                "njs": 17,
+                "njsOffset": 0,
+                "bombs": 14,
+                "notes": 1525,
+                "obstacles": 10
+              },
+              "hard": null,
+              "normal": null
+            },
+            "name": "Standard"
+          }
+        ],
+        "levelAuthorName": "Hen_Tie",
+        "songAuthorName": "EGOIST",
+        "songName": "Ame, Kimi o Tsurete",
+        "songSubName": "",
+        "bpm": 184
+      },
+      "stats": {
+        "downloads": 226,
+        "plays": 0,
+        "downVotes": 0,
+        "upVotes": 3,
+        "heat": 858.768005,
+        "rating": 0.6705937099936721
+      },
+      "description": "please send feedback to Hen_Tie#0001 on discord\npepebop song, map is probably a bit pepega like most of my maps but i hope you can find it fun\nexpert+ diff only\n1525 notes at 6.02/sec",
+      "deletedAt": null,
+      "_id": "5d350571452e91000626bd8a",
+      "key": "5854",
+      "name": "EGOIST - Ame, Kimi o Tsurete",
+      "uploader": {
+        "_id": "5cff0b7498cc5a672c85006a",
+        "username": "hentie"
+      },
+      "hash": "4b259a50d6396d7c705904ba93be48d6018f6480",
+      "uploaded": "2019-07-22T00:38:09.769Z",
+      "downloadURL": "/api/download/key/5854",
+      "coverURL": "/cdn/5854/4b259a50d6396d7c705904ba93be48d6018f6480.jpg"
+    },
+    {
+      "metadata": {
+        "difficulties": {
+          "easy": false,
+          "expert": true,
+          "expertPlus": false,
+          "hard": true,
+          "normal": false
+        },
+        "characteristics": [
+          {
+            "difficulties": {
+              "easy": null,
+              "expert": {
+                "duration": 810.3333129882812,
+                "length": 243,
+                "njs": 21,
+                "njsOffset": 0,
+                "bombs": 8,
+                "notes": 1428,
+                "obstacles": 5
+              },
+              "expertPlus": null,
+              "hard": {
+                "duration": 810.3333129882812,
+                "length": 243,
+                "njs": 16,
+                "njsOffset": 0,
+                "bombs": 8,
+                "notes": 1328,
+                "obstacles": 5
+              },
+              "normal": null
+            },
+            "name": "Standard"
+          }
+        ],
+        "levelAuthorName": "Hoppaw & AiThKe",
+        "songAuthorName": "Okazaki Taiiku",
+        "songName": "Kimi no Bouken",
+        "songSubName": "",
+        "bpm": 200
+      },
+      "stats": {
+        "downloads": 287,
+        "plays": 0,
+        "downVotes": 0,
+        "upVotes": 8,
+        "heat": 859.0992109,
+        "rating": 0.7419437476723167
+      },
+      "description": "owo rereleasing soon with 8key diff",
+      "deletedAt": null,
+      "_id": "5d34f4c98d9a800006f4aa91",
+      "key": "5852",
+      "name": "Kimi no Bouken",
+      "uploader": {
+        "_id": "5cff0b7498cc5a672c850660",
+        "username": "hoppaw"
+      },
+      "hash": "c845fd10539b426a16ab5493e7e739edb7861fc2",
+      "uploaded": "2019-07-21T23:27:05.441Z",
+      "downloadURL": "/api/download/key/5852",
+      "coverURL": "/cdn/5852/c845fd10539b426a16ab5493e7e739edb7861fc2.jpg"
+    },
+    {
+      "metadata": {
+        "difficulties": {
+          "easy": false,
+          "expert": false,
+          "expertPlus": true,
+          "hard": false,
+          "normal": false
+        },
+        "characteristics": [
+          {
+            "difficulties": {
+              "easy": null,
+              "expert": null,
+              "expertPlus": {
+                "duration": 834.369384765625,
+                "length": 292,
+                "njs": 21.375,
+                "njsOffset": 0,
+                "bombs": 4,
+                "notes": 1628,
+                "obstacles": 5
+              },
+              "hard": null,
+              "normal": null
+            },
+            "name": "Standard"
+          }
+        ],
+        "levelAuthorName": "Loloppe",
+        "songAuthorName": "Eminem ft. Nate Dogg",
+        "songName": "Till I Collapse",
+        "songSubName": "",
+        "bpm": 171
+      },
+      "stats": {
+        "downloads": 383,
+        "plays": 0,
+        "downVotes": 1,
+        "upVotes": 1,
+        "heat": 858.1829207,
+        "rating": 0.5
+      },
+      "description": "???\nExpert+?\nBPM: 171\nNotes: 1632\nEvents: 8275\nDuration: 5:00",
+      "deletedAt": null,
+      "_id": "5d34f2773d0800000673ab90",
+      "key": "5851",
+      "name": "Till I Collapse - Eminem ft. Nate Dogg",
+      "uploader": {
+        "_id": "5cff0b7398cc5a672c84f982",
+        "username": "loloppe"
+      },
+      "hash": "31138c054d7ca6b318c8d628015a5ccb996416e0",
+      "uploaded": "2019-07-21T23:17:11.431Z",
+      "downloadURL": "/api/download/key/5851",
+      "coverURL": "/cdn/5851/31138c054d7ca6b318c8d628015a5ccb996416e0.jpg"
+    },
+    {
+      "metadata": {
+        "difficulties": {
+          "easy": false,
+          "expert": true,
+          "expertPlus": false,
+          "hard": false,
+          "normal": false
+        },
+        "characteristics": [
+          {
+            "difficulties": {
+              "easy": null,
+              "expert": {
+                "duration": 266.2733459472656,
+                "length": 89,
+                "njs": 16,
+                "njsOffset": 0,
+                "bombs": 0,
+                "notes": 411,
+                "obstacles": 1
+              },
+              "expertPlus": null,
+              "hard": null,
+              "normal": null
+            },
+            "name": "Standard"
+          }
+        ],
+        "levelAuthorName": "Rigid",
+        "songAuthorName": "Nanahira",
+        "songName": "Chikatto Chika Chika",
+        "songSubName": "",
+        "bpm": 178
+      },
+      "stats": {
+        "downloads": 306,
+        "plays": 0,
+        "downVotes": 1,
+        "upVotes": 7,
+        "heat": 858.9217886,
+        "rating": 0.6814578107542375
+      },
+      "description": "",
+      "deletedAt": null,
+      "_id": "5d34eb8f452e91000626a717",
+      "key": "584f",
+      "name": "Nanahira - Chikatto Chika Chika",
+      "uploader": {
+        "_id": "5cff0b7598cc5a672c852224",
+        "username": "rigid"
+      },
+      "hash": "09e741dba99bcbcda91fc7fc78f710c95d6a866b",
+      "uploaded": "2019-07-21T22:47:43.681Z",
+      "downloadURL": "/api/download/key/584f",
+      "coverURL": "/cdn/584f/09e741dba99bcbcda91fc7fc78f710c95d6a866b.jpg"
+    },
+    {
+      "metadata": {
+        "difficulties": {
+          "easy": true,
+          "expert": false,
+          "expertPlus": false,
+          "hard": false,
+          "normal": false
+        },
+        "characteristics": [
+          {
+            "difficulties": {
+              "easy": {
+                "duration": 176.50009155273438,
+                "length": 52,
+                "njs": 8,
+                "njsOffset": 2,
+                "bombs": 0,
+                "notes": 609,
+                "obstacles": 84
+              },
+              "expert": null,
+              "expertPlus": null,
+              "hard": null,
+              "normal": null
+            },
+            "name": "Standard"
+          }
+        ],
+        "levelAuthorName": "Dennileon1",
+        "songAuthorName": "ORA",
+        "songName": "ORA ORA ORA",
+        "songSubName": "",
+        "bpm": 200
+      },
+      "stats": {
+        "downloads": 128,
+        "plays": 0,
+        "downVotes": 1,
+        "upVotes": 1,
+        "heat": 858.1304824,
+        "rating": 0.5
+      },
+      "description": "Chill Fun Map",
+      "deletedAt": null,
+      "_id": "5d34e93f3d0800000673a46d",
+      "key": "584e",
+      "name": "ORA ORA ORA",
+      "uploader": {
+        "_id": "5cff0b7798cc5a672c855e2f",
+        "username": "dennileon1"
+      },
+      "hash": "46b6068a294f6ca4a5b9aae4ba55c95b9045ca04",
+      "uploaded": "2019-07-21T22:37:51.706Z",
+      "downloadURL": "/api/download/key/584e",
+      "coverURL": "/cdn/584e/46b6068a294f6ca4a5b9aae4ba55c95b9045ca04.jpg"
+    },
+    {
+      "metadata": {
+        "difficulties": {
+          "easy": false,
+          "expert": true,
+          "expertPlus": false,
+          "hard": false,
+          "normal": false
+        },
+        "characteristics": [
+          {
+            "difficulties": {
+              "easy": null,
+              "expert": {
+                "duration": 969.75,
+                "length": 415,
+                "njs": 12,
+                "njsOffset": 0,
+                "bombs": 0,
+                "notes": 908,
+                "obstacles": 16
+              },
+              "expertPlus": null,
+              "hard": null,
+              "normal": null
+            },
+            "name": "Standard"
+          }
+        ],
+        "levelAuthorName": "Pixelman546",
+        "songAuthorName": "Remix by Noteblock",
+        "songName": "Waluigi Pinball",
+        "songSubName": "",
+        "bpm": 140
+      },
+      "stats": {
+        "downloads": 294,
+        "plays": 0,
+        "downVotes": 0,
+        "upVotes": 5,
+        "heat": 858.7652306,
+        "rating": 0.7084432256108616
+      },
+      "description": "First Beatsaber map with a Noteblock song!! YAY! I went with Waluigi Pinball because it had some great parts that fit well into Beatsaber (especially the streams) ;D \n\nCheck out his remix: https://youtu.be/bvhpOJa4rA0\n\nWatch me play the map: https://youtu.be/6B1loFQblxk",
+      "deletedAt": null,
+      "_id": "5d34ddf5fdb6a00006911cdb",
+      "key": "584d",
+      "name": "Waluigi's Pinball Machine (Remix by Noteblock)",
+      "uploader": {
+        "_id": "5d09b528f9117f00061ee31f",
+        "username": "pixelman546"
+      },
+      "hash": "49c217e37a4325291fc0024845c2c442cb4616c3",
+      "uploaded": "2019-07-21T21:49:41.726Z",
+      "downloadURL": "/api/download/key/584d",
+      "coverURL": "/cdn/584d/49c217e37a4325291fc0024845c2c442cb4616c3.jpg"
+    },
+    {
+      "metadata": {
+        "difficulties": {
+          "easy": false,
+          "expert": false,
+          "expertPlus": true,
+          "hard": false,
+          "normal": false
+        },
+        "characteristics": [
+          {
+            "difficulties": {
+              "easy": null,
+              "expert": null,
+              "expertPlus": {
+                "duration": 321.9666748046875,
+                "length": 96,
+                "njs": 19,
+                "njsOffset": 0,
+                "bombs": 4,
+                "notes": 783,
+                "obstacles": 20
+              },
+              "hard": null,
+              "normal": null
+            },
+            "name": "Standard"
+          }
+        ],
+        "levelAuthorName": "DE125",
+        "songAuthorName": "Crash-TM",
+        "songName": "Untan Goose",
+        "songSubName": "",
+        "bpm": 200
+      },
+      "stats": {
+        "downloads": 139,
+        "plays": 0,
+        "downVotes": 0,
+        "upVotes": 8,
+        "heat": 858.9654045,
+        "rating": 0.7419437476723167
+      },
+      "description": "SourPls SourPls SourPls SourPls SourPls SourPls SourPls SourPls SourPls SourPls SourPls SourPls SourPls SourPls SourPls SourPls SourPls SourPls SourPls SourPls SourPls SourPls SourPls SourPls SourPls SourPls SourPls SourPls SourPls SourPls SourPls SourPls SourPls SourPls SourPls SourPls SourPls SourPls SourPls SourPls ",
+      "deletedAt": null,
+      "_id": "5d34dd4419fc1b00062b7822",
+      "key": "584c",
+      "name": "Crash-TM - Untan Goose",
+      "uploader": {
+        "_id": "5cff0b7798cc5a672c8554ba",
+        "username": "de125"
+      },
+      "hash": "08e46d8c856dbeb617bd69115a8e4cb9a7c73baa",
+      "uploaded": "2019-07-21T21:46:44.154Z",
+      "downloadURL": "/api/download/key/584c",
+      "coverURL": "/cdn/584c/08e46d8c856dbeb617bd69115a8e4cb9a7c73baa.jpg"
+    }
+  ],
+  "totalDocs": 57,
+  "lastPage": 5,
+  "prevPage": 0,
+  "nextPage": 2
+}
