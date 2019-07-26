@@ -22,7 +22,7 @@ namespace FeedReader
     {
         private static FeedReaderLoggerBase _logger = new FeedReaderLogger(LoggingController.DefaultLogController);
         public static FeedReaderLoggerBase Logger { get { return _logger; } set { _logger = value; } }
-        private static string NameKey => "BeatSaverReader";
+        public static string NameKey => "BeatSaverReader";
         public string Name { get { return NameKey; } }
         public static readonly string SourceKey = "BeatSaver";
         public string Source { get { return SourceKey; } }

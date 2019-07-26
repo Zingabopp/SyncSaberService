@@ -17,7 +17,10 @@ using static SyncSaberLib.Utilities;
 using SyncSaberLib.Data;
 using SyncSaberLib.Web;
 using System.Reflection;
-using BeatSaber_PlayerDataReader;
+using BeatSaberDataProvider;
+using BeatSaberDataProvider.DataModels;
+using BeatSaberDataProvider.DataProviders;
+using FeedReader;
 
 namespace SyncSaberLib
 {
@@ -26,12 +29,12 @@ namespace SyncSaberLib
         public static SyncSaber Instance;
         public string CustomSongsPath;
         private static readonly string zipExtension = ".zip";
-        public static SongHashDataModel existingSongs;
+        public static SongHashDataProvider existingSongs;
 
         public static string VersionCheck()
         {
             string retStr = "";
-            var getPage = WebUtils.HttpClient.GetAsync("https://raw.githubusercontent.com/Zingabopp/SyncSaberService/master/Status");
+            var getPage = WebUtils.WebClient.GetAsync("https://raw.githubusercontent.com/Zingabopp/SyncSaberService/master/Status");
             getPage.Wait();
 
             if (getPage.Result.StatusCode != HttpStatusCode.OK)
@@ -81,7 +84,7 @@ namespace SyncSaberLib
         {
             Instance = this;
             VersionCheck();
-            existingSongs = new SongHashDataModel();
+            existingSongs = new SongHashDataProvider();
             existingSongs.Initialize();
             Logger.Info($"Found {existingSongs.Data.Count} songs cached by SongCore.");
             _historyPath = Path.Combine(OldConfig.BeatSaberPath, "UserData", "SyncSaberHistory.txt");
@@ -312,14 +315,16 @@ namespace SyncSaberLib
             IN_HISTORY = 2
         }
 
+        [Obsolete("This probably needs work")]
         public LocalSongStatus CheckLocalSong(SongInfo song, string songDirectory, bool checkSongHashFile = true)
         {
             bool songExists = false;
             if (checkSongHashFile)
             {
-                var existingSongs = SyncSaber.existingSongs.Data.Where((KeyValuePair<string, HashData> h) => h.Value.songHash.ToUpper() == song.hash);
+                songExists = SyncSaber.existingSongs.Data.TryGetValue(song.hash.ToUpper(), out SongHashData existingSong);
                 //bool songExists = existingSongs.Data.Values.Where(h => h.songHash.ToUpper() == song.hash).Count() > 0;
-                songExists = existingSongs.Any(s => Directory.Exists(s.Key));
+                if(songExists)
+                    songExists = Directory.Exists(existingSong.Directory);
             }
             if (!songExists)
             {
