@@ -1,3 +1,6 @@
 [submodule "SyncSaberLib/libs/BeatSaber-PlayerDataReader"]
 	path = SyncSaberLib/libs/BeatSaber-PlayerDataReader
 	url = https://github.com/Zingabopp/BeatSaber-PlayerDataReader.git
+[submodule "BeatSaberDataProvider"]
+	path = BeatSaberDataProvider
+	url = https://github.com/Zingabopp/BeatSaberDataProvider
