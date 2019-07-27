@@ -20,7 +20,7 @@ using System.Reflection;
 using BeatSaberDataProvider;
 using BeatSaberDataProvider.DataModels;
 using BeatSaberDataProvider.DataProviders;
-using FeedReader;
+using SongFeedReaders;
 
 namespace SyncSaberLib
 {

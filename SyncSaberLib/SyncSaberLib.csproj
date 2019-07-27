@@ -12,6 +12,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\BeatSaberDataProvider\SongFeedReaders\SongFeedReaders.csproj" />
+    <ProjectReference Include="..\..\BeatSaberDataProvider\WebUtilities\WebUtilities.csproj" />
     <ProjectReference Include="..\BeatSaberDataProvider\BeatSaberDataProvider\BeatSaberDataProvider.csproj" />
   </ItemGroup>
 

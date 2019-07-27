@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using FeedReader;
+using SongFeedReaders;
 
 namespace SyncSaberLib.Config
 {
