@@ -25,7 +25,38 @@ namespace SyncSaberLib
         private static readonly ConsoleColor DefaultFgColor = ConsoleColor.Gray;
         public static bool ShortenSourceName = false;
         public static bool ShowTime = true;
-        public static StreamWriter fileWriter = new StreamWriter("log.txt", false);
+        public static bool FileWriterEnabled = true;
+        public static StreamWriter fileWriter;
+        static Logger()
+        {
+            try
+            {
+                fileWriter = new StreamWriter("log.txt", false);
+                Logger.fileWriter.AutoFlush = true;
+            }
+            catch(Exception ex)
+            {
+                FileWriterEnabled = false;
+                Warning($"Unable to create or write to log file.\n{ex.Message}\n{ex.StackTrace}");
+            }
+            
+        }
+        public static void WriteToFile(string text)
+        {
+            if(FileWriterEnabled)
+            {
+                try
+                {
+                    fileWriter.Write(text + "\n");
+                    //fileWriter.Flush();
+                }
+                catch(Exception ex)
+                {
+                    FileWriterEnabled = false;
+                    Warning($"Unable to write to log file.\n{ex.Message}\n{ex.StackTrace}");
+                }
+            }
+        }
 
         private static void ResetForegroundColor()
         {
@@ -41,7 +72,6 @@ namespace SyncSaberLib
             {
                 return;
             }
-
             Console.ForegroundColor = ConsoleColor.Cyan;
             string sourcePart, timePart = "";
             if (!ShortenSourceName)
@@ -52,7 +82,7 @@ namespace SyncSaberLib
                 timePart = $" @ {DateTime.Now.ToString("HH:mm")}";
             string logText = $"{sourcePart}{timePart} - Trace] {text}";
             Console.WriteLine(logText);
-            fileWriter.Write(logText + "\n");
+            WriteToFile(logText);
             //Console.ForegroundColor = ConsoleColor.Cyan;
             //Console.WriteLine("[" + LoggerName + " @ " + DateTime.Now.ToString("HH:mm") + " - Trace] " + String.Format(format, args));
             ResetForegroundColor();
@@ -78,8 +108,7 @@ namespace SyncSaberLib
                 timePart = $" @ {DateTime.Now.ToString("HH:mm")}";
             string logText = $"{sourcePart}{timePart} - Debug] {text}";
             Console.WriteLine(logText);
-            fileWriter.Write(logText + "\n");
-            
+            WriteToFile(logText);
             //Console.ForegroundColor = ConsoleColor.Green;
             //Console.WriteLine("[" + LoggerName + " @ " + DateTime.Now.ToString("HH:mm") + " - Debug] " + String.Format(format, args));
             ResetForegroundColor();
@@ -90,11 +119,6 @@ namespace SyncSaberLib
             [CallerMemberName] string member = "",
             [CallerLineNumber] int line = 0)//params object[] args)
         {
-            if (LogLevel > LogLevel.Info)
-            {
-                return;
-            }
-
             Console.ForegroundColor = ConsoleColor.Gray;
             string sourcePart, timePart = "";
             if (!ShortenSourceName)
@@ -104,8 +128,12 @@ namespace SyncSaberLib
             if (ShowTime)
                 timePart = $" @ {DateTime.Now.ToString("HH:mm")}";
             string logText = $"{sourcePart}{timePart} - Info] {text}";
+            WriteToFile(logText);
+            if (LogLevel > LogLevel.Info)
+            {
+                return;
+            }
             Console.WriteLine(logText);
-            fileWriter.Write(logText + "\n");
             //Console.WriteLine("[" + LoggerName + " @ " + DateTime.Now.ToString("HH:mm") + " - Info] " + String.Format(format, args));
             //Console.WriteLine("{0}_{1}({2}): {3}", Path.GetFileName(file), member, line, format);
             ResetForegroundColor();
@@ -116,10 +144,7 @@ namespace SyncSaberLib
             [CallerMemberName] string member = "",
             [CallerLineNumber] int line = 0)//params object[] args)
         {
-            if (LogLevel > LogLevel.Warn)
-            {
-                return;
-            }
+            
 
             Console.ForegroundColor = ConsoleColor.Yellow;
             string sourcePart, timePart = "";
@@ -130,9 +155,12 @@ namespace SyncSaberLib
             if (ShowTime)
                 timePart = $" @ {DateTime.Now.ToString("HH:mm")}";
             string logText = $"{sourcePart}{timePart} - Warning] {text}";
+            WriteToFile(logText);
+            if (LogLevel > LogLevel.Warn)
+            {
+                return;
+            }
             Console.WriteLine(logText);
-            fileWriter.Write(logText + "\n");
-            fileWriter.Flush();
             //Console.ForegroundColor = ConsoleColor.Yellow;
             //Console.WriteLine("[" + LoggerName + " @ " + DateTime.Now.ToString("HH:mm") + " - Warning] " + String.Format(format, args));
             ResetForegroundColor();
@@ -153,9 +181,7 @@ namespace SyncSaberLib
                 timePart = $" @ {DateTime.Now.ToString("HH:mm")}";
             string logText = $"{sourcePart}{timePart} - Error] {text}";
             Console.WriteLine(logText);
-            fileWriter.Write(logText + "\n");
-            fileWriter.Flush();
-
+            WriteToFile(logText);
             //Console.WriteLine("[" + LoggerName + " @ " + DateTime.Now.ToString("HH:mm") + " - Error] " + String.Format(format, args));
             ResetForegroundColor();
         }
@@ -170,8 +196,7 @@ namespace SyncSaberLib
             //Console.WriteLine("[" + LoggerName + " @ " + DateTime.Now.ToString("HH:mm") + "] " + String.Format("{0}-{1}-{2}\n{3}", text, e.GetType().FullName, e.Message, e.StackTrace));
             string logText = $"[{Path.GetFileName(file)}_{member}({line}) @ {DateTime.Now.ToString("HH:mm")} - Exception] {text} - {e.GetType().FullName}-{e.Message}\n{e.StackTrace}";
             Console.WriteLine(logText);
-            fileWriter.Write(logText + "\n");
-            fileWriter.Flush();
+            WriteToFile(logText);
             ResetForegroundColor();
         }
 

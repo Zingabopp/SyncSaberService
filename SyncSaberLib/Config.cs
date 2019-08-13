@@ -576,8 +576,8 @@ namespace SyncSaberLib
             object setting = null;
             setting = BeatSaberPath;
             setting = BeastSaberUsername;
-            setting = OculusQuest;
-            setting = QuestSongsPath;
+            //setting = OculusQuest;
+            //setting = QuestSongsPath;
 
             setting = SyncCuratorRecommendedFeed;
             setting = SyncBookmarksFeed;

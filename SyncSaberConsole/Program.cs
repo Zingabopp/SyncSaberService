@@ -81,10 +81,9 @@ namespace SyncSaberConsole
 
         static void Main(string[] args)
         {
-            Logger.fileWriter.AutoFlush = true;
-            Logger.ShortenSourceName = true;
             try
             {
+                Logger.ShortenSourceName = true;
                 try
                 {
                     OldConfig.Initialize();
