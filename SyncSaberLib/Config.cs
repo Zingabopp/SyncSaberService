@@ -96,7 +96,7 @@ namespace SyncSaberLib
                 get
                 {
                     
-                    return CreateKeyData("BeatSaberPath", Path.Combine("C:", "Program Files (x86)", "Steam", "steamapps", "common", "Beat Saber");
+                    return CreateKeyData("BeatSaberPath", Path.Combine("C:", "Program Files (x86)", "Steam", "steamapps", "common", "Beat Saber"));
                 }
             }
             public static KeyData DownloadTimeout
