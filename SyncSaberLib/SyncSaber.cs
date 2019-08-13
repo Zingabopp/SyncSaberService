@@ -31,7 +31,7 @@ namespace SyncSaberLib
         public static string VersionCheck()
         {
             string retStr = "";
-            var getPage = WebUtils.HttpClient.GetAsync("https://raw.githubusercontent.com/Zingabopp/SyncSaberService/master/Status");
+            var getPage = WebUtils.HttpClient.GetAsync(new Uri("https://raw.githubusercontent.com/Zingabopp/SyncSaberService/master/Status"));
             getPage.Wait();
 
             if (getPage.Result.StatusCode != HttpStatusCode.OK)
@@ -40,27 +40,36 @@ namespace SyncSaberLib
                 Logger.Warning(retStr);
                 return retStr;
             }
-            var statusText = getPage.Result.Content.ReadAsStringAsync().Result.Split(
-                Environment.NewLine.ToCharArray(), StringSplitOptions.RemoveEmptyEntries).Select(l => l.Split(',')).ToDictionary(s => s[0], x => x[1]);
+            var pageText = getPage.Result.Content.ReadAsStringAsync().Result;
+            //var pageText = File.ReadAllText("status.txt");
+            var statusText = pageText.Split(Environment.NewLine.ToCharArray(), StringSplitOptions.RemoveEmptyEntries)
+                .Select(l => l.Split(','))
+                .ToDictionary(s => s[0], x => x.Skip(1).ToArray());
             var version = Assembly.GetExecutingAssembly().GetName().Version;
             var versionStr = string.Join(".", version.Major, version.Minor, version.Build);
             Console.WriteLine();
             if (statusText.ContainsKey(versionStr))
             {
-                var status = statusText[versionStr];
+                var status = statusText[versionStr].First();
                 switch (status)
                 {
                     case "Broken":
-                        string errorMsg = "This version of SyncSaberService is no longer functional.";
-                        if (statusText.Values.Any(s => s != "Broken"))
-                            errorMsg = errorMsg + " Please update to a newer version.";
+                        string errorMsg = "This version of SyncSaberService is no longer functional. ";
+                        if (statusText[versionStr].Count() > 1)
+                            errorMsg = errorMsg + statusText[versionStr][1];
+                        if (statusText.Values.Any(s => s.First() != "Broken"))
+                            errorMsg = errorMsg + "Please update to a newer version.";
                         throw new OutOfDateException(errorMsg);
                     case "Outdated":
-                        retStr = "This version of SyncSaberService is outdated, please update to a newer version.";
+                        retStr = "This version of SyncSaberService is outdated, please update to a newer version. ";
+                        if (statusText[versionStr].Count() > 1)
+                            retStr = retStr + statusText[versionStr][1];
                         Logger.Warning(retStr);
                         break;
                     case "Latest":
-                        retStr = "Running the latest version of SyncSaberService.";
+                        retStr = "Running the latest version of SyncSaberService. ";
+                        if (statusText[versionStr].Count() > 1)
+                            retStr = retStr + statusText[versionStr][1];
                         Logger.Info(retStr);
                         break;
                     default:
@@ -118,21 +127,21 @@ namespace SyncSaberLib
             };
         }
 
-        private void UpdatePlaylist(Playlist playlist, string songHash, string songIndex, string songName)
-        {
-            if (playlist == null)
-            {
-                Logger.Warning($"playlist is null in UpdatePlaylist for song {songIndex} - {songName}");
-                return;
-            }
-            bool songAlreadyInPlaylist = playlist.Songs.Exists(s => s.hash.ToUpper() == songHash.ToUpper());
+        //private void UpdatePlaylist(Playlist playlist, string songHash, string songIndex, string songName)
+        //{
+        //    if (playlist == null)
+        //    {
+        //        Logger.Warning($"playlist is null in UpdatePlaylist for song {songIndex} - {songName}");
+        //        return;
+        //    }
+        //    bool songAlreadyInPlaylist = playlist.Songs.Exists(s => s.hash.ToUpper() == songHash.ToUpper());
 
-            if (!songAlreadyInPlaylist)
-            {
-                playlist.TryAdd(songHash, songIndex, songName);
-                Logger.Info($"Success adding new song \"{songName}\" with BeatSaver index {songIndex} to playlist {playlist.Title}!");
-            }
-        }
+        //    if (!songAlreadyInPlaylist)
+        //    {
+        //        playlist.TryAdd(songHash, songIndex, songName);
+        //        Logger.Info($"Success adding new song \"{songName}\" with BeatSaver index {songIndex} to playlist {playlist.Title}!");
+        //    }
+        //}
 
         [Obsolete("Does not work anymore, returns immediately")]
         private void RemoveOldVersions(string songIndex)
