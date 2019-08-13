@@ -61,7 +61,8 @@ namespace SyncSaberLib.Web
         {
             _tokenSource = new CancellationTokenSource();
             _song = song;
-            TempPath = $"temp\\temp-{Song.key}"; // Folder the zip file is extracted to.
+            
+            TempPath = Path.Combine("temp", $"temp-{Song.key}"); // Folder the zip file is extracted to.
             _localZip = new FileInfo(downloadPath);
             SongDirectory = new DirectoryInfo(songDirectory);
             if (!_localZip.Directory.Exists)

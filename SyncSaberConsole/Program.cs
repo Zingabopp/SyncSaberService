@@ -39,7 +39,7 @@ namespace SyncSaberConsole
             var song = ScrapedDataProvider.Songs.Values.Where(s => s.ScoreSaberInfo.Any(d => d.Value.uid == 155732)).FirstOrDefault();
 
             var found = ScrapedDataProvider.TryGetSongByKey("3f57", out SongInfo badSong, false);
-            var CustomSongsPath = Path.Combine(OldConfig.BeatSaberPath, @"Beat Saber_Data\CustomLevels"); 
+            var CustomSongsPath = Path.Combine(OldConfig.BeatSaberPath, "Beat Saber_Data", "CustomLevels");
             var tempFolder = new DirectoryInfo(Path.Combine(Path.GetTempPath(), badSong.key + ".zip"));
             var outputFolder = new DirectoryInfo(Path.Combine(CustomSongsPath, $"{badSong.key} ({Utilities.MakeSafeFilename(badSong.songName)} - {Utilities.MakeSafeFilename(badSong.authorName)})"));
             var job = new DownloadJob(badSong, tempFolder.FullName, outputFolder.FullName);
@@ -71,11 +71,11 @@ namespace SyncSaberConsole
             {
                 Console.WriteLine($"{item.Key}: {string.Join("|", item.Value)}");
             }
-            
+
             var trending = ScrapedDataProvider.Songs.Values.Where(s => s.ScoreSaberInfo.Count > 0).OrderByDescending(s => s.ScoreSaberInfo.Values.Select(ss => ss.scores).Aggregate((a, b) => a + b)).Take(100);
             var detTrending = trending.Select(s => (s.ScoreSaberInfo.Values.Select(ss => ss.scores).Aggregate((a, b) => a + b), s)).ToList();
 
-                 
+
         }
 
 
@@ -100,7 +100,7 @@ namespace SyncSaberConsole
                 ScrapedDataProvider.Initialize();
                 Logger.Info($"Scrapes loaded, {ScrapedDataProvider.BeatSaverSongs.Data.Count} BeatSaverSongs and {ScrapedDataProvider.ScoreSaberSongs.Data.Count} ScoreSaber difficulties loaded");
                 //DoFullScrape();
-               
+
                 //Tests();
                 try
                 {
@@ -141,11 +141,12 @@ namespace SyncSaberConsole
                         Logger.Info($"Downloading songs from FavoriteMappers.ini...");
                         try
                         {
-                            ss.DownloadSongsFromFeed(BeatSaverReader.NameKey, new BeatSaverFeedSettings(0) {
+                            ss.DownloadSongsFromFeed(BeatSaverReader.NameKey, new BeatSaverFeedSettings(0)
+                            {
                                 Authors = OldConfig.FavoriteMappers.ToArray()
                             });
                         }
-                        catch(AggregateException ae)
+                        catch (AggregateException ae)
                         {
                             ae.WriteExceptions($"Exceptions downloading songs from FavoriteMappers.ini.");
                         }
@@ -156,8 +157,8 @@ namespace SyncSaberConsole
                     }
                     else
                     {
-                        if(OldConfig.SyncFavoriteMappersFeed)
-                            Logger.Warning($"Skipping FavoriteMappers.ini feed, no authors found in {OldConfig.BeatSaberPath + @"\UserData\FavoriteMappers.ini"}");
+                        if (OldConfig.SyncFavoriteMappersFeed)
+                            Logger.Warning($"Skipping FavoriteMappers.ini feed, no authors found in {Path.Combine(OldConfig.BeatSaberPath, "UserData", "FavoriteMappers.ini")}");
                     }
 
                     if (OldConfig.SyncFollowingsFeed)
@@ -168,7 +169,8 @@ namespace SyncSaberConsole
                         try
                         {
                             //ss.DownloadBeastSaberFeed(0, Web.BeastSaberReader.GetMaxBeastSaberPages(0));
-                            ss.DownloadSongsFromFeed(BeastSaberReader.NameKey, new BeastSaberFeedSettings(0) {
+                            ss.DownloadSongsFromFeed(BeastSaberReader.NameKey, new BeastSaberFeedSettings(0)
+                            {
                                 MaxPages = OldConfig.MaxFollowingsPages
                             });
                         }
@@ -189,7 +191,8 @@ namespace SyncSaberConsole
                         try
                         {
                             //ss.DownloadBeastSaberFeed(1, Web.BeastSaberReader.GetMaxBeastSaberPages(1));
-                            ss.DownloadSongsFromFeed(BeastSaberReader.NameKey, new BeastSaberFeedSettings(1) {
+                            ss.DownloadSongsFromFeed(BeastSaberReader.NameKey, new BeastSaberFeedSettings(1)
+                            {
                                 MaxPages = OldConfig.MaxBookmarksPages
                             });
                         }
@@ -210,7 +213,8 @@ namespace SyncSaberConsole
                         try
                         {
                             //ss.DownloadBeastSaberFeed(2, Web.BeastSaberReader.GetMaxBeastSaberPages(2));
-                            ss.DownloadSongsFromFeed(BeastSaberReader.NameKey, new BeastSaberFeedSettings(2) {
+                            ss.DownloadSongsFromFeed(BeastSaberReader.NameKey, new BeastSaberFeedSettings(2)
+                            {
                                 MaxPages = OldConfig.MaxCuratorRecommendedPages
                             });
                         }
@@ -232,7 +236,8 @@ namespace SyncSaberConsole
                         try
                         {
                             //ss.DownloadBeastSaberFeed(2, Web.BeastSaberReader.GetMaxBeastSaberPages(2));
-                            ss.DownloadSongsFromFeed(ScoreSaberReader.NameKey, new ScoreSaberFeedSettings((int) ScoreSaberFeeds.TOP_RANKED) {
+                            ss.DownloadSongsFromFeed(ScoreSaberReader.NameKey, new ScoreSaberFeedSettings((int)ScoreSaberFeeds.TOP_RANKED)
+                            {
                                 MaxSongs = 1000,//Config.MaxScoreSaberSongs,
                                 SongsPerPage = 10,
                                 searchOnline = true
@@ -266,7 +271,7 @@ namespace SyncSaberConsole
                     sw.Stop();
                     var processingTime = new TimeSpan(sw.ElapsedTicks);
                     Console.WriteLine();
-                    Logger.Info($"Finished downloading songs in {(int) processingTime.TotalMinutes} min {processingTime.Seconds} sec");
+                    Logger.Info($"Finished downloading songs in {(int)processingTime.TotalMinutes} min {processingTime.Seconds} sec");
                 }
                 else
                 {
@@ -278,7 +283,7 @@ namespace SyncSaberConsole
                 ScrapedDataProvider.BeatSaverSongs.WriteFile();
                 ScrapedDataProvider.ScoreSaberSongs.WriteFile();
             }
-            catch(OutOfDateException ex)
+            catch (OutOfDateException ex)
             {
                 Logger.Error(ex.Message);
             }

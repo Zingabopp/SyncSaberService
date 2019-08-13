@@ -101,7 +101,7 @@ namespace SyncSaberLib
                 File.Create(_historyPath);
             if (Directory.Exists(OldConfig.BeatSaberPath))
             {
-                CustomSongsPath = Path.Combine(OldConfig.BeatSaberPath, @"Beat Saber_Data\CustomLevels");
+                CustomSongsPath = Path.Combine(OldConfig.BeatSaberPath, Path.Combine("Beat Saber_Data","CustomLevels"));
                 if (!Directory.Exists(CustomSongsPath))
                 {
                     Directory.CreateDirectory(CustomSongsPath);

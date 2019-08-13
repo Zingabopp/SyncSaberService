@@ -95,7 +95,8 @@ namespace SyncSaberLib
             {
                 get
                 {
-                    return CreateKeyData("BeatSaberPath", @"C:\Program Files (x86)\Steam\steamapps\common\Beat Saber");
+                    
+                    return CreateKeyData("BeatSaberPath", Path.Combine("C:", "Program Files (x86)", "Steam", "steamapps", "common", "Beat Saber");
                 }
             }
             public static KeyData DownloadTimeout
@@ -627,31 +628,33 @@ namespace SyncSaberLib
             return level;
         }
 
-
-        private const string STEAM_REG_KEY = @"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Steam App 620980";
-        private const string OCULUS_REG_KEY = @"SOFTWARE\WOW6432Node\Oculus VR, LLC\Oculus\Config";
+        // Using Path.Combine makes it safe for regions that don't use '\' as a directory separator?
+        private static readonly string STEAM_REG_KEY = Path.Combine("SOFTWARE", "Microsoft", "Windows", "CurrentVersion", "Uninstall", "Steam App 620980");
+        //private const string STEAM_REG_KEY = @"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Steam App 620980";
+        private static readonly string OCULUS_REG_KEY = Path.Combine("SOFTWARE", "WOW6432Node", "Oculus VR, LLC", "Oculus", "Config");
+        //private const string OCULUS_REG_KEY = @"SOFTWARE\WOW6432Node\Oculus VR, LLC\Oculus\Config";
         public static string GetBeatSaberPathFromRegistry()
         {
             bool isSteam = false;
-
-            RegistryKey steamKey = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry64); // Doesn't work in 32 bit mode without this
-            steamKey = steamKey?.OpenSubKey(STEAM_REG_KEY);
-            string path = (string)steamKey?.GetValue("InstallLocation", string.Empty);
-            if (string.IsNullOrEmpty(path))
+            string path;
+            using (RegistryKey hklm = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry64))// Doesn't work in 32 bit mode without this
             {
-                RegistryKey oculusKey = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry64);
-                oculusKey = oculusKey?.OpenSubKey(OCULUS_REG_KEY);
-                path = (string)oculusKey?.GetValue("InitialAppLibrary", string.Empty);
-                if (!string.IsNullOrEmpty(path))
+                using (var steamKey = hklm?.OpenSubKey(STEAM_REG_KEY))
+                    path = (string)steamKey?.GetValue("InstallLocation", string.Empty);
+                if (string.IsNullOrEmpty(path))
                 {
-                    path = Path.Combine(path, @"Software\hyperbolic-magnetism-beat-saber");
+                    using (var oculusKey = hklm?.OpenSubKey(OCULUS_REG_KEY))
+                        path = (string)oculusKey?.GetValue("InitialAppLibrary", string.Empty);
+                    if (!string.IsNullOrEmpty(path))
+                    {
+                        path = Path.Combine(path, "Software", "hyperbolic-magnetism-beat-saber");
+                    }
+                }
+                else
+                {
+                    isSteam = true;
                 }
             }
-            else
-            {
-                isSteam = true;
-            }
-
             if (IsBeatSaberDirectory(path))
             {
                 Logger.Info($"Found {(isSteam ? "Steam" : "Oculus")} installation of Beat Saber at {path}");

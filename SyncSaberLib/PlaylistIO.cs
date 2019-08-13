@@ -17,7 +17,7 @@ namespace SyncSaberLib
         {
             try
             {
-                string filePath = OldConfig.BeatSaberPath + "\\Playlists\\" + playlist.fileName + (playlist.oldFormat ? ".json" : ".bplist");
+                string filePath = Path.Combine(OldConfig.BeatSaberPath, "Playlists", playlist.fileName + (playlist.oldFormat ? ".json" : ".bplist"));
                 //var playListJson = JObject.Parse(File.ReadAllText(filePath));
                 JsonConvert.PopulateObject(File.ReadAllText(filePath), playlist);
                 playlist.fileLoc = null;
@@ -39,7 +39,7 @@ namespace SyncSaberLib
                 Directory.CreateDirectory(Path.Combine(OldConfig.BeatSaberPath, "Playlists"));
             }
             var jsonString = JsonConvert.SerializeObject(playlist);
-            File.WriteAllText(OldConfig.BeatSaberPath + "\\Playlists\\" + playlist.fileName + (playlist.oldFormat ? ".json" : ".bplist"), jsonString);
+            File.WriteAllText(Path.Combine(OldConfig.BeatSaberPath, "Playlists", playlist.fileName + (playlist.oldFormat ? ".json" : ".bplist")), jsonString);
         }
     }
 }
