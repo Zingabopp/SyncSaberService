@@ -84,6 +84,8 @@ namespace SyncSaberLib
             existingSongs = new SongHashDataModel();
             existingSongs.Initialize();
             Logger.Info($"Found {existingSongs.Data.Count} songs cached by SongCore.");
+            if (!Directory.Exists(OldConfig.BeatSaberPath))
+                throw new ApplicationException($"Beat Saber directory {OldConfig.BeatSaberPath} doesn't exist, check your settings.");
             _historyPath = Path.Combine(OldConfig.BeatSaberPath, "UserData", "SyncSaberHistory.txt");
             if (File.Exists(_historyPath + ".bak"))
             {
@@ -98,14 +100,15 @@ namespace SyncSaberLib
                 _songDownloadHistory = File.ReadAllLines(_historyPath).ToList();
             }
             else
-                File.Create(_historyPath);
-            if (Directory.Exists(OldConfig.BeatSaberPath))
             {
-                CustomSongsPath = Path.Combine(OldConfig.BeatSaberPath, Path.Combine("Beat Saber_Data","CustomLevels"));
-                if (!Directory.Exists(CustomSongsPath))
-                {
-                    Directory.CreateDirectory(CustomSongsPath);
-                }
+                Directory.GetParent(_historyPath).Create();
+                using (var file = File.Create(_historyPath))
+                { }
+            }
+            CustomSongsPath = Path.Combine(OldConfig.BeatSaberPath, Path.Combine("Beat Saber_Data", "CustomLevels"));
+            if (!Directory.Exists(CustomSongsPath))
+            {
+                Directory.CreateDirectory(CustomSongsPath);
             }
 
             FeedReaders = new Dictionary<string, IFeedReader> {
@@ -229,7 +232,7 @@ namespace SyncSaberLib
             {
                 Logger.Info($"Last ScoreSaber scrape was at {lastSSScrape.ToString()}, skipping.");
             }
-            
+
         }
 
         public void DownloadSongsFromFeed(string feedType, IFeedSettings _settings)
@@ -402,7 +405,7 @@ namespace SyncSaberLib
                 //    //Logger.Debug($"Skipping song - SongExists: {songExists}, SongInHistory: {songInHistory}");
                 //    continue; // We already have the song or don't want it, skip
                 //}
-                
+
             }
             jobs.RunJobs().Wait();
             return matchedSongs;
