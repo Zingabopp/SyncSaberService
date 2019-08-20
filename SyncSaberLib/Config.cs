@@ -74,7 +74,7 @@ namespace SyncSaberLib
             {
                 get
                 {
-                    return CreateKeyData("MaxCuratorRecommendedPages", "0");
+                    return CreateKeyData("MaxCuratorRecommendedPages", "5");
                 }
             }
             public static KeyData MaxFollowingsPages
