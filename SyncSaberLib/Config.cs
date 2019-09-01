@@ -53,7 +53,7 @@ namespace SyncSaberLib
             {
                 get
                 {
-                    return CreateKeyData("SyncCuratorRecommendedFeed", "1");
+                    return CreateKeyData("SyncCuratorRecommendedFeed", "0");
                 }
             }
             public static KeyData SyncFollowingsFeed
@@ -74,7 +74,7 @@ namespace SyncSaberLib
             {
                 get
                 {
-                    return CreateKeyData("MaxCuratorRecommendedPages", "0");
+                    return CreateKeyData("MaxCuratorRecommendedPages", "5");
                 }
             }
             public static KeyData MaxFollowingsPages

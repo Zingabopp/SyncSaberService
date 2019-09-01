@@ -99,7 +99,8 @@ namespace SyncSaberConsole
                 ScrapedDataProvider.Initialize();
                 Logger.Info($"Scrapes loaded, {ScrapedDataProvider.BeatSaverSongs.Data.Count} BeatSaverSongs and {ScrapedDataProvider.ScoreSaberSongs.Data.Count} ScoreSaber difficulties loaded");
                 //DoFullScrape();
-
+                //var scoreSaberSongs = ScrapedDataProvider.ScoreSaberSongs.Data.Select(ss => ss.hash).Distinct().Count();
+                //var activeSongs = ScrapedDataProvider.Songs.Values.Where(s => s.ScoreSaberInfo?.Values.Count > 0).Count();
                 //Tests();
                 try
                 {
