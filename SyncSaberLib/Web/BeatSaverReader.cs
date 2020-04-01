@@ -596,7 +596,7 @@ namespace SyncSaberLib.Web
         public static SongInfo GetSongByHash(string hash)
         {
 
-            string url = BEATSAVER_GETBYHASH_BASE_URL + hash;
+            string url = BEATSAVER_GETBYHASH_BASE_URL + hash.ToLowerInvariant();
             string pageText = "";
             BeatSaverSong song;
             try

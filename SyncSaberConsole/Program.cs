@@ -12,6 +12,7 @@ using SyncSaberLib.Web;
 using SyncSaberLib.Data;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using System.Reflection;
 
 namespace SyncSaberConsole
 {
@@ -131,6 +132,8 @@ namespace SyncSaberConsole
                 if (!OldConfig.CriticalError)
                 {
                     WebUtils.Initialize(OldConfig.MaxConcurrentPageChecks);
+                    string version = Assembly.GetExecutingAssembly().GetName().Version.ToString();
+                    WebUtils.HttpClient.DefaultRequestHeaders.UserAgent.ParseAdd($"SyncSaberServer/{version}");
                     Stopwatch sw = new Stopwatch();
                     sw.Start();
                     SyncSaber ss = new SyncSaber();

@@ -12,13 +12,15 @@ using System.Net.Http;
 using System.Diagnostics;
 using static SyncSaberLib.Utilities;
 using SyncSaberLib.Data;
+using System.Globalization;
 
 namespace SyncSaberLib.Web
 {
     public class DownloadJob
     {
         public const string NOTFOUNDERROR = "The remote server returned an error: (404) Not Found.";
-        public const string BEATSAVER_DOWNLOAD_URL_BASE = "https://beatsaver.com/api/download/key/";
+        public const string BEATSAVER_KEY_DOWNLOAD_URL_BASE = "https://beatsaver.com/api/download/key/";
+        public const string BEATSAVER_HASH_DOWNLOAD_URL_BASE = "https://beatsaver.com/api/download/hash/";
         private const string TIMEOUTERROR = "The request was aborted: The request was canceled.";
 
         public enum JobResult
@@ -61,7 +63,7 @@ namespace SyncSaberLib.Web
         {
             _tokenSource = new CancellationTokenSource();
             _song = song;
-            
+
             TempPath = Path.Combine("temp", $"temp-{Song.key}"); // Folder the zip file is extracted to.
             _localZip = new FileInfo(downloadPath);
             SongDirectory = new DirectoryInfo(songDirectory);
@@ -74,12 +76,13 @@ namespace SyncSaberLib.Web
         {
             //JobResult result = JobResult.SUCCESS;
             bool successful = true;
-            Task<bool> dwnl = DownloadFile(BEATSAVER_DOWNLOAD_URL_BASE + Song.key, _localZip.FullName);
+            Task<bool> dwnl = DownloadByHash(Song.hash.ToLowerInvariant(), _localZip.FullName);
             //Task<bool> dwnl = DownloadFile("http://releases.ubuntu.com/18.04.2/ubuntu-18.04.2-desktop-amd64.iso", "test.iso");
             try
             {
                 successful = await dwnl.ConfigureAwait(false);
-            }catch(AggregateException ae)
+            }
+            catch (AggregateException ae)
             {
                 ae.WriteExceptions($"Error downloading song {_song.key} {_song.songName} by {_song.authorName}.\n");
                 successful = false;
@@ -97,7 +100,7 @@ namespace SyncSaberLib.Web
                     ae.WriteExceptions($"Error extracting zip {_localZip.FullName} to {TempPath}, with the files to be moved to {SongDirectory.FullName}.\n");
                     successful = false;
                 }
- 
+
                 if (successful)
                 {
                     Logger.Debug($"Extracted {Song.key}-{Song.songName} by {Song.authorName} successfully");
@@ -124,6 +127,10 @@ namespace SyncSaberLib.Web
         private CancellationTokenSource _tokenSource;
 
 
+        public Task<bool> DownloadByHash(string hash, string path) => DownloadFile(BEATSAVER_HASH_DOWNLOAD_URL_BASE + hash, path);
+
+        public Task<bool> DownloadByKey(string key, string path) => DownloadFile(BEATSAVER_KEY_DOWNLOAD_URL_BASE + key, path);
+
         public async Task<bool> DownloadFile(string url, string path)
         {
             bool successful = true;
@@ -139,7 +146,7 @@ namespace SyncSaberLib.Web
                 await downloadAsync.ConfigureAwait(false);
             }
             catch (Exception) { }
-            
+
             if (downloadAsync.IsFaulted || !File.Exists(path))
             {
                 successful = false;
@@ -209,7 +216,8 @@ namespace SyncSaberLib.Web
                     }
 
                     Logger.Trace($"Extracting files from {zipPath} to {tempDir.FullName}");
-                    await Task.Run(() => {
+                    await Task.Run(() =>
+                    {
                         var time = Stopwatch.StartNew();
                         bool waitTimeout = false;
                         while (IsFileLocked(zipPath) && !waitTimeout)
@@ -252,7 +260,7 @@ namespace SyncSaberLib.Web
                         }
                         Logger.Trace($"Moving files from {tempDir.FullName} to {extractDir.FullName}");
 
-                        
+
                         Utilities.MoveFilesRecursively(tempDir, extractDir);
                     }
                 }
@@ -266,7 +274,7 @@ namespace SyncSaberLib.Web
             return extracted;
         }
 
-        
+
     }
 
     public static class ZipArchiveExtensions
