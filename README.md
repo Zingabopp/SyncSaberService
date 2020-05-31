@@ -1,3 +1,6 @@
+# Replacement in beta:
+[BeatSyncConsole](https://github.com/Zingabopp/BeatSync/releases) is replacing SyncSaberService, and it's finally usable. 
+
 # SyncSaberService
 Automatically downloads Beat Saber maps
 
