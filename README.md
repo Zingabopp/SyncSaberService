@@ -1,4 +1,4 @@
-# Replacement in beta:
+# Replacement Released:
 [BeatSyncConsole](https://github.com/Zingabopp/BeatSync/releases) is replacing SyncSaberService, and it's finally usable. 
 
 # SyncSaberService
